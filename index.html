@@ -218,6 +218,22 @@
   .kit .when { font-size: .85rem; font-weight: 600; color: var(--emerald-deep); background: var(--mint-2); border: 1px solid var(--mint); padding: 6px 10px; border-radius: 999px; white-space: nowrap; }
   @media (max-width: 520px) { .kit { grid-template-columns: 44px 1fr; } .kit .when { grid-column: 2; justify-self: start; } }
 
+  /* services */
+  .services { background: var(--paper-2); border-top: 1px solid var(--line); }
+  .lines { display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(20px, 3vw, 40px); border-top: 1px solid var(--ink); padding-top: 26px; }
+  @media (max-width: 960px) { .lines { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px) { .lines { grid-template-columns: 1fr; } }
+  .line-col h3 { font-size: 1.35rem; letter-spacing: -0.02em; display: flex; align-items: center; gap: 10px; }
+  .line-col h3::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--emerald); flex: none; }
+  .line-col > p { color: var(--ink-2); margin-top: 8px; font-size: .98rem; min-height: 3.6em; }
+  .line-col ul { list-style: none; margin-top: 18px; border-top: 1px solid var(--line); }
+  .line-col li { padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .line-col li strong { display: block; font-weight: 600; }
+  .line-col li span { color: var(--ink-3); font-size: .93rem; }
+  .services .foot { margin-top: 30px; display: flex; gap: 18px; align-items: center; flex-wrap: wrap; justify-content: space-between; }
+  .services .foot p { color: var(--ink-2); max-width: 40em; }
+  .services .foot p strong { color: var(--ink); font-weight: 600; }
+
   /* video */
   .video-card { display: grid; grid-template-columns: 1.2fr .8fr; gap: 0; background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
   @media (max-width: 860px) { .video-card { grid-template-columns: 1fr; } }
@@ -280,6 +296,7 @@
     <ul class="nav-links">
       <li><a href="#fix">What I fix</a></li>
       <li><a href="#how">How it works</a></li>
+      <li><a href="#services">Services</a></li>
       <li><a href="#free">Free kits</a></li>
       <li><a href="#video">Videos</a></li>
       <li><a href="about.html">Who I am</a></li>
@@ -402,6 +419,60 @@
       <div class="num"><b data-count="10">0</b><span>minutes of recorded, specific advice you keep</span></div>
       <div class="num"><b data-count="3">0</b><span>build kits released free, from real fixes</span></div>
       <div class="num"><b data-count="0" data-prefix="$">0</b><span>cost to find out what's leaking</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="services" id="services">
+  <div class="wrap">
+    <div class="section-head" data-reveal>
+      <h2>Once the leak is found, here is what I build.</h2>
+      <p class="lede">Every job is quoted from the free check, at a fixed price, with a number we agree on up front. If the number can't be shown at 30 days, you don't pay.</p>
+    </div>
+    <div class="lines" data-reveal>
+      <div class="line-col">
+        <h3>Fix</h3>
+        <p>Stop the leak that's costing you leads this week.</p>
+        <ul>
+          <li><strong>Quick Install</strong><span>One kit, installed and tracked. Quote form, missed-call text-back, or the review system.</span></li>
+          <li><strong>Leak Fix</strong><span>All three kits plus the path from visitor to phone call, fixed end to end.</span></li>
+          <li><strong>Local Engine</strong><span>Google listing, reviews, service pages, and monthly rank tracking.</span></li>
+        </ul>
+      </div>
+      <div class="line-col">
+        <h3>Build</h3>
+        <p>Websites, landing pages, and the tools that run your week.</p>
+        <ul>
+          <li><strong>Landing Page</strong><span>One page for one service, built to turn a visitor into a call. Same build as this site.</span></li>
+          <li><strong>Website Rebuild</strong><span>Five to eight pages, fast on a phone, tracking live from day one.</span></li>
+          <li><strong>Automation Sprint</strong><span>One workflow off your plate in a week: quotes, reminders, invoices, the FAQ replies.</span></li>
+          <li><strong>Custom Build</strong><span>An internal app or a multi-step automation, scoped and fixed-priced.</span></li>
+        </ul>
+      </div>
+      <div class="line-col">
+        <h3>Market</h3>
+        <p>More of the right people reaching the thing we fixed.</p>
+        <ul>
+          <li><strong>Marketing Audit</strong><span>The written version of the free check, with a fix list ranked by return.</span></li>
+          <li><strong>Content Engine</strong><span>One recorded piece a month turned into clips and posts for your channels.</span></li>
+          <li><strong>Ad Creative Pack</strong><span>Four short spots a month from your own footage. You or your agency run the ads.</span></li>
+        </ul>
+      </div>
+      <div class="line-col">
+        <h3>Run</h3>
+        <p>Keep it working after I leave.</p>
+        <ul>
+          <li><strong>Front Desk Training</strong><span>Two hours with you or your office manager, on your own accounts. Cheat sheet included.</span></li>
+          <li><strong>Site Care</strong><span>Hosting, updates, and a couple of hours of edits a month.</span></li>
+          <li><strong>Ops Retainer</strong><span>The automations keep running, one improvement a month, a one-page report.</span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot" data-reveal>
+      <p><strong>Two project clients and three light retainers at a time.</strong> I'm a full-time student, so that's the real limit. I don't run ad budgets and I don't promise rankings or lead counts.</p>
+      <a class="btn" href="https://tally.so/r/81BBNk">Start with the free check
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
     </div>
   </div>
 </section>
