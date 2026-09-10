@@ -124,9 +124,13 @@
   .portrait .tag {
     position: absolute; z-index: 3; left: 4%; bottom: 10%;
     background: var(--paper-2); border: 1px solid var(--line); border-radius: 999px;
-    padding: 9px 14px 9px 10px; font-size: .9rem; font-weight: 600; display: flex; gap: 8px; align-items: center;
-    box-shadow: 0 10px 30px -14px rgb(11 18 32 / .35);
+    padding: 9px 16px 9px 12px; font-size: .9rem; display: flex; gap: 10px; align-items: center; text-decoration: none; color: var(--ink);
+    box-shadow: 0 10px 30px -14px rgb(11 18 32 / .35); transition: border-color .15s, transform .15s ease-out;
   }
+  .portrait .tag:hover { border-color: var(--ink); transform: translateY(-2px); }
+  .portrait .tag .tag-text { display: flex; flex-direction: column; line-height: 1.2; }
+  .portrait .tag strong { font-weight: 700; }
+  .portrait .tag small { font-size: .78rem; color: var(--ink-3); font-weight: 500; }
   .portrait .tag .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--emerald); box-shadow: 0 0 0 4px rgb(16 185 129 / .22); }
   @media (max-width: 860px) {
     .hero .wrap { grid-template-columns: 1fr; }
@@ -278,6 +282,7 @@
       <li><a href="#how">How it works</a></li>
       <li><a href="#free">Free kits</a></li>
       <li><a href="#video">Videos</a></li>
+      <li><a href="about.html">Who I am</a></li>
       <li class="cta-li"><a class="btn" href="https://tally.so/r/81BBNk">Get a free check</a></li>
     </ul>
   </div>
@@ -301,7 +306,7 @@
       <div class="blob" aria-hidden="true"></div>
       <div class="blob-2" aria-hidden="true"></div>
       <img src="assets/headshot-800.webp" srcset="assets/headshot-480.webp 480w, assets/headshot-800.webp 800w, assets/headshot-1200.webp 1200w" sizes="(max-width: 860px) 380px, 460px" width="800" height="800" alt="Clayton Trevino" fetchpriority="high">
-      <div class="tag"><span class="dot" aria-hidden="true"></span>Clayton Trevino</div>
+      <a class="tag" href="about.html"><span class="dot" aria-hidden="true"></span><span class="tag-text"><strong>Clayton Trevino</strong><small>SMU Cox School of Business</small></span></a>
     </div>
   </div>
 </section>
@@ -485,6 +490,7 @@
   <div class="wrap">
     <div>Clashworks, Clayton Trevino. Dallas, Texas.</div>
     <ul>
+      <li><a href="about.html">Who I am</a></li>
       <li><a href="https://www.youtube.com/@clashworkshq">YouTube</a></li>
       <li><a href="https://www.tiktok.com/@clashworkshq">TikTok</a></li>
       <li><a href="https://www.instagram.com/clashworkshq">Instagram</a></li>

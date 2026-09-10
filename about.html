@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Who I am. Clayton Trevino, Clashworks</title>
+<meta name="description" content="Clayton Trevino is a Finance and Real Estate major at SMU's Cox School of Business who fixes real business problems with AI and documents every fix in public. Not a developer. Numbers every time.">
+<meta name="theme-color" content="#F5F7FA">
+<meta property="og:title" content="Who I am. Clayton Trevino, Clashworks">
+<meta property="og:description" content="Not a developer. Fixing real businesses with AI anyway, and showing the numbers.">
+<meta property="og:image" content="assets/headshot-mint-512.webp">
+<link rel="canonical" href="https://clashworks.co/about.html">
+<link rel="icon" href="assets/favicon-64.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100,500..900&family=Hanken+Grotesk:wght@400..700&display=swap" rel="stylesheet">
+<link rel="preload" as="image" href="assets/headshot-800.webp" imagesrcset="assets/headshot-480.webp 480w, assets/headshot-800.webp 800w, assets/headshot-1200.webp 1200w" imagesizes="(max-width: 860px) 320px, 400px" fetchpriority="high">
+<style>
+  :root {
+    --ink: #0B1220;
+    --ink-2: #3B4453;
+    --ink-3: #6B7280;
+    --paper: #F5F7FA;
+    --paper-2: #FFFFFF;
+    --line: #E3E8EF;
+    --emerald: #10B981;
+    --emerald-deep: #047857;
+    --mint: #D1FAE5;
+    --mint-2: #ECFDF5;
+    --radius: 14px;
+    --max: 1360px;
+    --font: "Hanken Grotesk", "Segoe UI", system-ui, sans-serif;
+    --display: "Archivo", "Hanken Grotesk", "Segoe UI", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+  body { font-family: var(--font); color: var(--ink); background: var(--paper); line-height: 1.5; font-size: 17px; overflow-x: hidden; }
+  img { max-width: 100%; display: block; }
+  a { color: inherit; }
+  :focus-visible { outline: 2px solid var(--emerald-deep); outline-offset: 3px; border-radius: 6px; }
+  .skip { position: absolute; left: -999px; top: 8px; background: var(--ink); color: #fff; padding: 8px 12px; z-index: 100; }
+  .skip:focus { left: 8px; }
+
+  .wrap { width: min(var(--max), calc(100% - clamp(32px, 5vw, 72px))); margin-inline: auto; }
+  h1, h2, h3 { font-family: var(--display); font-weight: 700; letter-spacing: -0.02em; line-height: 1.05; }
+  h1 { font-size: clamp(2.4rem, 1.4rem + 4.2vw, 5rem); font-weight: 800; letter-spacing: -0.035em; }
+  h2 { font-size: clamp(1.9rem, 1.3rem + 2.4vw, 3.2rem); letter-spacing: -0.025em; }
+  h3 { font-size: 1.2rem; line-height: 1.25; }
+  p.lede { font-size: clamp(1.05rem, 0.95rem + 0.5vw, 1.3rem); color: var(--ink-2); max-width: 34em; }
+
+  /* nav */
+  .nav { position: sticky; top: 0; z-index: 50; transition: background-color .25s, box-shadow .25s; }
+  .nav.is-stuck { background: rgb(245 247 250 / .78); backdrop-filter: blur(14px) saturate(160%); box-shadow: 0 1px 0 var(--line); }
+  .nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 68px; }
+  .brand { display: inline-flex; align-items: center; gap: 10px; font-family: var(--display); font-weight: 700; text-decoration: none; font-size: 1.05rem; letter-spacing: -0.01em; }
+  .brand img { width: 34px; height: 34px; }
+  .nav-links { display: flex; gap: 26px; align-items: center; list-style: none; }
+  .nav-links a { text-decoration: none; color: var(--ink-2); font-weight: 500; font-size: .95rem; }
+  .nav-links a:hover, .nav-links a[aria-current] { color: var(--ink); }
+  .nav-links a[aria-current] { font-weight: 700; }
+  .nav-links .btn { padding: 10px 16px; font-size: .95rem; }
+  @media (max-width: 720px) { .nav-links li:not(.cta-li) { display: none; } }
+
+  /* buttons */
+  .btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--emerald); color: var(--ink); text-decoration: none;
+    font-weight: 700; padding: 15px 22px; border-radius: 999px; border: 0;
+    transition: background-color .15s ease-out, box-shadow .15s ease-out, transform .15s ease-out;
+  }
+  .btn:hover { background: #12CB8E; box-shadow: 0 8px 24px -10px rgb(16 185 129 / .7); }
+  .btn:active { transform: translateY(1px); }
+  .btn svg { width: 18px; height: 18px; }
+  .btn-ghost { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--line); }
+  .btn-ghost:hover { background: var(--paper-2); box-shadow: inset 0 0 0 1.5px var(--ink); }
+
+  /* hero */
+  .hero { padding: clamp(40px, 6vw, 88px) 0 clamp(36px, 5vw, 64px); }
+  .hero .wrap { display: grid; grid-template-columns: 1.2fr .8fr; gap: clamp(28px, 5vw, 72px); align-items: center; }
+  .hero-copy > * + * { margin-top: 22px; }
+  .hero-copy .who { font-size: 1.05rem; color: var(--ink-2); }
+  .hero-copy .who strong { color: var(--ink); font-weight: 700; }
+  .portrait { position: relative; aspect-ratio: 1; max-width: 400px; margin-inline: auto; width: 100%; }
+  .blob {
+    position: absolute; inset: 6%; border-radius: 46% 54% 52% 48% / 52% 44% 56% 48%;
+    background: radial-gradient(60% 60% at 30% 30%, var(--mint) 0%, var(--mint-2) 60%, transparent 100%),
+                radial-gradient(50% 50% at 75% 70%, rgb(16 185 129 / .35), transparent 70%);
+  }
+  .blob-2 { position: absolute; inset: 14%; border-radius: 52% 48% 44% 56% / 48% 56% 44% 52%; background: var(--mint); opacity: .9; }
+  .portrait img { position: relative; z-index: 2; width: 100%; height: 100%; object-fit: contain; object-position: bottom; mask-image: linear-gradient(#000 82%, transparent 100%); }
+  @media (max-width: 860px) {
+    .hero .wrap { grid-template-columns: 1fr; }
+    .portrait { max-width: 320px; order: -1; }
+  }
+
+  /* story */
+  section { padding: clamp(56px, 8vw, 104px) 0; }
+  .story { border-top: 1px solid var(--line); }
+  .story .wrap { display: grid; grid-template-columns: .8fr 1.2fr; gap: clamp(28px, 5vw, 80px); align-items: start; }
+  .story h2 { position: sticky; top: 92px; }
+  .prose { max-width: 36em; }
+  .prose p { color: var(--ink-2); font-size: 1.08rem; line-height: 1.6; }
+  .prose p + p { margin-top: 1.1em; }
+  .prose p:first-child { color: var(--ink); font-size: clamp(1.15rem, 1rem + .6vw, 1.45rem); line-height: 1.4; font-weight: 500; }
+  @media (max-width: 860px) { .story .wrap { grid-template-columns: 1fr; } .story h2 { position: static; } }
+
+  /* built */
+  .built { background: var(--paper-2); border-block: 1px solid var(--line); }
+  .built .head { max-width: 40em; margin-bottom: clamp(24px, 3vw, 40px); }
+  .built .head p { margin-top: 12px; }
+  .rows { border-top: 1px solid var(--line); }
+  .row { display: grid; grid-template-columns: 1.1fr 1.6fr .9fr; gap: 20px; padding: 22px 0; border-bottom: 1px solid var(--line); align-items: baseline; }
+  .row h3 { font-size: 1.15rem; }
+  .row p { color: var(--ink-2); font-size: 1rem; }
+  .row .status { font-size: .95rem; color: var(--ink-3); }
+  .row .status.live { color: var(--emerald-deep); font-weight: 600; }
+  .row .status.live::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--emerald); margin-right: 8px; vertical-align: 1px; }
+  .built .note { margin-top: 20px; color: var(--ink-3); font-size: .95rem; max-width: 40em; }
+  @media (max-width: 760px) { .row { grid-template-columns: 1fr; gap: 6px; } .row .status { margin-top: 4px; } }
+
+  /* rules */
+  .rules .wrap { display: grid; grid-template-columns: .8fr 1.2fr; gap: clamp(28px, 5vw, 80px); align-items: start; }
+  .rules ul { list-style: none; display: grid; gap: 14px; max-width: 36em; }
+  .rules li { display: grid; grid-template-columns: 22px 1fr; gap: 14px; align-items: start; font-size: 1.08rem; color: var(--ink-2); line-height: 1.55; }
+  .rules li svg { width: 22px; height: 22px; stroke: var(--emerald-deep); fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; margin-top: 3px; }
+  .rules li strong { color: var(--ink); font-weight: 600; }
+  .rules .not { margin-top: 34px; padding-top: 26px; border-top: 1px solid var(--line); max-width: 36em; color: var(--ink-2); font-size: 1.05rem; }
+  .rules .not strong { color: var(--ink); }
+  @media (max-width: 860px) { .rules .wrap { grid-template-columns: 1fr; } }
+
+  /* closing */
+  .closing { background: var(--ink); color: #fff; position: relative; overflow: hidden; }
+  .closing::before { content: ""; position: absolute; inset: auto -10% -60% -10%; height: 70%; background: radial-gradient(50% 100% at 50% 100%, rgb(16 185 129 / .38), transparent 70%); }
+  .closing .wrap { position: relative; display: grid; grid-template-columns: 1.2fr .8fr; gap: 32px; align-items: center; }
+  .closing h2 { color: #fff; }
+  .closing p { color: rgb(255 255 255 / .78); margin-top: 16px; max-width: 32em; }
+  .closing .actions { margin-top: 28px; display: flex; gap: 12px; flex-wrap: wrap; }
+  .closing .btn-ghost { color: #fff; box-shadow: inset 0 0 0 1.5px rgb(255 255 255 / .35); }
+  .closing .btn-ghost:hover { background: rgb(255 255 255 / .08); box-shadow: inset 0 0 0 1.5px #fff; }
+  .closing .side { border-left: 1px solid rgb(255 255 255 / .14); padding-left: 28px; color: rgb(255 255 255 / .8); font-size: 1rem; }
+  .closing .side strong { color: #fff; display: block; margin-bottom: 6px; }
+  .closing .side ul { list-style: none; display: flex; gap: 16px; flex-wrap: wrap; margin-top: 10px; }
+  .closing .side a { color: #fff; text-decoration: none; font-weight: 600; border-bottom: 1px solid rgb(255 255 255 / .3); }
+  .closing .side a:hover { border-color: var(--emerald); }
+  @media (max-width: 860px) {
+    .closing .wrap { grid-template-columns: 1fr; }
+    .closing .side { border-left: 0; border-top: 1px solid rgb(255 255 255 / .14); padding: 24px 0 0; }
+  }
+
+  /* footer */
+  footer { padding: 36px 0 44px; }
+  footer .wrap { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; align-items: center; color: var(--ink-3); font-size: .93rem; }
+  footer ul { display: flex; gap: 18px; list-style: none; flex-wrap: wrap; }
+  footer a { text-decoration: none; color: var(--ink-2); font-weight: 500; }
+  footer a:hover { color: var(--ink); }
+
+  /* one page-load moment, nothing else moves */
+  .js .hero-copy .line { clip-path: inset(0 0 100% 0); animation: unclip .9s cubic-bezier(.2,.7,.2,1) forwards; }
+  .js .hero-copy .line:nth-child(2) { animation-delay: .14s; }
+  .line { display: block; }
+  @keyframes unclip { to { clip-path: inset(0 0 -20% 0); } }
+  @media (prefers-reduced-motion: reduce) {
+    .js .hero-copy .line { clip-path: none; animation: none; }
+    html { scroll-behavior: auto; }
+    * { transition-duration: .01ms !important; }
+  }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a class="brand" href="index.html" aria-label="Clashworks home">
+      <img src="assets/logo.svg" alt="" width="34" height="34">
+      Clashworks
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html#fix">What I fix</a></li>
+      <li><a href="index.html#how">How it works</a></li>
+      <li><a href="index.html#free">Free kits</a></li>
+      <li><a href="about.html" aria-current="page">Who I am</a></li>
+      <li class="cta-li"><a class="btn" href="https://tally.so/r/81BBNk">Get a free check</a></li>
+    </ul>
+  </div>
+</header>
+
+<main id="main">
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-copy">
+      <h1><span class="line">Not a developer.</span><span class="line">Fixing real businesses with AI anyway.</span></h1>
+      <p class="who"><strong>Clayton Trevino.</strong> Finance and Real Estate major at SMU's Cox School of Business. Dallas, Texas.</p>
+      <p class="lede">I spent hundreds of hours learning to make AI do the unglamorous work inside a business: quotes, missed calls, follow-up, reviews, reminders. Now I fix those things for local owners and show the numbers, so you can see whether it worked.</p>
+    </div>
+    <div class="portrait">
+      <div class="blob" aria-hidden="true"></div>
+      <div class="blob-2" aria-hidden="true"></div>
+      <img src="assets/headshot-800.webp" srcset="assets/headshot-480.webp 480w, assets/headshot-800.webp 800w, assets/headshot-1200.webp 1200w" sizes="(max-width: 860px) 320px, 400px" width="800" height="800" alt="Clayton Trevino" fetchpriority="high">
+    </div>
+  </div>
+</section>
+
+<section class="story">
+  <div class="wrap">
+    <h2>How I got here.</h2>
+    <div class="prose">
+      <p>I did not learn to code. I learned to describe a business problem clearly enough that AI could build the fix, then I tested the fix on real businesses until it held up.</p>
+      <p>It started with my own family. My dad has run a flooring company in Dallas for forty years, and his website had a contact form with no phone field. You cannot call a lead back without a phone number. That was the first leak I found, and the first time I saw how much a small, boring problem costs a business every week.</p>
+      <p>From there I kept going: a booking sync for a vacation rental owner, an internal app for tracking work, a commercial real estate tool that I am still building. Along the way I learned that most local businesses lose money in the same five or six places, and that none of them need a developer to fix.</p>
+      <p>So that is what Clashworks is. I find the leak, I build the fix, I install tracking so the result is a number and not an opinion, and I hand the template out for free. If I get something wrong, I say so on camera.</p>
+    </div>
+  </div>
+</section>
+
+<section class="built">
+  <div class="wrap">
+    <div class="head">
+      <h2>What I've built so far.</h2>
+      <p class="lede">Every claim on this site is backed by one of these. Where I don't have a number yet, it says so.</p>
+    </div>
+    <div class="rows">
+      <div class="row">
+        <h3>The quote form</h3>
+        <p>A lead form that requires a phone number, skips the captcha, and tracks its own submissions. Built for a flooring company site. It goes in after the baseline is recorded, so the before and after are real.</p>
+        <span class="status">Free kit, coming with video 1</span>
+      </div>
+      <div class="row">
+        <h3>Missed-call text-back</h3>
+        <p>A text goes out the moment a call is missed, so the customer does not dial the next company on the list.</p>
+        <span class="status">Free kit, coming with video 3</span>
+      </div>
+      <div class="row">
+        <h3>The review request system</h3>
+        <p>Asks every customer for a review the day after the job, inside Google's 2026 rules. Reply templates included.</p>
+        <span class="status">Free kit, coming with video 8</span>
+      </div>
+      <div class="row">
+        <h3>Rental booking sync</h3>
+        <p>An automation that pulls a vacation rental owner's bookings out of Hostaway into their spreadsheet every day. Found one real outage, fixed it, still running.</p>
+        <span class="status live">Running daily since August 2026</span>
+      </div>
+      <div class="row">
+        <h3>ClarityHub</h3>
+        <p>A workflow-visibility app I built end to end, for seeing who is working on what without asking.</p>
+        <span class="status live">Built</span>
+      </div>
+      <div class="row">
+        <h3>CRE Copilot</h3>
+        <p>A commercial real estate tool, the overlap between my major and this work.</p>
+        <span class="status">In development</span>
+      </div>
+    </div>
+    <p class="note">Client results appear here as they are measured and released, with the owner's written permission. Nothing is published about a client without it.</p>
+  </div>
+</section>
+
+<section class="rules">
+  <div class="wrap">
+    <h2>How I work.</h2>
+    <div>
+      <ul>
+        <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><span><strong>Measured or free.</strong> Every fix ships with tracking. If the number cannot be shown at 30 days, you get a refund.</span></li>
+        <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><span><strong>Two clients at a time.</strong> I am a full-time student. That is the real limit, and it is why each one gets real attention.</span></li>
+        <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><span><strong>No promises on rankings or lead counts.</strong> Nobody can honestly make those. I promise the fix and the measurement.</span></li>
+        <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><span><strong>Baseline first.</strong> I record where you are before I touch anything, so the before and after are real.</span></li>
+        <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><span><strong>Never a shared password.</strong> You add me as a user with the lowest access that does the job. Your accounts stay yours.</span></li>
+        <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><span><strong>Templates go out free.</strong> The files I install for paying clients are the same ones I release with each video.</span></li>
+      </ul>
+      <p class="not"><strong>What I am not:</strong> a guru, an agency with a sales team, or a course. I do not manage ad spend. I fix specific things and show you what happened.</p>
+    </div>
+  </div>
+</section>
+
+<section class="closing">
+  <div class="wrap">
+    <div>
+      <h2>Got a problem that eats your week?</h2>
+      <p>Two free checks a week. Ten minutes of recorded, specific advice on your website, your Google listing, and how you run things. Yours to keep either way.</p>
+      <div class="actions">
+        <a class="btn" href="https://tally.so/r/81BBNk">Get a free Optimization Check
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        <a class="btn btn-ghost" href="index.html#fix">See what I fix</a>
+      </div>
+    </div>
+    <div class="side">
+      <strong>Follow the work</strong>
+      One real fix a week, on camera, with the exact prompt I used.
+      <ul>
+        <li><a href="https://www.youtube.com/@clashworkshq">YouTube</a></li>
+        <li><a href="https://www.tiktok.com/@clashworkshq">TikTok</a></li>
+        <li><a href="https://www.instagram.com/clashworkshq">Instagram</a></li>
+        <li><a href="https://www.linkedin.com/company/clashworks">LinkedIn</a></li>
+      </ul>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div>Clashworks, Clayton Trevino. Dallas, Texas.</div>
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="https://www.youtube.com/@clashworkshq">YouTube</a></li>
+      <li><a href="https://www.tiktok.com/@clashworkshq">TikTok</a></li>
+      <li><a href="https://www.instagram.com/clashworkshq">Instagram</a></li>
+      <li><a href="https://x.com/clashworkshq">X</a></li>
+      <li><a href="https://www.linkedin.com/company/clashworks">LinkedIn</a></li>
+      <li><a href="https://github.com/Clashworkshq">GitHub</a></li>
+    </ul>
+  </div>
+</footer>
+
+<script>
+document.documentElement.classList.add("js");
+const nav = document.getElementById("nav");
+const onScroll = () => nav.classList.toggle("is-stuck", scrollY > 8);
+onScroll(); addEventListener("scroll", onScroll, { passive: true });
+</script>
+</body>
+</html>
