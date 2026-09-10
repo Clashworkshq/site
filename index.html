@@ -216,6 +216,9 @@
   .kit h3 { font-size: 1.05rem; }
   .kit p { color: var(--ink-3); font-size: .93rem; margin-top: 3px; }
   .kit .when { font-size: .85rem; font-weight: 600; color: var(--emerald-deep); background: var(--mint-2); border: 1px solid var(--mint); padding: 6px 10px; border-radius: 999px; white-space: nowrap; }
+  .kit-soon { cursor: default; }
+  .kit-soon:hover { border-color: var(--line); transform: none; }
+  .kit-soon .when { color: var(--ink-3); background: transparent; border-color: var(--line); }
   @media (max-width: 520px) { .kit { grid-template-columns: 44px 1fr; } .kit .when { grid-column: 2; justify-self: start; } }
 
   /* services */
@@ -500,21 +503,21 @@
         </div>
       </div>
       <div class="kits">
-        <a class="kit" href="https://github.com/Clashworkshq/quote-form" data-reveal>
+        <div class="kit kit-soon" data-reveal>
           <div class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8"/></svg></div>
           <div><h3>The quote form</h3><p>Captures a lead you can actually call back. Phone required, no captcha, tracks itself.</p></div>
-          <span class="when">Free with video 1</span>
-        </a>
-        <a class="kit" href="https://github.com/Clashworkshq" data-reveal>
+          <span class="when">Coming with video 1</span>
+        </div>
+        <div class="kit kit-soon" data-reveal>
           <div class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.6a2 2 0 0 1-.5 2.1L8.1 9.6a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.8.3 1.7.5 2.6.7a2 2 0 0 1 1.7 2z"/></svg></div>
           <div><h3>Missed-call text-back</h3><p>A text goes out the moment a call is missed, so the customer doesn't dial the next company.</p></div>
-          <span class="when">Free with video 3</span>
-        </a>
-        <a class="kit" href="https://github.com/Clashworkshq" data-reveal>
+          <span class="when">Coming with video 3</span>
+        </div>
+        <div class="kit kit-soon" data-reveal>
           <div class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg></div>
           <div><h3>The review request system</h3><p>Asks every customer the day after the job, inside Google's 2026 rules. Reply templates included.</p></div>
-          <span class="when">Free with video 8</span>
-        </a>
+          <span class="when">Coming with video 8</span>
+        </div>
       </div>
     </div>
   </div>
