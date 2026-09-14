@@ -40,19 +40,19 @@
   .brand { display: inline-flex; align-items: center; gap: 10px; font-family: var(--display); font-weight: 700; text-decoration: none; font-size: 1.05rem; letter-spacing: -0.01em; }
   .brand img { width: 34px; height: 34px; }
 
+  /* home pill: outlined, letter-spaced, level with the logo at the far right */
   .back {
-    display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 18px 0 12px;
-    border-radius: 999px; text-decoration: none; font-weight: 600; font-size: .95rem; color: var(--ink);
-    background: var(--paper-2); box-shadow: inset 0 0 0 1.5px var(--line);
+    display: inline-flex; align-items: center; gap: 10px; min-height: 42px; padding: 0 20px 0 16px;
+    border-radius: 999px; text-decoration: none; color: var(--ink);
+    font-family: var(--display); font-weight: 600; font-size: .8rem; letter-spacing: .12em; text-transform: uppercase;
+    background: transparent; box-shadow: inset 0 0 0 1.5px var(--ink-3);
     transition: box-shadow .15s ease-out, background-color .15s ease-out, transform .15s ease-out;
     white-space: nowrap;
   }
-  .back svg { width: 18px; height: 18px; flex: none; transition: transform .2s ease-out; }
-  .back:hover { box-shadow: inset 0 0 0 1.5px var(--ink); }
-  .back:hover svg { transform: translateX(-3px); }
+  .back .arrow { font-family: var(--font); font-weight: 500; font-size: 1rem; line-height: 1; transition: transform .2s ease-out; }
+  .back:hover { box-shadow: inset 0 0 0 1.5px var(--ink); background: var(--paper-2); }
+  .back:hover .arrow { transform: translateX(-3px); }
   .back:active { transform: translateY(1px); }
-  .back .short { display: none; }
-  @media (max-width: 480px) { .back .long { display: none; } .back .short { display: inline; } }
 
   .intro { padding: clamp(28px, 4vw, 56px) 0 clamp(16px, 2vw, 28px); }
   .intro .wrap { max-width: 640px; }
@@ -90,10 +90,7 @@
       <img src="assets/logo.svg" alt="" width="34" height="34">
       Clashworks
     </a>
-    <a class="back" href="index.html#free">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
-      <span class="long">Back to clashworks.co</span><span class="short">Back</span>
-    </a>
+    <a class="back" href="index.html#free"><span class="arrow" aria-hidden="true">&larr;</span>Home</a>
   </div>
 </header>
 
