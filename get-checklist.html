@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Get the Lead Leak Checklist. Clashworks</title>
+<meta name="description" content="Fifteen yes-or-no questions that find where your website and Google listing lose customers. One field, your email, and it opens right away.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#F5F7FA">
+<link rel="icon" href="assets/favicon-64.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://tally.so">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100,500..900&family=Hanken+Grotesk:wght@400..700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0B1220; --ink-2: #3B4453; --ink-3: #6B7280;
+    --paper: #F5F7FA; --paper-2: #FFFFFF; --line: #E3E8EF;
+    --emerald: #10B981; --emerald-deep: #047857; --mint: #D1FAE5; --mint-2: #ECFDF5;
+    --radius: 14px; --max: 1360px;
+    --font: "Hanken Grotesk", "Segoe UI", system-ui, sans-serif;
+    --display: "Archivo", "Hanken Grotesk", "Segoe UI", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { font-family: var(--font); color: var(--ink); background: var(--paper); line-height: 1.5; font-size: 17px; overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column; }
+  main { flex: 1; }
+  img { max-width: 100%; display: block; }
+  a { color: inherit; }
+  :focus-visible { outline: 2px solid var(--emerald-deep); outline-offset: 3px; border-radius: 6px; }
+  .skip { position: absolute; left: -999px; top: 8px; background: var(--ink); color: #fff; padding: 8px 12px; z-index: 100; }
+  .skip:focus { left: 8px; }
+  .wrap { width: min(var(--max), calc(100% - clamp(32px, 5vw, 72px))); margin-inline: auto; }
+  h1 { font-family: var(--display); font-weight: 800; letter-spacing: -0.035em; line-height: 1.05; font-size: clamp(2rem, 1.3rem + 3vw, 3.6rem); }
+  p.lede { font-size: clamp(1.05rem, 0.95rem + 0.5vw, 1.25rem); color: var(--ink-2); max-width: 34em; margin-top: 14px; }
+
+  .nav { position: sticky; top: 0; z-index: 50; background: rgb(245 247 250 / .85); backdrop-filter: blur(14px) saturate(160%); box-shadow: 0 1px 0 var(--line); }
+  .nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 68px; gap: 12px; }
+  .brand { display: inline-flex; align-items: center; gap: 10px; font-family: var(--display); font-weight: 700; text-decoration: none; font-size: 1.05rem; letter-spacing: -0.01em; }
+  .brand img { width: 34px; height: 34px; }
+
+  .back {
+    display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 18px 0 12px;
+    border-radius: 999px; text-decoration: none; font-weight: 600; font-size: .95rem; color: var(--ink);
+    background: var(--paper-2); box-shadow: inset 0 0 0 1.5px var(--line);
+    transition: box-shadow .15s ease-out, background-color .15s ease-out, transform .15s ease-out;
+    white-space: nowrap;
+  }
+  .back svg { width: 18px; height: 18px; flex: none; transition: transform .2s ease-out; }
+  .back:hover { box-shadow: inset 0 0 0 1.5px var(--ink); }
+  .back:hover svg { transform: translateX(-3px); }
+  .back:active { transform: translateY(1px); }
+  .back .short { display: none; }
+  @media (max-width: 480px) { .back .long { display: none; } .back .short { display: inline; } }
+
+  .intro { padding: clamp(28px, 4vw, 56px) 0 clamp(16px, 2vw, 28px); }
+  .intro .wrap { max-width: 640px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: .85rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--emerald-deep); margin-bottom: 14px; }
+  .eyebrow::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--emerald); }
+  .intro ul { margin-top: 18px; list-style: none; display: grid; gap: 8px; color: var(--ink-2); }
+  .intro li { display: flex; gap: 10px; align-items: flex-start; }
+  .intro li svg { width: 20px; height: 20px; flex: none; stroke: var(--emerald-deep); margin-top: 2px; }
+
+  .form-wrap { padding-bottom: clamp(48px, 6vw, 96px); }
+  .form-wrap .wrap { max-width: 640px; }
+  .card { background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--radius); padding: clamp(10px, 2vw, 22px); box-shadow: 0 24px 48px -32px rgb(11 18 32 / .25); }
+  .card iframe { display: block; width: 100%; border: 0; min-height: 220px; }
+  .card.is-loading { position: relative; }
+  .card.is-loading::after { content: "Loading the form"; position: absolute; inset: 0; display: grid; place-items: center; color: var(--ink-3); font-size: .95rem; pointer-events: none; }
+  .card.is-loading iframe { opacity: 0; }
+  .fine { margin-top: 14px; color: var(--ink-3); font-size: .9rem; text-align: center; }
+  .fine a { color: var(--ink-2); }
+
+  footer { padding: 28px 0 40px; border-top: 1px solid var(--line); }
+  footer .wrap { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; align-items: center; color: var(--ink-3); font-size: .93rem; }
+  footer ul { display: flex; gap: 18px; list-style: none; flex-wrap: wrap; }
+  footer a { text-decoration: none; color: var(--ink-2); font-weight: 500; }
+  footer a:hover { color: var(--ink); }
+
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; } }
+</style>
+</head>
+<body>
+<a class="skip" href="#form">Skip to the form</a>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="index.html" aria-label="Clashworks home">
+      <img src="assets/logo.svg" alt="" width="34" height="34">
+      Clashworks
+    </a>
+    <a class="back" href="index.html#free">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+      <span class="long">Back to clashworks.co</span><span class="short">Back</span>
+    </a>
+  </div>
+</header>
+
+<main>
+<section class="intro">
+  <div class="wrap">
+    <div class="eyebrow">Free, ten minutes</div>
+    <h1>The Lead Leak Checklist</h1>
+    <p class="lede">Fifteen yes-or-no questions that find where your website and Google listing lose customers. Count your no's.</p>
+    <ul>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>Opens right after you hit send, no waiting on an email</li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>Works on your phone, saves your ticks, prints clean</li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>No newsletter unless you ask</li>
+    </ul>
+  </div>
+</section>
+
+<section class="form-wrap" id="form">
+  <div class="wrap">
+    <div class="card is-loading" id="card">
+      <iframe src="https://tally.so/embed/WOWWRe?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1" loading="eager" width="100%" height="220" title="Checklist request"></iframe>
+    </div>
+    <p class="fine">Form not loading? <a href="https://tally.so/r/WOWWRe">Open it on Tally instead</a>.</p>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div>Clashworks, Clayton Trevino. Dallas, Texas.</div>
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">Who I am</a></li>
+      <li><a href="check.html">Free Optimization Check</a></li>
+      <li><a href="https://www.youtube.com/@clashworkshq">YouTube</a></li>
+      <li><a href="https://www.linkedin.com/company/clashworks">LinkedIn</a></li>
+    </ul>
+  </div>
+</footer>
+
+<script>
+(() => {
+  const card = document.getElementById("card");
+  const frame = card.querySelector("iframe");
+  // The iframe carries its src directly. Tally's loader would otherwise wait on an
+  // IntersectionObserver before setting it, which some browsers never fire for a
+  // background tab. With src set, loadEmbeds() just attaches the auto-height resizer.
+  const s = document.createElement("script");
+  s.src = "https://tally.so/widgets/embed.js";
+  s.onload = () => { try { window.Tally && window.Tally.loadEmbeds(); } catch (err) { /* no resizer, fixed height below */ } };
+  // Without the resizer the form would be cut off, so let the frame scroll instead.
+  const plain = () => { frame.style.height = "80vh"; frame.setAttribute("scrolling", "yes"); frame.style.overflow = "auto"; };
+  s.onerror = plain;
+  document.head.appendChild(s);
+  window.addEventListener("message", (e) => {
+    if (e.origin !== "https://tally.so" || typeof e.data !== "string") return;
+    let msg; try { msg = JSON.parse(e.data); } catch { return; }
+    if (msg.event === "Tally.FormLoaded") card.classList.remove("is-loading");
+    // Tally would redirect only the iframe. Move the whole page instead.
+    if (msg.event === "Tally.FormSubmitted") window.location.assign("checklist.html");
+  });
+  setTimeout(() => { if (card.classList.contains("is-loading")) { plain(); card.classList.remove("is-loading"); } }, 8000);
+})();
+</script>
+</body>
+</html>
