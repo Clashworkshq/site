@@ -8,7 +8,11 @@
 <meta name="theme-color" content="#F5F7FA">
 <meta property="og:title" content="Clashworks. Business problems? I have the fix.">
 <meta property="og:description" content="Free 10-minute Optimization Check for local businesses. Tell me what still happens by hand and I'll show you what to fix first.">
-<meta property="og:image" content="assets/headshot-mint-512.webp">
+<meta property="og:image" content="https://clashworks.co/assets/headshot-mint-512.webp">
+<meta property="og:url" content="https://clashworks.co/">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<link rel="canonical" href="https://clashworks.co/">
 <link rel="icon" href="assets/favicon-64.png" type="image/png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -262,6 +266,21 @@
   @media (max-width: 860px) { .closing .side { border-left: 0; border-top: 1px solid rgb(255 255 255 / .14); padding: 24px 0 0; } }
 
   /* footer */
+  /* faq: plain disclosure list, one line each, opens in place */
+  .faq .wrap { max-width: 860px; }
+  .faq details { border-top: 1px solid var(--line); }
+  .faq details:last-of-type { border-bottom: 1px solid var(--line); }
+  .faq summary { cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding: 20px 0; font-family: var(--display); font-weight: 700; font-size: clamp(1.05rem, 1rem + 0.3vw, 1.2rem); letter-spacing: -0.01em; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary > span:first-child { transition: color .2s; }
+  .faq summary:hover > span:first-child { color: var(--emerald-deep); }
+  .faq .ic { flex: none; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; color: var(--emerald-deep); box-shadow: inset 0 0 0 1.5px var(--line); transition: transform .4s cubic-bezier(.2,.7,.2,1), background-color .2s, box-shadow .2s; }
+  .faq .ic svg { width: 14px; height: 14px; }
+  .faq summary:hover .ic { background: var(--mint-2); box-shadow: inset 0 0 0 1.5px var(--emerald); }
+  .faq details.is-open .ic { transform: rotate(45deg); background: var(--mint); box-shadow: inset 0 0 0 1.5px var(--emerald); }
+  .faq .answer { overflow: hidden; }
+  .faq .answer p { padding: 0 0 22px; color: var(--ink-2); max-width: 42em; }
+
   footer { padding: 36px 0 44px; }
   footer .wrap { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; align-items: center; color: var(--ink-3); font-size: .93rem; }
   footer ul { display: flex; gap: 18px; list-style: none; flex-wrap: wrap; }
@@ -286,6 +305,113 @@
     * { transition-duration: .01ms !important; }
   }
 </style>
+<link rel="stylesheet" href="assets/liquid.css">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "ProfessionalService",
+   "@id": "https://clashworks.co/#business",
+   "name": "Clashworks",
+   "url": "https://clashworks.co/",
+   "logo": "https://clashworks.co/assets/logo.svg",
+   "image": "https://clashworks.co/assets/headshot-mint-512.webp",
+   "description": "AI operations fixes for local service businesses: quote forms, missed-call text-back, review systems, tracking. Free 10-minute Optimization Check, two a week.",
+   "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Dallas",
+    "addressRegion": "TX",
+    "addressCountry": "US"
+   },
+   "areaServed": {
+    "@type": "City",
+    "name": "Dallas"
+   },
+   "founder": {
+    "@id": "https://clashworks.co/#clayton"
+   },
+   "priceRange": "$$",
+   "sameAs": [
+    "https://www.youtube.com/@clashworkshq",
+    "https://www.tiktok.com/@clashworkshq",
+    "https://www.instagram.com/clashworkshq",
+    "https://x.com/clashworkshq",
+    "https://www.linkedin.com/company/clashworks",
+    "https://github.com/Clashworkshq"
+   ]
+  },
+  {
+   "@type": "Person",
+   "@id": "https://clashworks.co/#clayton",
+   "name": "Clayton Trevino",
+   "url": "https://clashworks.co/about.html",
+   "image": "https://clashworks.co/assets/headshot-mint-512.webp",
+   "jobTitle": "Founder, Clashworks",
+   "affiliation": {
+    "@type": "CollegeOrUniversity",
+    "name": "SMU Cox School of Business"
+   },
+   "worksFor": {
+    "@id": "https://clashworks.co/#business"
+   }
+  },
+  {
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "What does the free Optimization Check actually cost?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Nothing, and there is no pitch on the recording. I pick two applications a week, spend ten minutes on your website, your Google listing, and how you run things, and record exactly what I would fix first. The recording is yours whether we ever work together or not."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Do you need my passwords?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Never. If we do paid work, you add me as a user on your own accounts with the lowest access that does the job, and you remove me when it is done. Your accounts stay yours."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "What does “measured or free” mean?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Every fix ships with tracking, and we agree on one number up front: quote requests a week, calls answered, reviews a month. Half is paid after the baseline is recorded, half on delivery. If the number cannot be shown at 30 days, you get a refund."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "How long does a fix take?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "A single kit install is about a week. A full Leak Fix, all three kits plus the path from visitor to phone call, is about two. Bigger builds get a fixed timeline in the quote before anything starts."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Will this get me to the top of Google?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "I do not promise rankings or lead counts, because nobody can honestly make those promises. I promise the fix, the tracking, and an honest number at 30 days."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "You are a student. Why should I trust you with my business?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Because nothing here rests on trust. You get the free check first and decide after. Every claim on this site is backed by something I built, and where I do not have a number yet, the site says so. If I get something wrong, I say so on camera."
+     }
+    }
+   ]
+  }
+ ]
+}
+</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -302,8 +428,9 @@
       <li><a href="#services">Services</a></li>
       <li><a href="#free">Free kits</a></li>
       <li><a href="#video">Videos</a></li>
+      <li><a href="#faq">Questions</a></li>
       <li><a href="about.html">Who I am</a></li>
-      <li class="cta-li"><a class="btn" href="check.html">Get a free check</a></li>
+      <li class="cta-li"><a class="btn" data-liquid="" href="check.html">Get a free check</a></li>
     </ul>
   </div>
 </header>
@@ -315,10 +442,10 @@
       <h1 id="headline"><span class="line">Business problems?</span><span class="line">I have the fix.</span></h1>
       <p class="lede" data-reveal>I spent hundreds of hours learning to fix business problems with AI so you don't have to. Tell me what still happens by hand in your business, and I'll show you what to fix first. Free.</p>
       <div class="hero-actions" data-reveal>
-        <a class="btn" href="check.html">Get a free Optimization Check
+        <a class="btn" data-liquid="" href="check.html">Get a free Optimization Check
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
         </a>
-        <a class="btn btn-ghost" href="#how">How it works</a>
+        <a class="btn btn-ghost" data-liquid="" href="#how">How it works</a>
       </div>
       <p class="hero-note" data-reveal><strong>Two a week.</strong> Ten minutes of my time, recorded, yours to keep. No pitch on the call.</p>
     </div>
@@ -349,35 +476,35 @@
       <p class="lede">Every one of these is something I've already built a fix for. Pick yours and I'll start there.</p>
     </div>
     <div class="picker-grid" id="picker" data-reveal>
-      <button class="tile" type="button" aria-pressed="false" data-value="Quoting and estimates">
+      <button class="tile" data-liquid="soft" type="button" aria-pressed="false" data-value="Quoting and estimates">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
         <span>Quoting and estimates</span><i class="check"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L20 7"/></svg></i>
       </button>
-      <button class="tile" type="button" aria-pressed="false" data-value="Scheduling and reminders">
+      <button class="tile" data-liquid="soft" type="button" aria-pressed="false" data-value="Scheduling and reminders">
         <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
         <span>Scheduling and reminders</span><i class="check"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L20 7"/></svg></i>
       </button>
-      <button class="tile" type="button" aria-pressed="false" data-value="Following up with leads">
+      <button class="tile" data-liquid="soft" type="button" aria-pressed="false" data-value="Following up with leads">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.4 8.4 0 0 1-3.7-.8L3 21l1.9-5.3A8.4 8.4 0 1 1 21 11.5z"/></svg>
         <span>Following up with leads</span><i class="check"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L20 7"/></svg></i>
       </button>
-      <button class="tile" type="button" aria-pressed="false" data-value="Invoicing and chasing payment">
+      <button class="tile" data-liquid="soft" type="button" aria-pressed="false" data-value="Invoicing and chasing payment">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1z"/><path d="M14 8H9.5a1.5 1.5 0 0 0 0 3h5a1.5 1.5 0 0 1 0 3H8M12 6v2M12 14v2"/></svg>
         <span>Invoicing and chasing payment</span><i class="check"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L20 7"/></svg></i>
       </button>
-      <button class="tile" type="button" aria-pressed="false" data-value="Asking for reviews">
+      <button class="tile" data-liquid="soft" type="button" aria-pressed="false" data-value="Asking for reviews">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>
         <span>Asking for reviews</span><i class="check"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L20 7"/></svg></i>
       </button>
-      <button class="tile" type="button" aria-pressed="false" data-value="Answering the same questions over and over">
+      <button class="tile" data-liquid="soft" type="button" aria-pressed="false" data-value="Answering the same questions over and over">
         <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/></svg>
         <span>Answering the same questions</span><i class="check"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L20 7"/></svg></i>
       </button>
-      <button class="tile" type="button" aria-pressed="false" data-value="Posting on social media">
+      <button class="tile" data-liquid="soft" type="button" aria-pressed="false" data-value="Posting on social media">
         <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
         <span>Posting on social media</span><i class="check"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L20 7"/></svg></i>
       </button>
-      <button class="tile" type="button" aria-pressed="false" data-value="Bookkeeping and reports">
+      <button class="tile" data-liquid="soft" type="button" aria-pressed="false" data-value="Bookkeeping and reports">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18"/><path d="M8 17V11M13 17V7M18 17v-4"/></svg>
         <span>Bookkeeping and reports</span><i class="check"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L20 7"/></svg></i>
       </button>
@@ -387,7 +514,7 @@
         <div class="count" aria-live="polite"><b id="count">0</b> <span id="count-label">things I'd automate first</span></div>
         <div class="hint" id="hint">Tick a few. They come with you into the application.</div>
       </div>
-      <a class="btn" id="picker-cta" href="check.html">Get my fix
+      <a class="btn" data-liquid="" id="picker-cta" href="check.html">Get my fix
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
       </a>
     </div>
@@ -420,7 +547,7 @@
     <div class="numbers" data-reveal>
       <div class="num"><b data-count="2">0</b><span>free checks a week, so each one gets real attention</span></div>
       <div class="num"><b data-count="10">0</b><span>minutes of recorded, specific advice you keep</span></div>
-      <div class="num"><b data-count="3">0</b><span>build kits released free, from real fixes</span></div>
+      <div class="num"><b data-count="3">0</b><span>build kits from real fixes, each released free with its video</span></div>
       <div class="num"><b data-count="0" data-prefix="$">0</b><span>cost to find out what's leaking</span></div>
     </div>
   </div>
@@ -473,7 +600,7 @@
     </div>
     <div class="foot" data-reveal>
       <p><strong>Fixed price, one number, 30 days.</strong> Every job is scoped from the free check and measured from day one. I don't run ad budgets and I don't promise rankings or lead counts.</p>
-      <a class="btn" href="check.html">Start with the free check
+      <a class="btn" data-liquid="" href="check.html">Start with the free check
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
       </a>
     </div>
@@ -496,7 +623,7 @@
           <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>Is there a way to ask for a review after every job?</li>
         </ul>
         <div class="get">
-          <a class="btn" href="get-checklist.html">Send me the checklist
+          <a class="btn" data-liquid="" href="get-checklist.html">Send me the checklist
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
           </a>
           <span>One field, your email. No newsletter unless you ask.</span>
@@ -537,18 +664,52 @@
       <div class="video-copy">
         <h3>The form you cannot call back.</h3>
         <p>Most local business websites have a contact form that only collects a name and an email. Here is what that costs, and the fix I built in an afternoon.</p>
-        <a class="btn btn-dark" href="https://www.youtube.com/@clashworkshq">Subscribe on YouTube</a>
+        <a class="btn btn-dark" data-liquid="" href="https://www.youtube.com/@clashworkshq">Subscribe on YouTube</a>
       </div>
     </div>
   </div>
 </section>
 
+<section class="faq" id="faq">
+  <div class="wrap">
+    <div class="section-head" data-reveal>
+      <h2>Questions owners ask first.</h2>
+      <p class="lede">Short answers. The long ones are in the free check.</p>
+    </div>
+    <div>
+      <details open class="is-open" data-reveal>
+        <summary data-liquid="glow"><span>What does the free Optimization Check actually cost?</span><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary>
+        <div class="answer"><p>Nothing, and there is no pitch on the recording. I pick two applications a week, spend ten minutes on your website, your Google listing, and how you run things, and record exactly what I would fix first. The recording is yours whether we ever work together or not.</p></div>
+      </details>
+      <details data-reveal>
+        <summary data-liquid="glow"><span>Do you need my passwords?</span><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary>
+        <div class="answer"><p>Never. If we do paid work, you add me as a user on your own accounts with the lowest access that does the job, and you remove me when it is done. Your accounts stay yours.</p></div>
+      </details>
+      <details data-reveal>
+        <summary data-liquid="glow"><span>What does “measured or free” mean?</span><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary>
+        <div class="answer"><p>Every fix ships with tracking, and we agree on one number up front: quote requests a week, calls answered, reviews a month. Half is paid after the baseline is recorded, half on delivery. If the number cannot be shown at 30 days, you get a refund.</p></div>
+      </details>
+      <details data-reveal>
+        <summary data-liquid="glow"><span>How long does a fix take?</span><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary>
+        <div class="answer"><p>A single kit install is about a week. A full Leak Fix, all three kits plus the path from visitor to phone call, is about two. Bigger builds get a fixed timeline in the quote before anything starts.</p></div>
+      </details>
+      <details data-reveal>
+        <summary data-liquid="glow"><span>Will this get me to the top of Google?</span><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary>
+        <div class="answer"><p>I do not promise rankings or lead counts, because nobody can honestly make those promises. I promise the fix, the tracking, and an honest number at 30 days.</p></div>
+      </details>
+      <details data-reveal>
+        <summary data-liquid="glow"><span>You are a student. Why should I trust you with my business?</span><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary>
+        <div class="answer"><p>Because nothing here rests on trust. You get the free check first and decide after. Every claim on this site is backed by something I built, and where I do not have a number yet, the site says so. If I get something wrong, I say so on camera.</p></div>
+      </details>
+    </div>
+  </div>
+</section>
 <section class="closing">
   <div class="wrap">
     <div data-reveal>
       <h2>Any problems? I have the fix.</h2>
       <p>Two free checks a week. Apply now and you'll hear from me either way within seven days.</p>
-      <a class="btn" href="check.html">Get a free Optimization Check
+      <a class="btn" data-liquid="" href="check.html">Get a free Optimization Check
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
       </a>
     </div>
@@ -565,6 +726,7 @@
     <div>Clashworks, Clayton Trevino. Dallas, Texas.</div>
     <ul>
       <li><a href="about.html">Who I am</a></li>
+      <li><a href="privacy.html">Privacy</a></li>
       <li><a href="https://www.youtube.com/@clashworkshq">YouTube</a></li>
       <li><a href="https://www.tiktok.com/@clashworkshq">TikTok</a></li>
       <li><a href="https://www.instagram.com/clashworkshq">Instagram</a></li>
@@ -628,6 +790,27 @@ window.addEventListener("DOMContentLoaded", () => {
   // anything already in view on load (hero) shows immediately
   document.querySelectorAll(".hero [data-reveal]").forEach(el => el.classList.add("in"));
 
+  // faq: the answer slides open and closed instead of jumping, and the plus turns into a cross
+  document.querySelectorAll("#faq details").forEach(d => {
+    const sum = d.querySelector("summary"), body = d.querySelector(".answer");
+    let anim = null;
+    sum.addEventListener("click", e => {
+      e.preventDefault();
+      if (reduce) { d.open = !d.open; d.classList.toggle("is-open", d.open); return; }
+      if (anim) anim.cancel();
+      const ease = "cubic-bezier(.2,.7,.2,1)";
+      if (d.open) {
+        d.classList.remove("is-open");
+        anim = body.animate({ height: [body.offsetHeight + "px", "0px"], opacity: [1, 0] }, { duration: 240, easing: ease });
+        anim.onfinish = () => { d.open = false; anim = null; };
+      } else {
+        d.open = true; d.classList.add("is-open");
+        anim = body.animate({ height: ["0px", body.offsetHeight + "px"], opacity: [0, 1] }, { duration: 340, easing: ease });
+        anim.onfinish = () => { anim = null; };
+      }
+    });
+  });
+
   // count up when the numbers row enters; falls back to the final number without gsap
   const counters = [...document.querySelectorAll("[data-count]")];
   const cio = new IntersectionObserver(entries => entries.forEach(e => {
@@ -650,5 +833,6 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 });
 </script>
+<script src="assets/liquid.js" defer></script>
 </body>
 </html>

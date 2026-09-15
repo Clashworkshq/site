@@ -8,7 +8,10 @@
 <meta name="theme-color" content="#F5F7FA">
 <meta property="og:title" content="Who I am. Clayton Trevino, Clashworks">
 <meta property="og:description" content="Not a developer. Fixing real businesses with AI anyway, and showing the numbers.">
-<meta property="og:image" content="assets/headshot-mint-512.webp">
+<meta property="og:image" content="https://clashworks.co/assets/headshot-mint-512.webp">
+<meta property="og:url" content="https://clashworks.co/about.html">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
 <link rel="canonical" href="https://clashworks.co/about.html">
 <link rel="icon" href="assets/favicon-64.png" type="image/png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
@@ -166,6 +169,7 @@
     * { transition-duration: .01ms !important; }
   }
 </style>
+<link rel="stylesheet" href="assets/liquid.css">
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -182,7 +186,7 @@
       <li><a href="index.html#services">Services</a></li>
       <li><a href="index.html#free">Free kits</a></li>
       <li><a href="about.html" aria-current="page">Who I am</a></li>
-      <li class="cta-li"><a class="btn" href="check.html">Get a free check</a></li>
+      <li class="cta-li"><a class="btn" data-liquid="" href="check.html">Get a free check</a></li>
     </ul>
   </div>
 </header>
@@ -280,10 +284,10 @@
       <h2>Got a problem that eats your week?</h2>
       <p>Two free checks a week. Ten minutes of recorded, specific advice on your website, your Google listing, and how you run things. Yours to keep either way.</p>
       <div class="actions">
-        <a class="btn" href="check.html">Get a free Optimization Check
+        <a class="btn" data-liquid="" href="check.html">Get a free Optimization Check
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
         </a>
-        <a class="btn btn-ghost" href="index.html#fix">See what I fix</a>
+        <a class="btn btn-ghost" data-liquid="" href="index.html#fix">See what I fix</a>
       </div>
     </div>
     <div class="side">
@@ -305,6 +309,7 @@
     <div>Clashworks, Clayton Trevino. Dallas, Texas.</div>
     <ul>
       <li><a href="index.html">Home</a></li>
+      <li><a href="privacy.html">Privacy</a></li>
       <li><a href="https://www.youtube.com/@clashworkshq">YouTube</a></li>
       <li><a href="https://www.tiktok.com/@clashworkshq">TikTok</a></li>
       <li><a href="https://www.instagram.com/clashworkshq">Instagram</a></li>
@@ -321,5 +326,6 @@ const nav = document.getElementById("nav");
 const onScroll = () => nav.classList.toggle("is-stuck", scrollY > 8);
 onScroll(); addEventListener("scroll", onScroll, { passive: true });
 </script>
+<script src="assets/liquid.js" defer></script>
 </body>
 </html>

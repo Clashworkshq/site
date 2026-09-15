@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy and terms. Clashworks</title>
+<meta name="description" content="What clashworks.co collects, why, where it goes, and how to have it removed. Plus the short version of the terms.">
+<meta name="theme-color" content="#F5F7FA">
+<meta property="og:title" content="Privacy and terms. Clashworks">
+<meta property="og:description" content="What clashworks.co collects, why, where it goes, and how to have it removed.">
+<meta property="og:image" content="https://clashworks.co/assets/headshot-mint-512.webp">
+<meta property="og:url" content="https://clashworks.co/privacy.html">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<link rel="canonical" href="https://clashworks.co/privacy.html">
+<link rel="icon" href="assets/favicon-64.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100,500..900&family=Hanken+Grotesk:wght@400..700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0B1220; --ink-2: #3B4453; --ink-3: #6B7280;
+    --paper: #F5F7FA; --paper-2: #FFFFFF; --line: #E3E8EF;
+    --emerald: #10B981; --emerald-deep: #047857; --mint: #D1FAE5; --mint-2: #ECFDF5;
+    --radius: 14px; --max: 1360px;
+    --font: "Hanken Grotesk", "Segoe UI", system-ui, sans-serif;
+    --display: "Archivo", "Hanken Grotesk", "Segoe UI", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  body { font-family: var(--font); color: var(--ink); background: var(--paper); line-height: 1.55; font-size: 17px; overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column; }
+  main { flex: 1; }
+  img { max-width: 100%; display: block; }
+  a { color: inherit; }
+  :focus-visible { outline: 2px solid var(--emerald-deep); outline-offset: 3px; border-radius: 6px; }
+  .skip { position: absolute; left: -999px; top: 8px; background: var(--ink); color: #fff; padding: 8px 12px; z-index: 100; }
+  .skip:focus { left: 8px; }
+  .wrap { width: min(var(--max), calc(100% - clamp(32px, 5vw, 72px))); margin-inline: auto; }
+  h1, h2 { font-family: var(--display); font-weight: 700; letter-spacing: -0.02em; line-height: 1.05; }
+  h1 { font-size: clamp(2rem, 1.3rem + 3vw, 3.6rem); font-weight: 800; letter-spacing: -0.035em; }
+  h2 { font-size: clamp(1.35rem, 1.1rem + 1vw, 1.8rem); margin: 44px 0 12px; }
+  p.lede { font-size: clamp(1.05rem, 0.95rem + 0.5vw, 1.25rem); color: var(--ink-2); max-width: 34em; }
+
+  .nav { position: sticky; top: 0; z-index: 50; background: rgb(245 247 250 / .85); backdrop-filter: blur(14px) saturate(160%); box-shadow: 0 1px 0 var(--line); }
+  .nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 68px; gap: 12px; }
+  .brand { display: inline-flex; align-items: center; gap: 10px; font-family: var(--display); font-weight: 700; text-decoration: none; font-size: 1.05rem; letter-spacing: -0.01em; }
+  .brand img { width: 34px; height: 34px; }
+  .back { display: inline-flex; align-items: center; gap: 10px; min-height: 42px; padding: 0 20px 0 16px; border-radius: 999px; text-decoration: none; color: var(--ink); font-family: var(--display); font-weight: 600; font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; background: transparent; box-shadow: inset 0 0 0 1.5px var(--ink-3); transition: box-shadow .15s ease-out, background-color .15s ease-out; white-space: nowrap; }
+  .back .arrow { font-family: var(--font); font-weight: 500; font-size: 1rem; line-height: 1; }
+  .back:hover { box-shadow: inset 0 0 0 1.5px var(--ink); background: var(--paper-2); }
+
+  .intro { padding: clamp(28px, 4vw, 56px) 0 clamp(8px, 2vw, 20px); }
+  .intro .wrap, .doc .wrap { max-width: 760px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: .85rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--emerald-deep); margin-bottom: 14px; }
+  .eyebrow::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--emerald); }
+  .intro p.lede { margin-top: 14px; }
+  .facts { display: flex; gap: 22px; flex-wrap: wrap; margin-top: 20px; color: var(--ink-3); font-size: .95rem; }
+  .facts strong { color: var(--ink); font-weight: 600; }
+
+  .doc { padding-bottom: clamp(48px, 6vw, 96px); }
+  .doc p, .doc li { color: var(--ink-2); max-width: 40em; }
+  .doc p + p { margin-top: 12px; }
+  .doc ul { margin: 12px 0 0 0; padding-left: 0; list-style: none; }
+  .doc li { position: relative; padding-left: 26px; margin-top: 8px; }
+  .doc li::before { content: ""; position: absolute; left: 4px; top: .62em; width: 8px; height: 8px; border-radius: 50%; background: var(--emerald); }
+  .doc strong { color: var(--ink); font-weight: 600; }
+  .doc a { color: var(--ink); text-decoration-color: var(--emerald); text-underline-offset: 3px; }
+  .doc a:hover { text-decoration-color: var(--emerald-deep); }
+  .toc { margin-top: 24px; padding: 18px 22px; background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--radius); }
+  .toc ol { margin: 8px 0 0 0; padding-left: 20px; columns: 2; column-gap: 32px; font-size: .95rem; }
+  .toc li { color: var(--ink-2); padding: 3px 0; }
+  .toc a { text-decoration: none; color: var(--ink-2); }
+  .toc a:hover { color: var(--ink); text-decoration: underline; }
+  .plain { margin-top: 44px; padding: 20px 22px; border-left: 3px solid var(--emerald); background: var(--mint-2); border-radius: 0 var(--radius) var(--radius) 0; }
+  .plain p { color: var(--ink-2); }
+  @media (max-width: 600px) { .toc ol { columns: 1; } }
+
+  /* reading progress: a hairline along the bottom of the nav that fills as you go */
+  .nav { position: sticky; }
+  .progress { position: absolute; left: 0; bottom: -1px; height: 2px; width: 100%; background: var(--emerald); transform: scaleX(0); transform-origin: left; }
+  /* the list at the top follows you: the section on screen is the highlighted one */
+  .toc a { transition: color .2s, padding-left .25s cubic-bezier(.2,.7,.2,1); }
+  .toc li { position: relative; }
+  .toc a.is-current { color: var(--emerald-deep); font-weight: 600; padding-left: 10px; }
+  .toc a.is-current::before { content: ""; position: absolute; left: -12px; top: .55em; width: 6px; height: 6px; border-radius: 50%; background: var(--emerald); }
+  /* each section arrives as you reach it, same timing as the homepage */
+  .js [data-reveal] { opacity: 0; transform: translateY(18px); transition: opacity .55s cubic-bezier(.2,.7,.2,1), transform .55s cubic-bezier(.2,.7,.2,1); transition-delay: var(--d, 0s); }
+  .js [data-reveal].in { opacity: 1; transform: none; }
+  .js .intro > .wrap > * { opacity: 0; animation: rise .7s cubic-bezier(.2,.7,.2,1) forwards; }
+  .js .intro > .wrap > :nth-child(2) { animation-delay: .08s; }
+  .js .intro > .wrap > :nth-child(3) { animation-delay: .16s; }
+  .js .intro > .wrap > :nth-child(4) { animation-delay: .24s; }
+  .js .intro > .wrap > :nth-child(5) { animation-delay: .32s; }
+  @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .js [data-reveal] { opacity: 1; transform: none; transition: none; } .js .intro > .wrap > * { opacity: 1; animation: none; } }
+
+  footer { padding: 28px 0 40px; border-top: 1px solid var(--line); }
+  footer .wrap { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; align-items: center; color: var(--ink-3); font-size: .93rem; }
+  footer ul { display: flex; gap: 18px; list-style: none; flex-wrap: wrap; }
+  footer a { text-decoration: none; color: var(--ink-2); font-weight: 500; }
+  footer a:hover { color: var(--ink); }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; } html { scroll-behavior: auto; } }
+</style>
+<link rel="stylesheet" href="assets/liquid.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="index.html" aria-label="Clashworks home">
+      <img src="assets/logo.svg" alt="" width="34" height="34">
+      Clashworks
+    </a>
+    <a class="back" data-liquid="" href="index.html"><span class="arrow" aria-hidden="true">&larr;</span>Home</a>
+  </div>
+  <div class="progress" id="progress" aria-hidden="true"></div>
+</header>
+
+<main id="main">
+<section class="intro">
+  <div class="wrap">
+    <div class="eyebrow">Plain English, no lawyer voice</div>
+    <h1>Privacy and terms.</h1>
+    <p class="lede">What this site collects, why, where it goes, and how to have it removed. Then the short version of the terms.</p>
+    <div class="facts">
+      <span><strong>Effective</strong> September 15, 2026</span>
+      <span><strong>Applies to</strong> clashworks.co and its forms</span>
+      <span><strong>Run by</strong> Clayton Trevino, Dallas, Texas</span>
+    </div>
+    <nav class="toc" aria-label="On this page">
+      <strong>On this page</strong>
+      <ol>
+        <li><a href="#collect" data-liquid="glow">What I collect</a></li>
+        <li><a href="#why" data-liquid="glow">Why I collect it</a></li>
+        <li><a href="#where" data-liquid="glow">Where it goes</a></li>
+        <li><a href="#cookies" data-liquid="glow">Cookies and tracking</a></li>
+        <li><a href="#keep" data-liquid="glow">How long I keep it</a></li>
+        <li><a href="#rights" data-liquid="glow">Your choices</a></li>
+        <li><a href="#terms" data-liquid="glow">Terms of use</a></li>
+        <li><a href="#changes" data-liquid="glow">Changes</a></li>
+      </ol>
+    </nav>
+  </div>
+</section>
+
+<section class="doc">
+  <div class="wrap">
+    <div class="block" data-reveal>
+    <h2 id="collect">What I collect</h2>
+    <p>Only what you type into a form. There are two.</p>
+    <ul>
+      <li><strong>The Optimization Check application.</strong> Your name, your business name, its website and Google listing, an email or phone number to reach you, and your answers about how the business runs. If you ticked items on the homepage picker, those come along too.</li>
+      <li><strong>The Lead Leak Checklist request.</strong> One field, your email address.</li>
+    </ul>
+    <p>Nothing is collected from you just for visiting. No account, no sign-in, no hidden fields.</p>
+    </div>
+    <div class="block" data-reveal>
+    <h2 id="why">Why I collect it</h2>
+    <ul>
+      <li>To record your free Optimization Check and send it to you.</li>
+      <li>To send the checklist you asked for.</li>
+      <li>To reply if you asked a question or wanted something built.</li>
+    </ul>
+    <p>I do not sell or rent any of it. I do not add you to a newsletter unless you ask for one. Nothing about your business is published without your written permission.</p>
+    </div>
+    <div class="block" data-reveal>
+    <h2 id="where">Where it goes</h2>
+    <p>Form answers are stored by <strong>Tally</strong> (tally.so), the form tool both forms run on, and then in my own private records for the check. These services have their own privacy policies and are the only outside places your form answers go:</p>
+    <ul>
+      <li><strong>Tally</strong> receives and stores what you submit and shows the form inside this page.</li>
+      <li><strong>Google Fonts</strong> serves the two typefaces on this site, which means your browser requests them from Google.</li>
+      <li><strong>cdnjs (Cloudflare)</strong> serves one small animation library on the homepage.</li>
+      <li><strong>GitHub Pages</strong> hosts the site itself and sees the usual server logs.</li>
+    </ul>
+    <p>Links to YouTube, TikTok, Instagram, X, LinkedIn, and GitHub take you to those sites, which then apply their own rules.</p>
+    </div>
+    <div class="block" data-reveal>
+    <h2 id="cookies">Cookies and tracking</h2>
+    <p>This site sets no cookies of its own and runs no analytics or advertising trackers. The embedded Tally form may set a functional cookie so the form works. That is the full list. If I add a visitor counter later, this page will say which one and what it records before it goes live.</p>
+    </div>
+    <div class="block" data-reveal>
+    <h2 id="keep">How long I keep it</h2>
+    <p>Application answers are kept while the check is open and for as long as we might work together, then deleted. Checklist emails are kept only to send the checklist. Anything you ask me to remove is removed, from Tally and from my records.</p>
+    </div>
+    <div class="block" data-reveal>
+    <h2 id="rights">Your choices</h2>
+    <p>You can ask to see what I hold about you, correct it, or have it deleted, at any time. Reply to any message from me, or send a note through the <a href="check.html">application form</a> or any Clashworks profile linked in the footer. I answer within seven days.</p>
+    </div>
+    <div class="block" data-reveal>
+    <h2 id="terms">Terms of use</h2>
+    <ul>
+      <li><strong>The free Optimization Check is advice, not a promise.</strong> It is my honest read of your website, Google listing, and how you run things. What you do with it is your call.</li>
+      <li><strong>No guarantees on rankings or lead counts.</strong> Nobody can honestly make those. Paid work comes with a fixed price and a number we agree on up front; if that number cannot be shown at 30 days, you get a refund. The details live in the written agreement we both sign before any paid work starts.</li>
+      <li><strong>The free kits are yours to use.</strong> They are released under the MIT license on <a href="https://github.com/Clashworkshq">GitHub</a>, with no warranty. Test them before you rely on them.</li>
+      <li><strong>The site content is mine.</strong> Quote it with a link back. Do not pass it off as your own.</li>
+      <li><strong>Two free checks a week.</strong> Applying does not guarantee a slot. You hear back either way.</li>
+    </ul>
+    </div>
+    <div class="block" data-reveal>
+    <h2 id="changes">Changes</h2>
+    <p>If this page changes in a way that matters, the effective date at the top moves and the change is described here in one line. Small wording fixes do not get an entry.</p>
+
+    <div class="plain">
+      <p><strong>The whole thing in one breath:</strong> I collect what you type, use it to do the thing you asked for, keep it only as long as that takes, and delete it when you say so.</p>
+    </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div>Clashworks, Clayton Trevino. Dallas, Texas.</div>
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">Who I am</a></li>
+      <li><a href="check.html">Free check</a></li>
+      <li><a href="https://www.youtube.com/@clashworkshq">YouTube</a></li>
+      <li><a href="https://www.linkedin.com/company/clashworks">LinkedIn</a></li>
+    </ul>
+  </div>
+</footer>
+
+<script>
+document.documentElement.classList.add("js");
+window.addEventListener("DOMContentLoaded", () => {
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // progress hairline
+  const bar = document.getElementById("progress");
+  const paint = () => {
+    const max = document.documentElement.scrollHeight - innerHeight;
+    bar.style.transform = "scaleX(" + (max > 0 ? Math.min(1, scrollY / max) : 0) + ")";
+  };
+  paint(); addEventListener("scroll", paint, { passive: true }); addEventListener("resize", paint);
+
+  // reveals, observer plus css
+  const io = new IntersectionObserver(entries => entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    io.unobserve(e.target); e.target.classList.add("in");
+  }), { threshold: .01 });
+  document.querySelectorAll("[data-reveal]").forEach(el => io.observe(el));
+
+  // the on-this-page list follows the section in view
+  const links = [...document.querySelectorAll(".toc a[href^='#']")];
+  const byId = Object.fromEntries(links.map(a => [a.getAttribute("href").slice(1), a]));
+  const heads = links.map(a => document.getElementById(a.getAttribute("href").slice(1))).filter(Boolean);
+  let current = null;
+  const setCurrent = id => {
+    if (id === current) return;
+    current = id;
+    links.forEach(a => a.classList.toggle("is-current", a === byId[id]));
+  };
+  // the current section is the last heading that has passed the top third of the screen
+  const spy = () => {
+    const line = innerHeight * .33;
+    let id = heads[0] && heads[0].id;
+    heads.forEach(hd => { if (hd.getBoundingClientRect().top <= line) id = hd.id; });
+    setCurrent(id);
+  };
+  spy(); addEventListener("scroll", spy, { passive: true }); addEventListener("resize", spy);
+
+  // smooth scroll from the list, unless the reader asked for no motion
+  links.forEach(a => a.addEventListener("click", e => {
+    const t = document.getElementById(a.getAttribute("href").slice(1));
+    if (!t) return;
+    e.preventDefault();
+    t.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+    history.replaceState(null, "", a.getAttribute("href"));
+  }));
+});
+</script>
+<script src="assets/liquid.js" defer></script>
+</body>
+</html>

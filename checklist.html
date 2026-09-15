@@ -84,6 +84,7 @@
   footer a:hover { color: var(--ink); }
   @media print { .nav, .score, .closing .actions, footer { display: none; } .item input { display: inline-block; } body { font-size: 12pt; } }
 </style>
+<link rel="stylesheet" href="assets/liquid.css">
 </head>
 <body>
 
@@ -94,8 +95,8 @@
       Clashworks
     </a>
     <div class="nav-actions">
-      <a class="btn btn-small btn-ghost" href="index.html">Back to the site</a>
-      <a class="btn btn-small" href="check.html">Get a free check</a>
+      <a class="btn btn-small btn-ghost" data-liquid="" href="index.html">Back to the site</a>
+      <a class="btn btn-small" data-liquid="" href="check.html">Get a free check</a>
     </div>
   </div>
 </header>
@@ -150,11 +151,11 @@
     <h2>Want me to look at yours?</h2>
     <p>I do two free Optimization Checks a week for local businesses: a 10-minute recorded walkthrough of your site, your Google listing, and how you run things, with what I would fix first. The recording is yours either way.</p>
     <div class="actions">
-      <a class="btn" href="check.html">Apply for a free check
+      <a class="btn" data-liquid="" href="check.html">Apply for a free check
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
       </a>
-      <a class="btn btn-ghost" href="https://github.com/Clashworkshq/quote-form">Fix number 2 yourself, free</a>
-      <a class="btn btn-ghost" href="index.html">Back to the site</a>
+      <a class="btn btn-ghost" data-liquid="" href="https://github.com/Clashworkshq/quote-form">Fix number 2 yourself, free</a>
+      <a class="btn btn-ghost" data-liquid="" href="index.html">Back to the site</a>
     </div>
     <p class="sig">Clayton Trevino, Clashworks</p>
   </div>
@@ -167,6 +168,7 @@
     <ul>
       <li><a href="index.html">Home</a></li>
       <li><a href="about.html">Who I am</a></li>
+      <li><a href="privacy.html">Privacy</a></li>
       <li><a href="https://www.youtube.com/@clashworkshq">YouTube</a></li>
       <li><a href="https://www.linkedin.com/company/clashworks">LinkedIn</a></li>
     </ul>
@@ -193,5 +195,6 @@
   update();
 })();
 </script>
+<script src="assets/liquid.js" defer></script>
 </body>
 </html>

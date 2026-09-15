@@ -1,0 +1,57 @@
+/* Liquid controls, after Apple's Liquid Glass.
+   A control is a small piece of glass: it lights up where the pointer is,
+   drifts a few pixels toward it, and gives under a press, then springs back.
+   Modes, set with data-liquid on the element:
+     ""     full: glow, magnet, press   (buttons, pills)
+     "soft" glow and press, no magnet    (tiles, list rows)
+     "glow" glow only                    (text links, disclosure rows)
+   Everything here is off under prefers-reduced-motion except the glow. */
+
+.liquid {
+  position: relative; isolation: isolate; overflow: hidden;
+  --mx: 50%; --my: 50%; --tx: 0px; --ty: 0px; --press: 1;
+  transform: translate(var(--tx), var(--ty)) scale(var(--press));
+  transition: transform .55s cubic-bezier(.34, 1.56, .64, 1), background-color .2s, box-shadow .25s, color .2s;
+  will-change: transform;
+}
+.liquid::before {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: -1;
+  background: radial-gradient(140px circle at var(--mx) var(--my), rgb(255 255 255 / .55), rgb(255 255 255 / 0) 62%);
+  opacity: 0; transition: opacity .3s;
+}
+.liquid.is-near::before { opacity: 1; }
+.liquid.is-pressed { --press: .96; transition-duration: .12s; }
+[data-liquid="glow"].liquid.is-pressed { --press: 1; }
+
+/* the frosted edge: a thin light on the top rim, the way glass catches light */
+.liquid::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .45);
+}
+[data-liquid="glow"].liquid::after { display: none; }
+
+/* outlined pills become glass: translucent, blurred behind, a soft lift when near */
+.liquid.btn-ghost, .liquid.back {
+  background: rgb(255 255 255 / .18);
+  -webkit-backdrop-filter: blur(12px) saturate(140%); backdrop-filter: blur(12px) saturate(140%);
+}
+.liquid.btn-ghost.is-near, .liquid.back.is-near { background: rgb(255 255 255 / .3); }
+
+/* the solid emerald button keeps its color and gets depth instead */
+.liquid.btn:not(.btn-ghost):not(.btn-dark) { box-shadow: 0 10px 24px -14px rgb(16 185 129 / .6); }
+.liquid.btn:not(.btn-ghost):not(.btn-dark).is-near { box-shadow: 0 16px 32px -14px rgb(16 185 129 / .75); }
+.liquid.btn:not(.btn-ghost):not(.btn-dark)::before {
+  background: radial-gradient(140px circle at var(--mx) var(--my), rgb(255 255 255 / .38), rgb(255 255 255 / 0) 62%);
+}
+
+/* disclosure rows and list links: only the light moves */
+summary.liquid::before, .toc a.liquid::before {
+  background: radial-gradient(220px circle at var(--mx) var(--my), rgb(16 185 129 / .12), rgb(16 185 129 / 0) 62%);
+}
+/* list links stay on the baseline: no clipping, the glow lives inside the padding box */
+.toc a.liquid { display: inline-block; overflow: visible; vertical-align: baseline; padding: 0 8px; margin-left: -8px; border-radius: 8px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .liquid { transition: background-color .2s, box-shadow .25s, color .2s; transform: none; }
+  .liquid.is-pressed { transform: none; }
+}
