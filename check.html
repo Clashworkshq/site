@@ -131,9 +131,26 @@
 <section class="form-wrap" id="form">
   <div class="wrap">
     <div class="card is-loading" id="card">
-      <iframe src="https://tally.so/embed/81BBNk?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1" loading="eager" width="100%" height="420" title="Optimization Check application"></iframe>
+      <iframe data-src="https://tally.so/embed/81BBNk?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1" loading="eager" width="100%" height="420" title="Optimization Check application"></iframe>
     </div>
-    <p class="fallback">Form not loading? <a href="https://tally.so/r/81BBNk">Open it on Tally instead</a>.</p>
+    <p class="fallback">Form not loading? <a id="tally-link" href="https://tally.so/r/81BBNk">Open it on Tally instead</a>.</p>
+    <script>
+    // Forward the homepage picker ticks (?byhand=...) into the Tally hidden field
+    // named "byhand". Runs inline so the iframe loads once, with the final URL.
+    (() => {
+      const frame = document.querySelector("#card iframe");
+      const link = document.getElementById("tally-link");
+      let src = frame.dataset.src;
+      const raw = new URLSearchParams(location.search).get("byhand") || "";
+      const byhand = raw.replace(/[^A-Za-z0-9 ,'-]/g, "").slice(0, 300).trim();
+      if (byhand) {
+        const q = "byhand=" + encodeURIComponent(byhand);
+        src += "&" + q;
+        link.href += "?" + q;
+      }
+      frame.src = src;
+    })();
+    </script>
 
     <div class="thanks" id="thanks" role="status" aria-live="polite">
       <h2>Got it.</h2>
@@ -166,9 +183,10 @@
 (() => {
   const card = document.getElementById("card");
   const frame = card.querySelector("iframe");
-  // The iframe carries its src directly. Tally's loader would otherwise wait on an
-  // IntersectionObserver before setting it, which some browsers never fire for a
-  // background tab. With src set, loadEmbeds() just attaches the auto-height resizer.
+  // The iframe src is set inline above (with any ?byhand prefill). Tally's loader
+  // would otherwise wait on an IntersectionObserver before setting it, which some
+  // browsers never fire for a background tab. With src set, loadEmbeds() just
+  // attaches the auto-height resizer.
   const s = document.createElement("script");
   s.src = "https://tally.so/widgets/embed.js";
   s.onload = () => { try { window.Tally && window.Tally.loadEmbeds(); } catch (err) { /* no resizer, fixed height below */ } };
