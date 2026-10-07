@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The stack behind Clashworks</title>
+<meta name="description" content="Four tools a finance major uses to run a business with AI: hundreds of hours of AI content, custom mods, Higgsfield, and a sync that runs while he sleeps. No sponsors.">
+<link rel="canonical" href="https://clashworks.co/stack.html">
+<meta property="og:title" content="The stack behind Clashworks">
+<meta property="og:description" content="Four tools I actually use to run a business with AI. No sponsors, no affiliate links.">
+<meta property="og:url" content="https://clashworks.co/stack.html">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#F5F7FA">
+<link rel="icon" href="assets/favicon-64.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100,500..900&family=Hanken+Grotesk:wght@400..700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0B1220; --ink-2: #3B4453; --ink-3: #6B7280;
+    --paper: #F5F7FA; --paper-2: #FFFFFF; --line: #E3E8EF;
+    --emerald: #10B981; --emerald-deep: #047857; --mint: #D1FAE5; --mint-2: #ECFDF5;
+    --radius: 14px; --max: 1360px;
+    --font: "Hanken Grotesk", "Segoe UI", system-ui, sans-serif;
+    --display: "Archivo", "Hanken Grotesk", "Segoe UI", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { font-family: var(--font); color: var(--ink); background: var(--paper); line-height: 1.5; font-size: 17px; overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column; }
+  main { flex: 1; }
+  a { color: inherit; }
+  :focus-visible { outline: 2px solid var(--emerald-deep); outline-offset: 3px; border-radius: 6px; }
+  .skip { position: absolute; left: -999px; top: 8px; background: var(--ink); color: #fff; padding: 8px 12px; z-index: 100; }
+  .skip:focus { left: 8px; }
+  .wrap { width: min(var(--max), calc(100% - clamp(32px, 5vw, 72px))); margin-inline: auto; }
+  h1 { font-family: var(--display); font-weight: 800; letter-spacing: -0.035em; line-height: 1.05; font-size: clamp(2rem, 1.3rem + 3vw, 3.6rem); }
+  p.lede { font-size: clamp(1.05rem, 0.95rem + 0.5vw, 1.25rem); color: var(--ink-2); max-width: 34em; margin-top: 14px; }
+
+  .nav { position: sticky; top: 0; z-index: 50; background: rgb(245 247 250 / .85); backdrop-filter: blur(14px) saturate(160%); box-shadow: 0 1px 0 var(--line); }
+  .nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 68px; gap: 12px; }
+  .brand { display: inline-flex; align-items: center; gap: 10px; font-family: var(--display); font-weight: 700; text-decoration: none; font-size: 1.05rem; letter-spacing: -0.01em; }
+  .brand img { width: 34px; height: 34px; }
+  .back {
+    display: inline-flex; align-items: center; gap: 10px; min-height: 42px; padding: 0 20px 0 16px;
+    border-radius: 999px; text-decoration: none; color: var(--ink);
+    font-family: var(--display); font-weight: 600; font-size: .8rem; letter-spacing: .12em; text-transform: uppercase;
+    background: transparent; box-shadow: inset 0 0 0 1.5px var(--ink-3);
+    transition: box-shadow .15s ease-out, background-color .15s ease-out, transform .15s ease-out;
+    white-space: nowrap;
+  }
+  .back .arrow { font-family: var(--font); font-weight: 500; font-size: 1rem; line-height: 1; transition: transform .2s ease-out; }
+  .back:hover { box-shadow: inset 0 0 0 1.5px var(--ink); background: var(--paper-2); }
+  .back:hover .arrow { transform: translateX(-3px); }
+
+  .hero { padding: clamp(36px, 6vw, 80px) 0 clamp(20px, 3vw, 36px); }
+  .hero .wrap, .tools .wrap, .next .wrap, .biz .wrap { max-width: 760px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: .85rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--emerald-deep); margin-bottom: 14px; }
+  .eyebrow::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--emerald); }
+
+  .tools .wrap { display: grid; gap: 16px; }
+  .tool { background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--radius); padding: clamp(18px, 3vw, 28px); box-shadow: 0 24px 48px -36px rgb(11 18 32 / .25); }
+  .tool-head { display: flex; align-items: center; gap: 12px; }
+  .tool-head h2 { font-family: var(--display); font-weight: 800; letter-spacing: -0.02em; font-size: clamp(1.3rem, 1.1rem + 1vw, 1.7rem); line-height: 1.1; flex: 1; min-width: 0; }
+  .num { font-family: var(--display); font-weight: 700; color: var(--ink-3); font-size: .95rem; }
+  .badge { width: 30px; height: 30px; flex: none; }
+  .tool dl { display: grid; gap: 12px; margin-top: 16px; }
+  .tool dt { font-size: .78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+  .tool dd { color: var(--ink-2); margin-top: 2px; }
+  .more { display: inline-block; margin-top: 16px; color: var(--emerald-deep); font-weight: 600; text-decoration: none; }
+  .more:hover { text-decoration: underline; }
+
+  .next { padding: clamp(28px, 4vw, 48px) 0 0; }
+  .strip { background: var(--ink); color: var(--paper); border-radius: var(--radius); padding: clamp(20px, 3vw, 30px); display: flex; flex-wrap: wrap; gap: 14px 24px; align-items: center; justify-content: space-between; }
+  .strip p { max-width: 30em; }
+  .strip strong { font-family: var(--display); font-weight: 800; font-size: 1.2rem; display: block; margin-bottom: 4px; }
+  .btn { display: inline-flex; align-items: center; min-height: 46px; padding: 0 22px; border-radius: 999px; background: var(--emerald); color: var(--ink); font-weight: 700; text-decoration: none; white-space: nowrap; }
+  .btn:hover { background: #34d399; }
+
+  .biz { padding: clamp(28px, 4vw, 48px) 0 clamp(48px, 6vw, 96px); }
+  .biz .box { border: 1.5px solid var(--emerald-deep); background: var(--mint-2); border-radius: var(--radius); padding: clamp(20px, 3vw, 30px); }
+  .biz h2 { font-family: var(--display); font-weight: 800; letter-spacing: -0.02em; font-size: clamp(1.3rem, 1.1rem + 1vw, 1.6rem); }
+  .biz p { color: var(--ink-2); margin: 8px 0 18px; max-width: 34em; }
+  .biz .btn { background: var(--ink); color: var(--paper); }
+  .biz .btn:hover { background: var(--emerald-deep); }
+
+  footer { padding: 28px 0 40px; border-top: 1px solid var(--line); }
+  footer .wrap { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; align-items: center; color: var(--ink-3); font-size: .93rem; }
+  footer ul { display: flex; gap: 18px; list-style: none; flex-wrap: wrap; }
+  footer a { text-decoration: none; color: var(--ink-2); font-weight: 500; }
+  footer a:hover { color: var(--ink); }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; } }
+</style>
+<link rel="stylesheet" href="assets/liquid.css">
+</head>
+<body>
+<a class="skip" href="#tools">Skip to the stack</a>
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="index.html" aria-label="Clashworks home">
+      <img src="assets/logo.svg" alt="" width="34" height="34">
+      Clashworks
+    </a>
+    <a class="back" data-liquid="" href="index.html"><span class="arrow" aria-hidden="true">&larr;</span>Home</a>
+  </div>
+</header>
+<main>
+<section class="hero">
+  <div class="wrap">
+    <div class="eyebrow">From reel 01</div>
+    <h1>The stack behind Clashworks.</h1>
+    <p class="lede">I'm a finance major, not a developer. These are the four things I actually use to run the business, and all of them sit on top of Claude Code. Nobody paid to be on this list.</p>
+  </div>
+</section>
+<section class="tools" id="tools">
+  <div class="wrap">
+    <article class="tool">
+      <div class="tool-head"><span class="num">01</span><h2>Hundreds of hours, boiled down</h2><svg class="badge" viewBox="0 0 24 24" role="img" aria-label="I use this"><rect x="1" y="1" width="22" height="22" rx="6" fill="#10B981"/><path d="M7 12.5l3.2 3.2L17 9" fill="none" stroke="#0B1220" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <dl>
+        <div><dt>What it is</dt><dd>Hundreds of hours of AI content I've watched, plus a research robot: a browser agent paired with faster-whisper, a free speech-to-text model that runs on my laptop.</dd></div>
+        <div><dt>What it did</dt><dd>For this reel the robot went through 29 TikToks and transcribed 13 of them. The pattern it found, hook to CTA, is the one you just watched.</dd></div>
+        <div><dt>Cost</dt><dd>Free. Runs on my own computer.</dd></div>
+      </dl>
+      <a class="more" href="https://github.com/SYSTRAN/faster-whisper" rel="noopener">faster-whisper on GitHub <span aria-hidden="true">&rarr;</span></a>
+    </article>
+    <article class="tool">
+      <div class="tool-head"><span class="num">02</span><h2>Custom mods</h2><svg class="badge" viewBox="0 0 24 24" role="img" aria-label="I use this"><rect x="1" y="1" width="22" height="22" rx="6" fill="#10B981"/><path d="M7 12.5l3.2 3.2L17 9" fill="none" stroke="#0B1220" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <dl>
+        <div><dt>What it is</dt><dd>Small add-ons I built inside my AI coding tool, so the things I check all day sit right on screen.</dd></div>
+        <div><dt>What it did</dt><dd>I use them every day while I work. The full breakdown comes in the mods series, so follow if you want it.</dd></div>
+        <div><dt>Cost</dt><dd>Free. I wrote them.</dd></div>
+      </dl>
+    </article>
+    <article class="tool">
+      <div class="tool-head"><span class="num">03</span><h2>Higgsfield</h2><svg class="badge" viewBox="0 0 24 24" role="img" aria-label="I use this"><rect x="1" y="1" width="22" height="22" rx="6" fill="#10B981"/><path d="M7 12.5l3.2 3.2L17 9" fill="none" stroke="#0B1220" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <dl>
+        <div><dt>What it is</dt><dd>An AI studio for images, video and voice.</dd></div>
+        <div><dt>What it did</dt><dd>It made every scene in this reel, the stills and the animation.</dd></div>
+        <div><dt>Cost</dt><dd>Paid plan.</dd></div>
+      </dl>
+      <a class="more" href="https://higgsfield.ai" rel="noopener">higgsfield.ai <span aria-hidden="true">&rarr;</span></a>
+    </article>
+    <article class="tool">
+      <div class="tool-head"><span class="num">04</span><h2>A sync that runs while I sleep</h2><svg class="badge" viewBox="0 0 24 24" role="img" aria-label="I use this"><rect x="1" y="1" width="22" height="22" rx="6" fill="#10B981"/><path d="M7 12.5l3.2 3.2L17 9" fill="none" stroke="#0B1220" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <dl>
+        <div><dt>What it is</dt><dd>A short Python script that copies new bookings from a rental platform into a spreadsheet once a day.</dd></div>
+        <div><dt>What it did</dt><dd>I set it up and haven't touched it since. Each run takes under a minute.</dd></div>
+        <div><dt>Cost</dt><dd>$0 a run on GitHub Actions.</dd></div>
+      </dl>
+    </article>
+  </div>
+</section>
+<section class="next">
+  <div class="wrap">
+    <div class="strip">
+      <p><strong>Coming next: the repos I use</strong>One per reel, each one tested on real work first.</p>
+      <a class="btn" href="https://www.instagram.com/clashworkshq/" rel="noopener">Follow @clashworkshq</a>
+    </div>
+  </div>
+</section>
+<section class="biz">
+  <div class="wrap">
+    <div class="box">
+      <h2>Run a local business?</h2>
+      <p>The free Optimization Check shows where your website and Google listing are losing customers: missed calls, dead forms, no reviews.</p>
+      <a class="btn" href="check.html">Get the free Optimization Check</a>
+    </div>
+  </div>
+</section>
+</main>
+<footer>
+  <div class="wrap">
+    <div>Clashworks, Clayton Trevino. Dallas, Texas.</div>
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">Who I am</a></li>
+      <li><a href="check.html">Free Optimization Check</a></li>
+      <li><a href="privacy.html">Privacy</a></li>
+      <li><a href="https://www.youtube.com/@clashworkshq">YouTube</a></li>
+      <li><a href="https://www.linkedin.com/company/clashworks">LinkedIn</a></li>
+    </ul>
+  </div>
+</footer>
+<script src="assets/liquid.js" defer></script>
+</body>
+</html>
