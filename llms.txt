@@ -1,0 +1,29 @@
+# Clashworks
+
+> Clashworks is Clayton Trevino's AI operations business in Dallas, Texas. He fixes how local service businesses and property or rental operators get and answer leads (websites, quote forms, missed-call text-back, reviews, booking sync, AI search visibility) and documents every fix in public. Clayton is a Finance and Real Estate major at SMU's Cox School of Business. Every paid fix ships with tracking and a Measured-or-Free guarantee: one number agreed up front, measured 30 days after delivery, full refund of fees if it cannot be shown. No promises on rankings or lead counts.
+
+## Start here
+
+- [Home](https://clashworks.co/): who it is for, the services, how pricing and the guarantee work, and the FAQ
+- [Free Optimization Check](https://clashworks.co/check.html): apply for a free 10-minute review of a website, Google listing, and how the business runs; two a week, reply within seven days
+- [Who I am](https://clashworks.co/about.html): Clayton Trevino's background, how he works, and what he has built
+- [The stack](https://clashworks.co/stack.html): the AI tools and setup behind the work, as shown in reel 01
+
+## Services
+
+- Fix: Quick Install (one kit installed and tracked), Leak Fix (quote form, missed-call text-back, review system, end to end), Local Engine (Google listing, reviews, service pages, monthly AI search check)
+- Build: Landing Page, Website Rebuild, Automation Sprint, Owner Report and Booking Sync for rental operators, Custom Build
+- Market: Marketing Audit, AI Search Visibility
+- Run: Front Desk Training, Site Care, Ops Retainer
+- Every job is fixed-price, quoted from the free check
+
+## Policies
+
+- [Terms](https://clashworks.co/terms.html): the guarantee's full conditions, not legal or financial advice, results and reviews, AI-made content
+- [Privacy policy](https://clashworks.co/privacy.html): what the forms collect, no cookies of its own, no trackers, nothing sold
+- [Accessibility](https://clashworks.co/accessibility.html): WCAG 2.2 AA target, how it was tested, how to report a problem
+
+## Optional
+
+- [Free kits on GitHub](https://github.com/Clashworkshq): open-source (MIT) builds from real fixes, starting with the quote form
+- Profiles: YouTube, TikTok, Instagram and X at @clashworkshq; LinkedIn at linkedin.com/company/clashworks

@@ -55,3 +55,10 @@ summary.liquid::before, .toc a.liquid::before {
   .liquid { transition: background-color .2s, box-shadow .25s, color .2s; transform: none; }
   .liquid.is-pressed { transform: none; }
 }
+
+/* Accessibility floor shared by every page (WCAG 2.2 AA).
+   Jump links and Tab focus land below the 68px sticky nav (2.4.11),
+   and footer links and checkboxes meet the 24px target size (2.5.8). */
+html { scroll-padding-top: 88px; }
+footer li a { display: inline-flex; align-items: center; justify-content: center; min-height: 24px; min-width: 24px; }
+input[type="checkbox"] { min-width: 24px; min-height: 24px; }

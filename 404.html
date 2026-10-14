@@ -49,6 +49,7 @@
   .blob { position: absolute; width: clamp(260px, 40vw, 520px); aspect-ratio: 1; border-radius: 46% 54% 52% 48% / 52% 44% 56% 48%; background: radial-gradient(circle at 35% 35%, var(--mint) 0%, var(--mint-2) 55%, transparent 72%); top: -8%; right: -6%; z-index: -1; animation: drift 14s ease-in-out infinite alternate; pointer-events: none; }
   @keyframes drift { from { transform: translate(0, 0) rotate(0deg); } to { transform: translate(-28px, 22px) rotate(12deg); } }
   /* one load sequence: the number wipes in from the left, then the words and buttons rise in turn */
+  .code::before { content: attr(data-code); } /* decoration; the h1 says it in words */
   .js .code { clip-path: inset(0 100% 0 0); animation: wipe .9s cubic-bezier(.2,.7,.2,1) .1s forwards; }
   .js .lost h1, .js .lost .lede, .js .lost .actions, .js .lost .places { opacity: 0; animation: rise .7s cubic-bezier(.2,.7,.2,1) forwards; }
   .js .lost h1 { animation-delay: .45s; }
@@ -98,7 +99,7 @@
 <section class="lost">
   <div class="blob" aria-hidden="true"></div>
   <div class="wrap">
-    <div class="code" id="code" aria-hidden="true">404</div>
+    <div class="code" id="code" aria-hidden="true" data-code="404"></div>
     <h1>That page is not here.</h1>
     <p class="lede">The link is old, or a letter is off. Nothing on this site is hidden, so everything worth reaching is one tap away.</p>
     <div class="actions">
@@ -114,11 +115,13 @@
 
 <footer>
   <div class="wrap">
-    <div>Clashworks, Clayton Trevino. Dallas, Texas.</div>
+    <div>&copy; 2026 Clashworks, run by Clayton Trevino. Dallas, Texas.</div>
     <ul>
       <li><a href="/">Home</a></li>
       <li><a href="/about.html">Who I am</a></li>
       <li><a href="/privacy.html">Privacy</a></li>
+      <li><a href="/terms.html">Terms</a></li>
+      <li><a href="/accessibility.html">Accessibility</a></li>
       <li><a href="https://www.youtube.com/@clashworkshq">YouTube</a></li>
       <li><a href="https://www.linkedin.com/company/clashworks">LinkedIn</a></li>
     </ul>

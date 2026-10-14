@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Accessibility. Clashworks</title>
+<meta name="description" content="How clashworks.co is built for people who use a keyboard, a screen reader, zoom, or reduced motion, what is still limited, and how to report a problem.">
+<meta name="theme-color" content="#F5F7FA">
+<meta property="og:title" content="Accessibility. Clashworks">
+<meta property="og:description" content="How clashworks.co is built for people who use a keyboard, a screen reader, zoom, or reduced motion, what is still limited, and how to report a problem.">
+<meta property="og:image" content="https://clashworks.co/assets/headshot-mint-512.webp">
+<meta property="og:url" content="https://clashworks.co/accessibility.html">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<link rel="canonical" href="https://clashworks.co/accessibility.html">
+<link rel="icon" href="assets/favicon-64.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100,500..900&family=Hanken+Grotesk:wght@400..700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0B1220; --ink-2: #3B4453; --ink-3: #6B7280;
+    --paper: #F5F7FA; --paper-2: #FFFFFF; --line: #E3E8EF;
+    --emerald: #10B981; --emerald-deep: #047857; --mint: #D1FAE5; --mint-2: #ECFDF5;
+    --radius: 14px; --max: 1360px;
+    --font: "Hanken Grotesk", "Segoe UI", system-ui, sans-serif;
+    --display: "Archivo", "Hanken Grotesk", "Segoe UI", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  body { font-family: var(--font); color: var(--ink); background: var(--paper); line-height: 1.55; font-size: 17px; overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column; }
+  main { flex: 1; }
+  img { max-width: 100%; display: block; }
+  a { color: inherit; }
+  :focus-visible { outline: 2px solid var(--emerald-deep); outline-offset: 3px; border-radius: 6px; }
+  .skip { position: absolute; left: -999px; top: 8px; background: var(--ink); color: #fff; padding: 8px 12px; z-index: 100; }
+  .skip:focus { left: 8px; }
+  .wrap { width: min(var(--max), calc(100% - clamp(32px, 5vw, 72px))); margin-inline: auto; }
+  h1, h2 { font-family: var(--display); font-weight: 700; letter-spacing: -0.02em; line-height: 1.05; }
+  h1 { font-size: clamp(2rem, 1.3rem + 3vw, 3.6rem); font-weight: 800; letter-spacing: -0.035em; }
+  h2 { font-size: clamp(1.35rem, 1.1rem + 1vw, 1.8rem); margin: 44px 0 12px; }
+  p.lede { font-size: clamp(1.05rem, 0.95rem + 0.5vw, 1.25rem); color: var(--ink-2); max-width: 34em; }
+
+  .nav { position: sticky; top: 0; z-index: 50; background: rgb(245 247 250 / .85); backdrop-filter: blur(14px) saturate(160%); box-shadow: 0 1px 0 var(--line); }
+  .nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 68px; gap: 12px; }
+  .brand { display: inline-flex; align-items: center; gap: 10px; font-family: var(--display); font-weight: 700; text-decoration: none; font-size: 1.05rem; letter-spacing: -0.01em; }
+  .brand img { width: 34px; height: 34px; }
+  .back { display: inline-flex; align-items: center; gap: 10px; min-height: 42px; padding: 0 20px 0 16px; border-radius: 999px; text-decoration: none; color: var(--ink); font-family: var(--display); font-weight: 600; font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; background: transparent; box-shadow: inset 0 0 0 1.5px var(--ink-3); transition: box-shadow .15s ease-out, background-color .15s ease-out; white-space: nowrap; }
+  .back .arrow { font-family: var(--font); font-weight: 500; font-size: 1rem; line-height: 1; }
+  .back:hover { box-shadow: inset 0 0 0 1.5px var(--ink); background: var(--paper-2); }
+
+  .intro { padding: clamp(28px, 4vw, 56px) 0 clamp(8px, 2vw, 20px); }
+  .intro .wrap, .doc .wrap { max-width: 760px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: .85rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--emerald-deep); margin-bottom: 14px; }
+  .eyebrow::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--emerald); }
+  .intro p.lede { margin-top: 14px; }
+  .facts { display: flex; gap: 22px; flex-wrap: wrap; margin-top: 20px; color: var(--ink-3); font-size: .95rem; }
+  .facts strong { color: var(--ink); font-weight: 600; }
+
+  .doc { padding-bottom: clamp(48px, 6vw, 96px); }
+  .doc p, .doc li { color: var(--ink-2); max-width: 40em; }
+  .doc p + p { margin-top: 12px; }
+  .doc ul { margin: 12px 0 0 0; padding-left: 0; list-style: none; }
+  .doc li { position: relative; padding-left: 26px; margin-top: 8px; }
+  .doc li::before { content: ""; position: absolute; left: 4px; top: .62em; width: 8px; height: 8px; border-radius: 50%; background: var(--emerald); }
+  .doc strong { color: var(--ink); font-weight: 600; }
+  .doc a { color: var(--ink); text-decoration-color: var(--emerald); text-underline-offset: 3px; }
+  .doc a:hover { text-decoration-color: var(--emerald-deep); }
+  .toc { margin-top: 24px; padding: 18px 22px; background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--radius); }
+  .toc ol { margin: 8px 0 0 0; padding-left: 20px; columns: 2; column-gap: 32px; font-size: .95rem; }
+  .toc li { color: var(--ink-2); padding: 3px 0; }
+  .toc a { text-decoration: none; color: var(--ink-2); }
+  .toc a:hover { color: var(--ink); text-decoration: underline; }
+  .plain { margin-top: 44px; padding: 20px 22px; border-left: 3px solid var(--emerald); background: var(--mint-2); border-radius: 0 var(--radius) var(--radius) 0; }
+  .plain p { color: var(--ink-2); }
+  @media (max-width: 600px) { .toc ol { columns: 1; } }
+
+  /* reading progress: a hairline along the bottom of the nav that fills as you go */
+  .nav { position: sticky; }
+  .progress { position: absolute; left: 0; bottom: -1px; height: 2px; width: 100%; background: var(--emerald); transform: scaleX(0); transform-origin: left; }
+  /* the list at the top follows you: the section on screen is the highlighted one */
+  .toc a { transition: color .2s, padding-left .25s cubic-bezier(.2,.7,.2,1); }
+  .toc li { position: relative; }
+  .toc a.is-current { color: var(--emerald-deep); font-weight: 600; padding-left: 10px; }
+  .toc a.is-current::before { content: ""; position: absolute; left: -12px; top: .55em; width: 6px; height: 6px; border-radius: 50%; background: var(--emerald); }
+  /* each section arrives as you reach it, same timing as the homepage */
+  .js [data-reveal] { opacity: 0; transform: translateY(18px); transition: opacity .55s cubic-bezier(.2,.7,.2,1), transform .55s cubic-bezier(.2,.7,.2,1); transition-delay: var(--d, 0s); }
+  .js [data-reveal].in { opacity: 1; transform: none; }
+  .js .intro > .wrap > * { opacity: 0; animation: rise .7s cubic-bezier(.2,.7,.2,1) forwards; }
+  .js .intro > .wrap > :nth-child(2) { animation-delay: .08s; }
+  .js .intro > .wrap > :nth-child(3) { animation-delay: .16s; }
+  .js .intro > .wrap > :nth-child(4) { animation-delay: .24s; }
+  .js .intro > .wrap > :nth-child(5) { animation-delay: .32s; }
+  @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .js [data-reveal] { opacity: 1; transform: none; transition: none; } .js .intro > .wrap > * { opacity: 1; animation: none; } }
+
+  footer { padding: 28px 0 40px; border-top: 1px solid var(--line); }
+  footer .wrap { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; align-items: center; color: var(--ink-3); font-size: .93rem; }
+  footer ul { display: flex; gap: 18px; list-style: none; flex-wrap: wrap; }
+  footer a { text-decoration: none; color: var(--ink-2); font-weight: 500; }
+  footer a:hover { color: var(--ink); }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; } html { scroll-behavior: auto; } }
+</style>
+<link rel="stylesheet" href="assets/liquid.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="index.html" aria-label="Clashworks home">
+      <img src="assets/logo.svg" alt="" width="34" height="34">
+      Clashworks
+    </a>
+    <a class="back" data-liquid="" href="index.html"><span class="arrow" aria-hidden="true">&larr;</span>Home</a>
+  </div>
+  <div class="progress" id="progress" aria-hidden="true"></div>
+</header>
+
+<main id="main">
+<section class="intro">
+  <div class="wrap">
+    <div class="eyebrow">Built for every visitor</div>
+    <h1>Accessibility.</h1>
+    <p class="lede">This site should work for you whether you use a mouse, a keyboard, a screen reader, a phone, or zoom. Here is what I did, what is still limited, and how to tell me when something gets in your way.</p>
+    <div class="facts">
+      <span><strong>Goal</strong> WCAG 2.2, level AA</span>
+      <span><strong>Last reviewed</strong> October 14, 2026</span>
+      <span><strong>Run by</strong> Clayton Trevino, as Clashworks</span>
+    </div>
+    <nav class="toc" aria-label="On this page">
+      <strong>On this page</strong>
+      <ol>
+        <li><a href="#goal" data-liquid="glow">The goal</a></li>
+        <li><a href="#done" data-liquid="glow">What is in place</a></li>
+        <li><a href="#tested" data-liquid="glow">How it was checked</a></li>
+        <li><a href="#limits" data-liquid="glow">Known limits</a></li>
+        <li><a href="#report" data-liquid="glow">Report a problem</a></li>
+      </ol>
+    </nav>
+  </div>
+</section>
+
+<section class="doc">
+  <div class="wrap">
+    <div class="block" data-reveal>
+    <h2 id="goal">The goal</h2>
+    <p>The target is WCAG 2.2 level AA, the standard checklist that accessible websites are tested against. I do not claim the site is perfect. I claim it is checked, and that problems you report get fixed.</p>
+    </div>
+    <div class="block" data-reveal>
+    <h2 id="done">What is in place</h2>
+    <ul>
+      <li><strong>Keyboard.</strong> Everything works with Tab, Enter, and Space, a "Skip to content" link comes first, and focus is always visible and never hidden under the top bar.</li>
+      <li><strong>Screen readers.</strong> Pages declare English, have one main heading, headings in order, named regions, and described images.</li>
+      <li><strong>Reading.</strong> Text meets 4.5 to 1 contrast, and pages reflow on a phone or at 200% zoom without sideways scrolling.</li>
+      <li><strong>Motion.</strong> If your device asks for reduced motion, the animations stop. The scrolling strip on the homepage has a pause button.</li>
+      <li><strong>Tap targets.</strong> Buttons and links are at least 24 pixels, so they are easy to hit on a phone.</li>
+      <li><strong>No overlay widget.</strong> The fixes are in the code itself, not in a plugin pasted on top.</li>
+    </ul>
+    </div>
+    <div class="block" data-reveal>
+    <h2 id="tested">How it was checked</h2>
+    <p>On October 14, 2026, every page was scanned with axe-core 4.10 (the engine behind most accessibility scanners) at desktop and phone widths, then checked by hand with a keyboard. Result: no automated issues on any page.</p>
+    </div>
+    <div class="block" data-reveal>
+    <h2 id="limits">Known limits</h2>
+    <ul>
+      <li><strong>The two forms run on Tally,</strong> a form service embedded in the page. Its accessibility is Tally's. Each form page has a link to open the form directly on Tally, which can work better with some screen readers.</li>
+      <li><strong>Videos live on YouTube, TikTok, and Instagram.</strong> They carry burned-in captions; the platform players are outside my control.</li>
+    </ul>
+    </div>
+    <div class="block" data-reveal>
+    <h2 id="report">Report a problem</h2>
+    <p>If anything on this site blocks you, tell me through any Clashworks profile linked in the footer, or reply to any message from me. Say which page and what happened. I answer within seven days, and if a form will not work for you, I will take your answers another way.</p>
+    </div>
+    <div class="plain">
+      <p><strong>The whole thing in one breath:</strong> built and tested to WCAG 2.2 AA, no overlay, and if something still gets in your way, tell me and it gets fixed.</p>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div>&copy; 2026 Clashworks, run by Clayton Trevino. Dallas, Texas.</div>
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">Who I am</a></li>
+      <li><a href="check.html">Free check</a></li>
+      <li><a href="privacy.html">Privacy</a></li>
+      <li><a href="terms.html">Terms</a></li>
+      <li><a href="accessibility.html">Accessibility</a></li>
+      <li><a href="https://www.youtube.com/@clashworkshq">YouTube</a></li>
+      <li><a href="https://www.linkedin.com/company/clashworks">LinkedIn</a></li>
+    </ul>
+  </div>
+</footer>
+
+<script>
+document.documentElement.classList.add("js");
+window.addEventListener("DOMContentLoaded", () => {
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // progress hairline
+  const bar = document.getElementById("progress");
+  const paint = () => {
+    const max = document.documentElement.scrollHeight - innerHeight;
+    bar.style.transform = "scaleX(" + (max > 0 ? Math.min(1, scrollY / max) : 0) + ")";
+  };
+  paint(); addEventListener("scroll", paint, { passive: true }); addEventListener("resize", paint);
+
+  // reveals, observer plus css
+  const io = new IntersectionObserver(entries => entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    io.unobserve(e.target); e.target.classList.add("in");
+  }), { threshold: .01 });
+  document.querySelectorAll("[data-reveal]").forEach(el => io.observe(el));
+
+  // the on-this-page list follows the section in view
+  const links = [...document.querySelectorAll(".toc a[href^='#']")];
+  const byId = Object.fromEntries(links.map(a => [a.getAttribute("href").slice(1), a]));
+  const heads = links.map(a => document.getElementById(a.getAttribute("href").slice(1))).filter(Boolean);
+  let current = null;
+  const setCurrent = id => {
+    if (id === current) return;
+    current = id;
+    links.forEach(a => a.classList.toggle("is-current", a === byId[id]));
+  };
+  // the current section is the last heading that has passed the top third of the screen
+  const spy = () => {
+    const line = innerHeight * .33;
+    let id = heads[0] && heads[0].id;
+    heads.forEach(hd => { if (hd.getBoundingClientRect().top <= line) id = hd.id; });
+    setCurrent(id);
+  };
+  spy(); addEventListener("scroll", spy, { passive: true }); addEventListener("resize", spy);
+
+  // smooth scroll from the list, unless the reader asked for no motion
+  links.forEach(a => a.addEventListener("click", e => {
+    const t = document.getElementById(a.getAttribute("href").slice(1));
+    if (!t) return;
+    e.preventDefault();
+    t.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+    history.replaceState(null, "", a.getAttribute("href"));
+  }));
+});
+</script>
+<script src="assets/liquid.js" defer></script>
+</body>
+</html>

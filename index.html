@@ -146,6 +146,11 @@
   .marquee { border-block: 1px solid var(--line); background: var(--paper-2); overflow: hidden; padding: 14px 0; --gap: 44px; }
   .marquee .track { display: flex; gap: var(--gap); width: max-content; animation: scroll 42s linear infinite; }
   .marquee:hover .track { animation-play-state: paused; }
+  .marquee.is-paused .track { animation-play-state: paused; }
+  .marquee-row { position: relative; }
+  .marquee-pause { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); z-index: 2; min-height: 30px; padding: 0 12px; border: 0; border-radius: 999px; background: var(--paper-2); color: var(--ink-2); box-shadow: inset 0 0 0 1.5px var(--line), 0 2px 8px rgb(11 18 32 / .06); font: 600 .8rem/1 var(--font); letter-spacing: .02em; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+  .marquee-pause:hover { color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--ink-3), 0 2px 8px rgb(11 18 32 / .06); }
+  .marquee-pause svg { width: 12px; height: 12px; fill: currentColor; }
   .marquee ul { display: flex; gap: var(--gap); list-style: none; align-items: center; white-space: nowrap; font-weight: 600; color: var(--ink-2); font-size: .95rem; }
   .marquee li { display: flex; align-items: center; gap: 12px; }
   .marquee li::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--emerald); }
@@ -301,6 +306,7 @@
     .js .hero-copy .line { clip-path: none; animation: none; }
     .js .portrait { animation: none; }
     .marquee .track, .blob, .blob-2 { animation: none; }
+    .marquee-pause { display: none; }
     html { scroll-behavior: auto; }
     * { transition-duration: .01ms !important; }
   }
@@ -380,7 +386,7 @@
      "name": "What does “measured or free” mean?",
      "acceptedAnswer": {
       "@type": "Answer",
-      "text": "Every fix ships with tracking, and we agree on one number up front: quote requests a week, calls answered, reviews a month. Half is paid after the baseline is recorded, half on delivery. If the number cannot be shown at 30 days, you get a refund."
+      "text": "Every fix ships with tracking, and we agree on one number up front: quote requests a week, calls answered, reviews a month. Half is paid after the baseline is recorded, half on delivery. If the number cannot be shown 30 days after delivery, you get a full refund of my fees within 15 days. It does not promise the number goes up, and it does not apply if the tracking is removed. Full conditions are on the Terms page."
      }
     },
     {
@@ -458,6 +464,7 @@
   </div>
 </section>
 
+<div class="marquee-row">
 <div class="marquee" aria-hidden="true">
   <div class="track">
     <ul>
@@ -467,6 +474,8 @@
       <li>Quotes typed by hand</li><li>Missed calls that never get a text back</li><li>Contact forms with no phone field</li><li>Reminders from memory</li><li>Invoices chased one by one</li><li>Reviews nobody asks for</li><li>The same question answered ten times a day</li><li>Hours wrong on Google</li>
     </ul>
   </div>
+</div>
+<button class="marquee-pause" id="marquee-pause" type="button" aria-label="Pause the scrolling list"><svg viewBox="0 0 12 12" aria-hidden="true"><rect x="2" y="1" width="3" height="10" rx="1"/><rect x="7" y="1" width="3" height="10" rx="1"/></svg><span>Pause</span></button>
 </div>
 
 <section id="fix">
@@ -557,7 +566,7 @@
   <div class="wrap">
     <div class="section-head" data-reveal>
       <h2>Once the leak is found, here is what I build.</h2>
-      <p class="lede">Every job is quoted from the free check, at a fixed price, with a number we agree on up front. If the number can't be shown at 30 days, you don't pay.</p>
+      <p class="lede">Every job is quoted from the free check, at a fixed price, with a number we agree on up front. If the number can't be shown 30 days after delivery, you get your fees back (<a href="terms.html#guarantee">conditions</a>).</p>
     </div>
     <div class="lines" data-reveal>
       <div class="line-col">
@@ -687,7 +696,7 @@
       </details>
       <details data-reveal>
         <summary data-liquid="glow"><span>What does “measured or free” mean?</span><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary>
-        <div class="answer"><p>Every fix ships with tracking, and we agree on one number up front: quote requests a week, calls answered, reviews a month. Half is paid after the baseline is recorded, half on delivery. If the number cannot be shown at 30 days, you get a refund.</p></div>
+        <div class="answer"><p>Every fix ships with tracking, and we agree on one number up front: quote requests a week, calls answered, reviews a month. Half is paid after the baseline is recorded, half on delivery. If the number cannot be shown 30 days after delivery, you get a full refund of my fees within 15 days. It does not promise the number goes up, and it does not apply if the tracking is removed. <a href="terms.html#guarantee">Full conditions</a>.</p></div>
       </details>
       <details data-reveal>
         <summary data-liquid="glow"><span>How long does a fix take?</span><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary>
@@ -723,10 +732,12 @@
 
 <footer>
   <div class="wrap">
-    <div>Clashworks, Clayton Trevino. Dallas, Texas.</div>
+    <div>&copy; 2026 Clashworks, run by Clayton Trevino. Dallas, Texas.</div>
     <ul>
       <li><a href="about.html">Who I am</a></li>
       <li><a href="privacy.html">Privacy</a></li>
+      <li><a href="terms.html">Terms</a></li>
+      <li><a href="accessibility.html">Accessibility</a></li>
       <li><a href="https://www.youtube.com/@clashworkshq">YouTube</a></li>
       <li><a href="https://www.tiktok.com/@clashworkshq">TikTok</a></li>
       <li><a href="https://www.instagram.com/clashworkshq">Instagram</a></li>
@@ -742,6 +753,17 @@
 document.documentElement.classList.add("js");
 window.addEventListener("DOMContentLoaded", () => {
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // the scrolling strip moves for good, so it gets a pause (WCAG 2.2.2)
+  const mq = document.querySelector(".marquee"), mqBtn = document.getElementById("marquee-pause");
+  if (mq && mqBtn) mqBtn.addEventListener("click", () => {
+    const paused = mq.classList.toggle("is-paused");
+    mqBtn.setAttribute("aria-label", (paused ? "Play" : "Pause") + " the scrolling list");
+    mqBtn.querySelector("span").textContent = paused ? "Play" : "Pause";
+    mqBtn.querySelector("svg").innerHTML = paused
+      ? '<path d="M3 1.5v9l7.5-4.5z"/>'
+      : '<rect x="2" y="1" width="3" height="10" rx="1"/><rect x="7" y="1" width="3" height="10" rx="1"/>';
+  });
   const FORM = "check.html";
 
   // nav glass once scrolled
