@@ -302,6 +302,25 @@
   .line-col li { padding: 12px 0; border-bottom: 1px solid var(--line); }
   .line-col li strong { display: block; font-weight: 600; }
   .line-col li span { color: var(--ink-3); font-size: .93rem; }
+  /* Services slide sideways: on wide screens hscroll.js adds .on, pins .hs-pin under the nav and
+     moves the columns left as the page scrolls down. Without it (phones, Reduce motion, no JS) the grid above stays. */
+  .hs-rail { display: none; }
+  .services { overflow-x: clip; } /* the wide row must never let the page scroll sideways (clip, unlike hidden, keeps sticky working) */
+  .hs.on .hs-pin { position: sticky; top: var(--hs-top, 76px); margin-inline: calc(-1 * var(--lane)); padding-inline: var(--lane);
+    -webkit-mask-image: linear-gradient(90deg, transparent calc(var(--lane) * .3), #000 var(--lane)); mask-image: linear-gradient(90deg, transparent calc(var(--lane) * .3), #000 var(--lane)); }
+  .hs.on .lines { display: flex; gap: clamp(20px, 2.4vw, 32px); width: max-content; border-top: 0; padding-top: 0; counter-reset: col; will-change: translate; }
+  .hs.on .line-col { flex: none; width: clamp(380px, 36vw, 520px); padding: 22px 28px 12px; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); counter-increment: col; }
+  .hs.on .line-col::after { content: counter(col, decimal-leading-zero); position: absolute; top: 18px; right: 24px; font: 800 2.6rem/1 var(--display); letter-spacing: -0.04em; color: var(--line); }
+  .hs.on .line-col::before { inset: 0; }
+  .hs.on .line-col > p { min-height: 0; margin-top: 6px; }
+  .hs.on .line-col ul { margin-top: 14px; }
+  .hs.on .line-col li { padding: 8px 0; line-height: 1.4; }
+  .hs.on .line-col li span { font-size: .9rem; }
+  .hs.on .hs-rail { display: flex; align-items: center; gap: 18px; margin-top: 16px; }
+  .hs-bar { position: relative; width: clamp(120px, 14vw, 200px); height: 2px; background: var(--line); border-radius: 2px; overflow: hidden; }
+  .hs-bar i { position: absolute; inset: 0; background: var(--emerald); transform: scaleX(var(--p, 0)); transform-origin: left; }
+  .hs-rail ol { display: flex; gap: 16px; list-style: none; font-size: .85rem; color: var(--ink-3); }
+  .hs-rail li.is-on { color: var(--ink); font-weight: 600; }
   .services .foot { margin-top: 30px; display: flex; gap: 18px; align-items: center; flex-wrap: wrap; justify-content: space-between; }
   .services .foot p { color: var(--ink-2); max-width: 40em; }
   .services .foot p strong { color: var(--ink); font-weight: 600; }
@@ -769,6 +788,7 @@
       <h2>Once the leak is found, here is what I build.</h2>
       <p class="lede">Every job is quoted from the free check, at a fixed price, with a number we agree on up front. If the number can't be shown 30 days after delivery, you get your fees back (<a href="terms.html#guarantee">conditions</a>).</p>
     </div>
+    <div class="hs" data-hs><div class="hs-pin">
     <div class="lines spot" data-reveal>
       <div class="line-col">
         <h3>Fix</h3>
@@ -808,6 +828,8 @@
         </ul>
       </div>
     </div>
+    <div class="hs-rail" aria-hidden="true"><span class="hs-bar"><i></i></span><ol><li>Fix</li><li>Build</li><li>Market</li><li>Run</li></ol></div>
+    </div></div>
     <div class="foot" data-reveal>
       <p><strong class="lit">Fixed price, one number, 30 days.</strong> Every job is scoped from the free check and measured from day one. I don't run ad budgets and I don't promise rankings or lead counts.</p>
       <a class="btn" data-liquid="" href="check.html">Start with the free check
@@ -1146,7 +1168,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const paint = () => {
       raf = 0;
       cards.forEach(c => {
-        const r = c.getBoundingClientRect(), pad = c.classList.contains("kit") ? [0, 0] : [14, 12]; // the column's glow box overhangs it
+        const r = c.getBoundingClientRect(), pad = c.classList.contains("kit") || c.closest(".hs.on") ? [0, 0] : [14, 12]; // the column's glow box overhangs it (not as a sliding card)
         c.style.setProperty("--sx", Math.round(mx - r.left + pad[0]) + "px");
         c.style.setProperty("--sy", Math.round(my - r.top + pad[1]) + "px");
       });
@@ -1197,5 +1219,6 @@ window.addEventListener("DOMContentLoaded", () => {
 </script>
 <script src="assets/liquid.js" defer></script>
 <script src="assets/motion.js" defer></script>
+<script src="assets/hscroll.js" defer></script>
 </body>
 </html>

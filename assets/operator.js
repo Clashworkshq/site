@@ -547,11 +547,13 @@
     override = "idea"; aim = 0;
     ideaCall = gsap.delayedCall(3, () => { if (override === "idea") override = null; });
     openTip();
+    window.cwTrack?.("Operator tip", { section });
   });
 
   // ---------- tuck away and bring back ----------
   const setTucked = (v, focusTo) => {
     tucked = v; store.set("cw-operator", v ? "tucked" : null);
+    window.cwTrack?.(v ? "Operator hidden" : "Operator shown");
     closeTip(false); endVisit(); ambient();
     gsap.to(op, { autoAlpha: v && !wide ? 0 : 1, duration: .25, overwrite: "auto" });
     if (focusTo) requestAnimationFrame(() => focusTo.focus());

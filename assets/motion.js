@@ -31,3 +31,8 @@
   });
   paint();
 })();
+
+// Analytics bridge (motion plan Phase 0.4). Pages call cwTrack("Event name") at the moments worth
+// counting. Until a cookieless analytics script is added to the page (Plausible defines
+// window.plausible), every call does nothing and nothing leaves the browser.
+window.cwTrack = (name, props) => { try { if (window.plausible) window.plausible(name, props ? { props } : undefined); } catch {} };

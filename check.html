@@ -91,6 +91,13 @@
   .thanks.is-on { display: block; }
   .thanks h2 { font-size: clamp(1.8rem, 1.2rem + 2vw, 2.8rem); letter-spacing: -0.03em; color: var(--emerald); }
   .thanks p { margin-top: 12px; color: rgb(255 255 255 / .8); max-width: 34em; }
+  .thanks.is-on { display: flow-root; }
+  /* the Operator cheers once when Tally reports the submit: up, a small overshoot, settle */
+  .cheer { float: right; width: clamp(112px, 24vw, 190px); height: auto; margin: -18px -10px 4px 14px; }
+  .cheer.go { animation: cheer .7s cubic-bezier(.2,.8,.25,1) .2s both; }
+  @keyframes cheer { 0% { opacity: 0; transform: translateY(28px) scale(.82) rotate(-6deg); } 60% { opacity: 1; transform: translateY(-8px) scale(1.04) rotate(3deg); } 100% { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .cheer.go { animation: none; } }
+  .rm .cheer.go { animation: none; }
   .thanks .actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 24px; }
   .btn { display: inline-flex; align-items: center; gap: 10px; background: var(--emerald); color: var(--ink); text-decoration: none; font-weight: 700; padding: 15px 22px; border-radius: 999px; transition: background-color .15s, box-shadow .15s, transform .15s; }
   .btn:hover { background: #12CB8E; box-shadow: 0 8px 24px -10px rgb(16 185 129 / .7); }
@@ -170,6 +177,7 @@
     </script>
 
     <div class="thanks" id="thanks" role="status" aria-live="polite">
+      <img class="cheer" src="assets/operator-celebrate-480.webp" width="480" height="480" alt="" loading="lazy" hidden>
       <h2>Got it.</h2>
       <p>I pick two a week and record them on Sunday. You will hear from me either way within 7 days. Until then, run the 15-point Lead Leak Checklist on your own site tonight.</p>
       <div class="actions">
@@ -214,11 +222,18 @@
   const plain = () => { frame.style.height = "80vh"; frame.setAttribute("scrolling", "yes"); frame.style.overflow = "auto"; };
   s.onerror = plain;
   document.head.appendChild(s);
+  let started = false;
+  // the Operator hops once in the thank-you panel (CSS; a still pose under Reduce motion)
+  const celebrate = () => { const op = document.querySelector("#thanks .cheer"); if (op) { op.hidden = false; op.classList.add("go"); } };
   window.addEventListener("message", (e) => {
     if (e.origin !== "https://tally.so" || typeof e.data !== "string") return;
     let msg; try { msg = JSON.parse(e.data); } catch { return; }
     if (msg.event === "Tally.FormLoaded") card.classList.remove("is-loading");
+    // reaching page 2 means they answered the first page: count it once as a form start
+    if (msg.event === "Tally.FormPageView" && !started && msg.payload && msg.payload.page > 1) { started = true; window.cwTrack?.("Form start"); }
     if (msg.event === "Tally.FormSubmitted") {
+      window.cwTrack?.("Form submit");
+      celebrate();
       card.hidden = true;
       document.getElementById("fallback").hidden = true;
       document.getElementById("thanks").classList.add("is-on");
