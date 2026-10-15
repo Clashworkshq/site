@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script>(function(d){var m;try{m=localStorage.getItem("cw-motion")}catch(e){}if(m==="reduce"||m==="paused"||(m!=="full"&&matchMedia("(prefers-reduced-motion: reduce)").matches))d.classList.add("rm")})(document.documentElement)</script>
 <title>Who I am. Clayton Trevino, Clashworks</title>
 <meta name="description" content="Clayton Trevino is a Finance and Real Estate major at SMU's Cox School of Business who fixes real business problems with AI and documents every fix in public. Not a developer. Numbers every time.">
 <meta name="theme-color" content="#F5F7FA">
@@ -15,9 +16,11 @@
 <link rel="canonical" href="https://clashworks.co/about.html">
 <link rel="icon" href="assets/favicon-64.png" type="image/png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100,500..900&family=Hanken+Grotesk:wght@400..700&display=swap" rel="stylesheet">
+<style>
+  /* self-hosted, latin subset (every character the site uses); no request to Google */
+  @font-face { font-family: "Archivo"; font-style: normal; font-weight: 500 900; font-stretch: 100%; font-display: swap; src: url(assets/fonts/archivo-latin.woff2) format("woff2"); }
+  @font-face { font-family: "Hanken Grotesk"; font-style: normal; font-weight: 400 700; font-display: swap; src: url(assets/fonts/hanken-grotesk-latin.woff2) format("woff2"); }
+</style>
 <link rel="preload" as="image" href="assets/headshot-800.webp" imagesrcset="assets/headshot-480.webp 480w, assets/headshot-800.webp 800w, assets/headshot-1200.webp 1200w" imagesizes="(max-width: 860px) 320px, 400px" fetchpriority="high">
 <style>
   :root {
@@ -168,6 +171,10 @@
     html { scroll-behavior: auto; }
     * { transition-duration: .01ms !important; }
   }
+  /* the same, when the visitor flips the Reduce motion switch */
+  .rm.js .hero-copy .line { clip-path: none; animation: none; }
+  html.rm { scroll-behavior: auto; }
+  .rm * { transition-duration: .01ms !important; }
 </style>
 <link rel="stylesheet" href="assets/liquid.css">
 </head>
@@ -331,7 +338,7 @@
 
 <footer>
   <div class="wrap">
-    <div>&copy; 2026 Clashworks, run by Clayton Trevino. Dallas, Texas.</div>
+    <div class="foot-meta"><span>&copy; 2026 Clashworks, run by Clayton Trevino. Dallas, Texas.</span><button type="button" class="rm-switch" role="switch" aria-checked="false" hidden><span class="knob" aria-hidden="true"></span>Reduce motion</button></div>
     <ul>
       <li><a href="index.html">Home</a></li>
       <li><a href="privacy.html">Privacy</a></li>
@@ -354,5 +361,6 @@ const onScroll = () => nav.classList.toggle("is-stuck", scrollY > 8);
 onScroll(); addEventListener("scroll", onScroll, { passive: true });
 </script>
 <script src="assets/liquid.js" defer></script>
+<script src="assets/motion.js" defer></script>
 </body>
 </html>

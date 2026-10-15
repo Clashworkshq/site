@@ -3,15 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script>(function(d){var m;try{m=localStorage.getItem("cw-motion")}catch(e){}if(m==="reduce"||m==="paused"||(m!=="full"&&matchMedia("(prefers-reduced-motion: reduce)").matches))d.classList.add("rm")})(document.documentElement)</script>
 <title>Page not found. Clashworks</title>
 <meta name="description" content="That page is not here. Head back to clashworks.co or apply for a free Optimization Check.">
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#F5F7FA">
 <link rel="icon" href="/assets/favicon-64.png" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100,500..900&family=Hanken+Grotesk:wght@400..700&display=swap" rel="stylesheet">
+<style>
+  /* self-hosted, latin subset (every character the site uses); no request to Google */
+  @font-face { font-family: "Archivo"; font-style: normal; font-weight: 500 900; font-stretch: 100%; font-display: swap; src: url(/assets/fonts/archivo-latin.woff2) format("woff2"); }
+  @font-face { font-family: "Hanken Grotesk"; font-style: normal; font-weight: 400 700; font-display: swap; src: url(/assets/fonts/hanken-grotesk-latin.woff2) format("woff2"); }
+</style>
 <style>
   :root {
     --ink: #0B1220; --ink-2: #3B4453; --ink-3: #6B7280;
@@ -57,12 +60,24 @@
   .js .lost .actions { animation-delay: .7s; }
   .js .lost .places { animation-delay: .85s; }
   @keyframes wipe { to { clip-path: inset(0 -5% 0 0); } }
+  /* the Operator, lost, flashlight out, hovering on its live flame beside the number */
+  .lost-bot { --bw: clamp(160px, 20vw, 300px); position: absolute; right: calc(-1 * var(--bw) - 10px); top: -30px; width: var(--bw); aspect-ratio: 1; pointer-events: none; animation: hover 3.2s ease-in-out infinite alternate; }
+  .lost-bot img { position: relative; width: 100%; height: 100%; }
+  .lost-bot canvas { position: absolute; top: 0; }
+  @keyframes hover { from { transform: translateY(0) rotate(-3deg); } to { transform: translateY(-14px) rotate(3deg); } }
+  @media (max-width: 1179px) { .lost-bot { --bw: 128px; right: -6px; top: -36px; } }
   @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
   @media (prefers-reduced-motion: reduce) {
     .js .code { clip-path: none; animation: none; }
     .js .lost h1, .js .lost .lede, .js .lost .actions, .js .lost .places { opacity: 1; animation: none; }
     .blob { animation: none; }
+    .lost-bot { animation: none; }
   }
+  /* the same, when the visitor flips the Reduce motion switch */
+  .rm.js .code { clip-path: none; animation: none; }
+  .rm.js .lost h1, .rm.js .lost .lede, .rm.js .lost .actions, .rm.js .lost .places { opacity: 1; animation: none; }
+  .rm .blob { animation: none; }
+  .rm .lost-bot { animation: none; }
   .actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 28px; }
   .btn { display: inline-flex; align-items: center; gap: 10px; background: var(--emerald); color: var(--ink); text-decoration: none; font-weight: 700; padding: 15px 22px; border-radius: 999px; transition: background-color .15s, box-shadow .15s, transform .15s; }
   .btn:hover { background: #12CB8E; box-shadow: 0 8px 24px -10px rgb(16 185 129 / .7); }
@@ -79,6 +94,8 @@
   footer a { text-decoration: none; color: var(--ink-2); font-weight: 500; }
   footer a:hover { color: var(--ink); }
   @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; } }
+  /* the same, when the visitor flips the Reduce motion switch */
+  .rm *, .rm *::before, .rm *::after { transition: none !important; }
 </style>
 <link rel="stylesheet" href="/assets/liquid.css">
 </head>
@@ -99,6 +116,7 @@
 <section class="lost">
   <div class="blob" aria-hidden="true"></div>
   <div class="wrap">
+    <div class="lost-bot" id="lost-bot" aria-hidden="true"><canvas></canvas><img src="/assets/operator-lost-480.webp" srcset="/assets/operator-lost-480.webp 480w, /assets/operator-lost-960.webp 960w" sizes="(max-width: 1179px) 128px, 300px" width="480" height="480" alt=""></div>
     <div class="code" id="code" aria-hidden="true" data-code="404"></div>
     <h1>That page is not here.</h1>
     <p class="lede">The link is old, or a letter is off. Nothing on this site is hidden, so everything worth reaching is one tap away.</p>
@@ -115,7 +133,7 @@
 
 <footer>
   <div class="wrap">
-    <div>&copy; 2026 Clashworks, run by Clayton Trevino. Dallas, Texas.</div>
+    <div class="foot-meta"><span>&copy; 2026 Clashworks, run by Clayton Trevino. Dallas, Texas.</span><button type="button" class="rm-switch" role="switch" aria-checked="false" hidden><span class="knob" aria-hidden="true"></span>Reduce motion</button></div>
     <ul>
       <li><a href="/">Home</a></li>
       <li><a href="/about.html">Who I am</a></li>
@@ -132,7 +150,7 @@
 document.documentElement.classList.add("js");
 // the number leans toward the pointer, a few pixels, only where there is a pointer and motion is welcome
 (() => {
-  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const reduce = document.documentElement.classList.contains("rm");
   const hover = matchMedia("(hover: hover) and (pointer: fine)").matches;
   if (reduce || !hover) return;
   const code = document.getElementById("code");
@@ -144,5 +162,27 @@ document.documentElement.classList.add("js");
 })();
 </script>
 <script src="/assets/liquid.js" defer></script>
+<script src="/assets/motion.js" defer></script>
+<script src="/assets/operator-flame.js" defer></script>
+<script>
+// the lost Operator's flame: live, or one still frame under Reduce motion
+addEventListener("DOMContentLoaded", () => {
+  const bot = document.getElementById("lost-bot");
+  if (!bot || !window.OperatorFlame) return;
+  const cv = bot.querySelector("canvas"), f = new OperatorFlame(cv), NZ = [.4758, .7517];
+  const still = () => document.documentElement.classList.contains("rm");
+  let w = 0, raf = 0;
+  const size = () => { w = bot.offsetWidth; cv.style.left = (-.6 * w) + "px"; f.resize(2.2 * w, 2 * w); };
+  const paint = () => f.still({ x: (NZ[0] + .6) * w, y: NZ[1] * w, size: w });
+  const loop = t => {
+    if (still()) { raf = 0; return paint(); }
+    f.draw({ x: (NZ[0] + .6) * w, y: NZ[1] * w, size: w, t: t / 1000 });
+    raf = requestAnimationFrame(loop);
+  };
+  size(); raf = requestAnimationFrame(loop);
+  addEventListener("resize", () => { size(); if (still()) paint(); });
+  document.addEventListener("cw-motion", () => { if (!raf) raf = requestAnimationFrame(loop); });
+});
+</script>
 </body>
 </html>

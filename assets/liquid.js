@@ -1,13 +1,13 @@
 // Liquid controls: the light follows the pointer, full-mode controls drift a
 // few pixels toward it, and a press gives then springs back. See liquid.css.
 (() => {
-  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const reduce = () => document.documentElement.classList.contains("rm"); // the site's Reduce motion switch
   const fine = matchMedia("(hover: hover) and (pointer: fine)").matches;
   const PULL_X = 8, PULL_Y = 6; // max drift in px, full mode only
 
   document.querySelectorAll("[data-liquid]").forEach(el => {
     const mode = el.dataset.liquid || "";
-    const magnet = mode === "" && fine && !reduce;
+    const magnet = mode === "" && fine;
     el.classList.add("liquid");
 
     const move = e => {
@@ -16,7 +16,7 @@
       const x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
       el.style.setProperty("--mx", (x * 100).toFixed(1) + "%");
       el.style.setProperty("--my", (y * 100).toFixed(1) + "%");
-      if (magnet) {
+      if (magnet && !reduce()) {
         el.style.setProperty("--tx", ((x - .5) * PULL_X).toFixed(1) + "px");
         el.style.setProperty("--ty", ((y - .5) * PULL_Y).toFixed(1) + "px");
       }

@@ -1,14 +1,19 @@
 // The Operator, Clashworks' robot, plus the hero loop it lives in.
-// Hero: the background video loads after the page has painted, and "Pause animation"
-// stops the video and the robot's idle bob, blink and wave (WCAG 2.2.2).
-// Scroll: the robot flies from the hero into a dock (the side lane on wide screens, the
-// nav bar on narrow ones) and changes pose per section. It blinks, watches a mouse
-// cursor, points at a primary button you hover or focus, and gives a short tip when
-// pressed. Reduced motion: none of the movement; the robot stays put in the hero and
-// each section shows a still pose inline (CSS). Needs gsap (deferred); loads ScrollTrigger itself.
+// It flies itself: a spring with momentum chases a target (home in the hero, a dive down and to
+// the right on the first scroll, then a perch beside whatever section you are reading), so it
+// lags, banks into turns and overshoots like something with weight. A live flame
+// (operator-flame.js) trails behind it and stretches with speed. Pose changes are cuts inside a
+// squash, never crossfades, so two robots never show at once. It tours: taps the #how numbers,
+// scans the checklist, points at the guarantee and the last button. It reacts: points at a green
+// button you hover or focus, zips to a tile you tick, sits by the question you open, wanders when
+// left alone, rolls and gives a tip when pressed, can be grabbed and thrown. Narrow screens: home
+// is the nav slot and each stop is a short trip to the right edge. The site-wide "Reduce motion"
+// switch (assets/motion.js, html.rm) stops all of it, and turning it off restarts it with no
+// reload; under it the robot stays still in the hero and each section shows a still pose (CSS).
+// Needs gsap and operator-flame.js (both deferred).
 (() => {
   const $ = s => document.querySelector(s);
-  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const reduce = () => document.documentElement.classList.contains("rm");
   const fine = matchMedia("(hover: hover) and (pointer: fine)").matches;
   const op = $("#op"), btn = $("#op-btn");
   if (!op || !btn) return;
@@ -51,7 +56,10 @@
     const r = btn.getBoundingClientRect(), bw = bubble.offsetWidth, bh = bubble.offsetHeight;
     let x, y;
     if (innerWidth < 700) { x = innerWidth - bw - 12; y = r.bottom + 6; }
-    else { x = r.left + r.width * .22 - bw; y = r.top + r.height * .3 - bh; } // above and left of the head, clear of what it points at
+    else { // beside the head on the side facing the page, clear of what it points at
+      x = r.left + r.width / 2 < innerWidth / 2 ? r.left + r.width * .78 : r.left + r.width * .22 - bw;
+      y = r.top + r.height * .3 - bh;
+    }
     x = Math.max(12, Math.min(x, innerWidth - bw - 12));
     y = Math.max(76, Math.min(y, innerHeight - bh - 12));
     bubble.style.transform = `translate(${Math.round(x)}px, ${Math.round(y)}px)`;
@@ -63,7 +71,7 @@
     btn.setAttribute("aria-expanded", "true");
     placeBubble();
     live.textContent = ""; setTimeout(() => { live.textContent = text; }, 60);
-    if (!reduce && window.gsap) gsap.fromTo(bubble, { autoAlpha: 0, y: 6, scale: .96, transformOrigin: "100% 0" }, { autoAlpha: 1, y: 0, scale: 1, duration: .22, ease: "back.out(2)", clearProps: "opacity,visibility,scale,y" });
+    if (!reduce() && window.gsap) gsap.fromTo(bubble, { autoAlpha: 0, y: 6, scale: .96, transformOrigin: "100% 0" }, { autoAlpha: 1, y: 0, scale: 1, duration: .22, ease: "back.out(2)", clearProps: "opacity,visibility,scale,y" });
   };
   const closeTip = refocus => {
     if (!bubbleOpen) return;
@@ -82,54 +90,68 @@
   const stillClick = () => bubbleOpen ? closeTip(false) : openTip();
   btn.addEventListener("click", stillClick);
   hideBtn.hidden = true;
-  if (reduce || !window.gsap) return;
 
-  // "Pause animation" works from the first moment; start() hooks the robot and video into it
-  const pauseBtn = $("#hero-pause");
-  let paused = store.get("cw-motion") === "paused", onPause = () => {};
-  const paintPause = () => {
-    pauseBtn.querySelector("span").textContent = paused ? "Play animation" : "Pause animation";
-    pauseBtn.querySelector("svg").innerHTML = paused ? '<path d="M3 1.5v9l7.5-4.5z"/>' : '<rect x="2" y="1" width="3" height="10" rx="1"/><rect x="7" y="1" width="3" height="10" rx="1"/>';
-  };
-  pauseBtn.addEventListener("click", () => {
-    paused = !paused;
-    store.set("cw-motion", paused ? "paused" : null);
-    paintPause(); onPause();
-  });
-  paintPause();
-
-  // ScrollTrigger and all the motion start once the page has painted, so neither competes with
-  // the hero poster (the LCP element) for the network or the main thread
+  // All the motion starts once the page has painted, so none of it competes with the hero
+  // poster (the LCP element) for the network or the main thread
   const later = fn => ("requestIdleCallback" in window ? requestIdleCallback(fn, { timeout: 2000 }) : setTimeout(fn, 900));
   const whenLoaded = fn => document.readyState === "complete" ? later(fn) : addEventListener("load", () => later(fn), { once: true });
-  whenLoaded(() => {
-    if (window.ScrollTrigger) return start();
-    const s = document.createElement("script");
-    s.src = "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.15.0/ScrollTrigger.min.js";
-    s.integrity = "sha512-OaIE7ud4P04EhnBuhEcm0wQSceIxbi2pV03oBLS/+F6ampfxsnxcIxOp7H2eF9G7N0kEht0VAzOLG+dTLSo17Q==";
-    s.crossOrigin = "anonymous";
-    s.onload = start;
-    document.head.append(s);
+  let stop = null;
+  const boot = () => { if (!stop && !reduce() && window.gsap && window.OperatorFlame) stop = start(); };
+  // under Reduce motion the still hero robot keeps its flame: one frame, drawn once (and again on resize)
+  let stillCanvas = null;
+  const paintStill = () => {
+    if (!reduce() || !window.OperatorFlame) return;
+    const w = op.offsetWidth; if (!w) return;
+    if (!stillCanvas) {
+      stillCanvas = document.createElement("canvas"); stillCanvas.className = "op-flame"; stillCanvas.setAttribute("aria-hidden", "true");
+      op.querySelector(".op-bob").prepend(stillCanvas);
+    }
+    stillCanvas.style.left = (-.6 * w) + "px";
+    const f = new OperatorFlame(stillCanvas);
+    f.resize(2.2 * w, 2 * w);
+    f.still({ x: (.545 + .6) * w, y: .7088 * w, size: w }); // the hello pose's thruster
+  };
+  const clearStill = () => { if (stillCanvas) { stillCanvas.remove(); stillCanvas = null; } };
+  let stillT = 0;
+  addEventListener("resize", () => { clearTimeout(stillT); stillT = setTimeout(paintStill, 150); });
+  whenLoaded(() => { boot(); paintStill(); });
+  // the Reduce motion switch: stop everything and settle back to the still robot, or start again
+  document.addEventListener("cw-motion", e => {
+    if (!e.detail.reduce) { clearStill(); return boot(); }
+    if (stop) { stop(); stop = null; }
+    paintStill();
   });
 
+  // Runs the whole live robot. Returns stop(), which removes every listener and tween it made and
+  // puts the page back exactly as the still robot expects it.
   function start() {
+  const ac = new AbortController();
+  const listen = (t, type, fn, o = {}) => t.addEventListener(type, fn, { ...o, signal: ac.signal });
+  clearStill();
   btn.removeEventListener("click", stillClick);
   hideBtn.hidden = false;
-  gsap.registerPlugin(ScrollTrigger);
   const root = document.documentElement;
   const tilt = op.querySelector(".op-tilt"), bob = op.querySelector(".op-bob"), art = op.querySelector(".op-art");
   const hero = $(".hero-stage"), slot = $("#op-slot"), float = $("#op-float"), home = $("#op-home");
+  const clamp = (lo, hi, v) => Math.max(lo, Math.min(hi, v)), rand = (a, b) => a + Math.random() * (b - a);
+  const NAV = 68;
 
   // ---------- pose art ----------
   // eye box [x0, y0, x1, y1] measured on the 960px art; scan's eye throws a beam, so it keeps its own
   const EYES = {
     idle: [520, 283, 568, 332], hello: [498, 263, 556, 321], "point-down": [541, 262, 601, 323],
     fly: [720, 269, 766, 312], "point-left": [552, 281, 609, 335], idea: [520, 377, 572, 427],
-    phone: [484, 286, 535, 336], calculator: [523, 293, 577, 348], scan: null
+    phone: [484, 286, 535, 336], calculator: [523, 293, 577, 348], scan: null, lost: [466, 334, 516, 383]
   };
-  const BIG = new Set(["idle", "hello", "point-down", "fly", "point-left", "idea"]); // poses that can show at hero size
+  // where the thruster sits on each pose, as a fraction of the art box
+  // (measured from the painted flames before they were removed: builds/site-assets/operator/noflame/nozzles.json)
+  const NOZZLE = {
+    idle: [.4877, .7166], hello: [.545, .7088], "point-down": [.5591, .7088], fly: [.5938, .6541], "point-left": [.5388, .7048],
+    idea: [.5409, .7791], phone: [.4804, .697], calculator: [.4428, .7322], scan: [.4455, .7088], lost: [.4758, .7517]
+  };
+  const BIG = new Set(["idle", "hello", "point-down", "fly", "point-left", "idea", "lost"]); // poses that can show at hero size
   const layers = {};
-  let W = 96, cur = "idle";
+  let W = 112, cur = "hello";
   const pct = v => (v / 9.6).toFixed(2) + "%";
   const addEye = (el, name) => {
     const e = EYES[name]; if (!e) return null;
@@ -146,88 +168,138 @@
     if (layers[name]) return layers[name];
     const el = document.createElement("span"); el.className = "op-pose"; el.dataset.pose = name;
     const img = new Image(480, 480); img.alt = ""; img.decoding = "async";
-    if (BIG.has(name)) { img.sizes = sizes(); img.srcset = `assets/operator-${name}-480.webp 480w, assets/operator-${name}-960.webp 960w`; }
+    if (BIG.has(name)) { img.sizes = sizes(); img.srcset = `assets/operator-${name}-480.webp 480w, assets/operator-${name}-960.webp 960w, assets/operator-${name}-1280.webp 1280w`; }
     img.src = `assets/operator-${name}-480.webp`;
     el.append(img);
-    gsap.set(el, { autoAlpha: 0 });
     const L = { el, img, eye: addEye(el, name) };
     art.append(el);
     return (layers[name] = L);
   };
-  { // the idle pose is already in the page
+  { // the hello pose (the hero pose) is already in the page
     const el = art.querySelector(".op-pose");
-    layers.idle = { el, img: el.querySelector("img"), eye: addEye(el, "idle") };
+    layers.hello = { el, img: el.querySelector("img"), eye: addEye(el, "hello") };
   }
   const loadAll = () => Object.keys(EYES).forEach(layer);
+  // the count badge: at three or more ticked tiles it holds up the number with its calculator
+  const badge = document.createElement("i"); badge.className = "op-badge"; badge.setAttribute("aria-hidden", "true");
+  tilt.append(badge);
+  // napping: little z's drift up from its head
+  const zs = [0, 1, 2].map(() => { const z = document.createElement("i"); z.className = "op-z"; z.setAttribute("aria-hidden", "true"); z.textContent = "z"; tilt.append(z); return z; });
 
   let tucked = store.get("cw-operator") === "tucked";
-  let p = 0, atHome = true, flying = false, docked = false;
-  let heroPose = "idle", sectionPose = "idle", override = null, aim = 0, lean = 0;
+  let heroPose = "hello", stopPose = "idle", override = null, hovering = false, dragging = false, rolling = false, fast = false;
+  let aim = 0, lean = 0, offX = 0, offY = 0, lastActive = performance.now(), ticks = 0, napping = false, kbd = false;
 
   const blink = () => {
-    const L = layers[cur]; if (!L || !L.eye) return;
+    const L = layers[cur]; if (!L || !L.eye || napping) return;
     gsap.fromTo(L.eye, { scaleY: 1 }, { scaleY: .1, duration: .07, yoyo: true, repeat: 1, ease: "power1.in", overwrite: "auto" });
   };
+  // A pose change is a quick fade out, then a fade in of the new pose, never an overlap: in every frame at
+  // most one pose is visible, so two robots never show. A soft squash and release sells it as the robot
+  // shifting its weight.
+  let lastSwap = 0, swapTl = null;
   const show = async name => {
     if (name === cur) return;
     const L = layer(name);
     if (!L.img.complete) { try { await L.img.decode(); } catch {} }
-    if (name !== want()) return; // a newer pose won while this one loaded
-    const prev = layers[cur], prevName = cur;
-    cur = name;
-    gsap.killTweensOf([prev.el, L.el], "opacity,visibility,scale,y");
-    gsap.fromTo(L.el, { autoAlpha: 0, scale: .9, y: 6 }, { autoAlpha: 1, scale: 1, y: 0, duration: .3, ease: "back.out(2.2)" });
-    gsap.to(prev.el, { autoAlpha: 0, scale: 1.04, duration: .18, ease: "power1.in", onComplete: () => { if (cur !== prevName) gsap.set(prev.el, { scale: 1 }); } });
-    gsap.fromTo(bob, { y: 0 }, { y: -W * .025, duration: .12, yoyo: true, repeat: 1, ease: "power2.out" });
-    if (L.eye) gsap.delayedCall(.32, blink);
+    if (ac.signal.aborted || name !== want() || name === cur) return; // stopped, or a newer pose won while this one loaded
+    const vis = Object.values(layers).find(o => o.el.classList.contains("is-on"));
+    cur = name; lastSwap = performance.now();
+    if (swapTl) swapTl.kill();
+    swapTl = gsap.timeline();
+    if (vis && vis !== L) swapTl.to(vis.el, { opacity: 0, duration: .1, ease: "power1.in" });
+    swapTl.add(() => {
+      Object.values(layers).forEach(o => { o.el.classList.toggle("is-on", o === L); if (o !== L) gsap.set(o.el, { opacity: 1 }); });
+      gsap.set(L.el, { opacity: 0 });
+    }).to(L.el, { opacity: 1, duration: .18, ease: "power1.out" });
+    gsap.fromTo(bob, { scaleX: 1.03, scaleY: .96 }, { scaleX: 1, scaleY: 1, duration: .45, ease: "back.out(1.8)", overwrite: "auto" });
+    if (L.eye) gsap.delayedCall(.25, blink);
     look();
   };
-  const want = () => override || (flying ? "fly" : atHome ? heroPose : sectionPose);
-  const refresh = () => show(want());
+  const want = () => {
+    if (napping) return cur;
+    if (dragging) return "fly";
+    if (override) return override;
+    if (state === "home") return heroPose; // one pose in the hero, no automatic changes
+    if (fast) return "fly";
+    return hovering ? "hello" : stopPose;
+  };
 
-  // ---------- ambient motion in the hero: bob, blink, a wave, then point at the scroll ----------
-  const bobTw = gsap.to(bob, { yPercent: -2.6, rotation: 1.2, duration: 1.9, ease: "sine.inOut", yoyo: true, repeat: -1, paused: true });
-  let blinkCall = null, waveCalls = [];
-  const blinkLoop = () => { blink(); if (Math.random() < .2) gsap.delayedCall(.24, blink); blinkCall = gsap.delayedCall(2.8 + Math.random() * 3.2, blinkLoop); };
+  // ---------- the live flame ----------
+  const canvas = document.createElement("canvas");
+  canvas.className = "op-flame"; canvas.setAttribute("aria-hidden", "true");
+  bob.prepend(canvas);
+  const flame = new OperatorFlame(canvas);
+  let power = 0, flip = 1;
+  // the canvas spans 2.2 robots wide and 2 tall, with the robot's own box at (0.6W, 0)
+  const sizeCanvas = () => { canvas.style.left = (-.6 * W) + "px"; flame.resize(2.2 * W, 2 * W); };
+  const burst = v => { power = Math.max(power, v); };
+
+  // ---------- ambient life: hover bob and blink, a wave in the hero ----------
+  const bobTw = gsap.to(bob, { yPercent: -2.8, rotation: 1.4, duration: 1.8, ease: "sine.inOut", yoyo: true, repeat: -1, paused: true });
+  let blinkCall = null;
+  const blinkLoop = () => { blink(); if (Math.random() < .2) gsap.delayedCall(.24, blink); blinkCall = gsap.delayedCall(2.6 + Math.random() * 3, blinkLoop); };
   const ambient = () => {
-    const on = atHome && !paused;
+    const on = !tucked;
     on ? bobTw.play() : bobTw.pause();
-    if (on && !blinkCall) blinkCall = gsap.delayedCall(1.6, blinkLoop);
+    if (on && !blinkCall) blinkCall = gsap.delayedCall(1.4, blinkLoop);
     if (!on && blinkCall) { blinkCall.kill(); blinkCall = null; }
   };
-  const wave = () => {
-    if (paused) return;
-    const at = (t, pose) => waveCalls.push(gsap.delayedCall(t, () => { heroPose = pose; refresh(); }));
-    at(1.4, "hello"); at(4, "idle"); at(5.2, "point-down");
+  // a barrel roll in the picture plane, so the robot is never seen edge-on
+  const roll = () => {
+    rolling = true;
+    gsap.fromTo(art, { rotation: 0 }, { rotation: 360, duration: .7, ease: "power2.inOut", onComplete: () => { gsap.set(art, { rotation: 0 }); rolling = false; } });
+    gsap.fromTo(bob, { y: 0 }, { y: -W * .1, duration: .35, yoyo: true, repeat: 1, ease: "power2.out" });
+    burst(1);
   };
+  // left alone for a minute it dozes off: eye shut, slow bob, a low flame and z's; any input wakes it with two blinks
+  let zCall = null;
+  const nap = () => {
+    napping = true; closeTip(false);
+    const L = layers[cur]; if (L && L.eye) gsap.to(L.eye, { scaleY: .12, duration: .5, overwrite: "auto" });
+    bobTw.timeScale(.45);
+    let i = 0;
+    const puff = () => {
+      const z = zs[i++ % zs.length];
+      gsap.fromTo(z, { x: 0, y: 0, opacity: 0, scale: .6 }, { x: W * .12, y: -W * .22, opacity: 1, scale: 1.1, duration: 1.6, ease: "sine.out", onComplete: () => gsap.to(z, { opacity: 0, duration: .3 }) });
+      zCall = gsap.delayedCall(1.1, puff);
+    };
+    puff();
+  };
+  const wake = () => {
+    if (!napping) return;
+    napping = false; bobTw.timeScale(1);
+    if (zCall) { zCall.kill(); zCall = null; }
+    gsap.to(zs, { opacity: 0, duration: .2 });
+    const L = layers[cur];
+    if (L && L.eye) gsap.to(L.eye, { scaleY: 1, duration: .15, overwrite: "auto", onComplete: () => { blink(); gsap.delayedCall(.32, blink); } });
+    burst(.7);
+  };
+  const nod = () => { if (!tucked) { gsap.fromTo(bob, { y: 0 }, { y: -W * .05, duration: .12, yoyo: true, repeat: 1, ease: "power2.out" }); blink(); burst(.6); } };
 
   // ---------- the hero loop ----------
   const video = $("#hero-video");
   let videoReady = false;
   const loadVideo = () => {
-    if (videoReady || paused || (navigator.connection && navigator.connection.saveData)) return;
+    if (videoReady || (navigator.connection && navigator.connection.saveData)) return;
     videoReady = true;
     video.querySelectorAll("source").forEach(s => { s.src = s.dataset.src; });
-    video.addEventListener("playing", () => video.classList.add("is-playing"), { once: true });
+    listen(video, "playing", () => video.classList.add("is-playing"), { once: true });
     video.load();
     video.play().catch(() => {});
   };
-  onPause = () => {
-    if (paused) { video.pause(); waveCalls.forEach(c => c.kill()); waveCalls = []; }
-    else { loadVideo(); if (videoReady) video.play().catch(() => {}); }
-    ambient();
-  };
   // the loop only plays while the hero is on screen
-  new IntersectionObserver(([e]) => {
-    if (!videoReady || paused) return;
+  const heroIO = new IntersectionObserver(([e]) => {
+    if (!videoReady) return;
     e.isIntersecting ? video.play().catch(() => {}) : video.pause();
-  }).observe(hero);
+  });
+  heroIO.observe(hero);
 
-  // ---------- layout: home in the hero, dock in the lane or the nav ----------
+  // ---------- layout: home in the hero, a dock in the side lane (wide) or the nav slot (narrow) ----------
   root.classList.add("op-on");
   slot.classList.add("is-on");
   op.classList.add("is-live");
-  let homeBox = { x: 0, y: 0, s: 96 }, dock = { x: 0, y: 0, s: 52 }, wide = false, arc = 60;
+  let homeBox = { x: 0, y: 0, s: 112 }, wide = false, lane = { x: 0, s: 75 };
   const measure = () => {
     wide = innerWidth >= 1100;
     const h = (innerWidth <= 860 ? float : home).getBoundingClientRect();
@@ -237,178 +309,406 @@
     op.style.setProperty("--u", (W / 100) + "px");
     Object.values(layers).forEach(L => { if (L.img.srcset) L.img.sizes = sizes(); });
     if (wide) {
-      const m = $("#fix > .wrap").getBoundingClientRect().left;
-      const s = Math.min(150, m - 10);
-      dock = { x: innerWidth - m / 2 - s / 2, y: innerHeight * .56 - s / 2, s };
-      arc = 90;
+      // the empty lane left of the content: the robot faces right, so from here it faces the page
+      const mL = $("#fix > .wrap").getBoundingClientRect().left;
+      const s = Math.round(clamp(110, 200, mL * 1.15)); // only the art's transparent margin may reach past the lane
+      lane = { x: Math.max(4, mL / 2 - s / 2), s }; // and the whole art box stays inside the window
     } else {
-      const r = slot.getBoundingClientRect();
-      dock = { x: r.left, y: r.top, s: r.width };
+      const r = slot.getBoundingClientRect(), s = r.width * 1.3;
+      lane = { x: r.left + r.width / 2 - s / 2, y: r.top + r.height / 2 - s / 2, s };
       root.style.setProperty("--slot-x", r.left + "px");
       root.style.setProperty("--slot-y", r.top + "px");
-      arc = 26;
     }
+    sizeCanvas();
   };
 
-  const xTo = gsap.quickTo(op, "x", { duration: .45, ease: "power3" });
-  const yTo = gsap.quickTo(op, "y", { duration: .45, ease: "power3" });
-  const sxTo = gsap.quickTo(op, "scaleX", { duration: .45, ease: "power3" }), syTo = gsap.quickTo(op, "scaleY", { duration: .45, ease: "power3" });
-  const sTo = v => { sxTo(v); syTo(v); };
-  const rTo = gsap.quickTo(tilt, "rotation", { duration: .5, ease: "power3" });
-  const flipTo = gsap.quickTo(art, "scaleX", { duration: .25, ease: "power2" });
-  const ease = gsap.parseEase("power2.inOut");
-  let lastX = null, vel = 0, settle = null, faded = false;
+  // ---------- the flight: a spring that chases a target, with momentum ----------
+  // State: "home" (in the hero), "launch" (the dive down and right), "cruise" (following the reader).
+  // Positions are screen coordinates of the robot box's top left; size is its width in px. Working on the
+  // screen, not the page, means a mouse-wheel notch never jerks it: it trails a smoothed scroll speed instead.
+  let state = "home", launchAt = 0;
+  let px = 0, py = 0, vx = 0, vy = 0, size = 112, tilted = 0;
+  let lastSY = scrollY, scrollV = 0, smT = null;
+  let visit = null;   // { x, y } page target, pose, until, trip (narrow screens)
+  let wander = { x: 0, y: 0, until: 0 };
 
-  const place = () => {
-    const e = ease(p);
-    const hx = homeBox.x - scrollX, hy = homeBox.y - scrollY;
-    let x = hx + (dock.x - hx) * e, y = hy + (dock.y - hy) * e - Math.sin(Math.PI * p) * arc;
-    let s = (homeBox.s + (dock.s - homeBox.s) * e) / W;
-    if (docked) y += gsap.utils.clamp(-26, 26, vel * .012) * (wide ? 1 : 0); // trails the scroll a little, then settles
-    if (tucked && wide) x = innerWidth + 24;
-    const fade = tucked && !wide;
-    if (fade !== faded) { faded = fade; gsap.to(op, { autoAlpha: fade ? 0 : 1, duration: .25, overwrite: "auto" }); }
-    if (flying && lastX !== null && Math.abs(x - lastX) > 2) flipTo(x < lastX ? -1 : 1);
-    if (!flying) flipTo(1);
-    lastX = x;
-    // on narrow screens it flies under the nav bar and only sits above it once it lands in the slot
-    const z = !wide && p >= .85 ? "55" : "45";
-    if (op.style.zIndex !== z) op.style.zIndex = z;
-    xTo(x); yTo(y); sTo(s);
-    rTo(aim + lean);
-    tuckBtn.hidden = !(wide && docked && !tucked);
-    showBtn.hidden = !tucked;
+  // ---------- one stop per section: where the robot perches and what it does there ----------
+  const openRow = () => $("#faq details[open] summary") || $("#faq summary");
+  const STOPS = [
+    { sel: "#fix", key: "fix", pose: () => ticks >= 3 ? "calculator" : "phone", at: () => $("#picker") },
+    { sel: "#how", key: "how", pose: () => "calculator", at: () => $("#how .numbers"), act: () => hopNumbers() },
+    { sel: "#services", key: "services", pose: () => "idle", at: () => $("#services .lines") },
+    { sel: ".services .foot", key: "services", pose: () => "point-left", at: () => $(".services .foot .lit") || $(".services .foot") },
+    { sel: "#free", key: "free", pose: () => "scan", at: () => $("#free .checklist-card"), act: () => scanCard() },
+    { sel: "#video", key: "video", pose: () => "hello", at: () => $("#video .video-card") },
+    { sel: "#faq", key: "faq", pose: () => "idea", at: openRow },
+    { sel: ".closing", key: "closing", pose: () => "point-left", at: () => $(".closing .btn") }
+  ].map(s => ({ ...s, el: $(s.sel), done: false }));
+  let active = null;
+  const pickStop = () => {
+    let hit = null;
+    for (const s of STOPS) {
+      if (!s.el) continue;
+      const r = s.el.getBoundingClientRect();
+      if (r.top < innerHeight * .62 && r.bottom > innerHeight * .38) hit = s; // later stops win (the services foot beats services)
+    }
+    if (hit !== active) {
+      active = hit;
+      section = hit ? hit.key : "top";
+      if (hit && state === "cruise") {
+        burst(.5);
+        if (!hit.done && hit.act) { // only if the reader is still there half a second later; otherwise next visit
+          gsap.delayedCall(.5, () => {
+            const el = hit.at(), r = el && el.getBoundingClientRect();
+            if (active !== hit || !r || r.bottom < NAV || r.top > innerHeight) return;
+            hit.done = true; hit.act();
+          });
+        }
+        else if (!wide && !hit.tripped && !tucked) { hit.tripped = true; tripTo(hit.at(), hit.pose(), 2.6); }
+      }
+    }
+    if (active) stopPose = active.pose();
+  };
+  // the screen y where a stop wants the robot: level with its anchor, inside the viewport
+  const anchorY = el => {
+    if (!el) return innerHeight * .5;
+    const r = el.getBoundingClientRect();
+    return clamp(NAV + 40, innerHeight - 120, r.top + Math.min(r.height, 260) / 2);
   };
 
-  const flight = ScrollTrigger.create({
-    trigger: hero, start: "top top+=68", end: () => "+=" + Math.round(hero.offsetHeight * .62),
-    onUpdate: self => setFlight(self.progress)
-  });
-  function setFlight(v) {
-    p = v;
-    const was = [atHome, flying];
-    atHome = p < .04; flying = !atHome && p < .92; docked = p >= .92;
-    if (was[0] !== atHome || was[1] !== flying) {
-      if (!atHome) { loadAll(); closeTip(false); }
-      ambient(); refresh();
-    }
-    place();
-  }
+  // a short visit somewhere on the page, then back to its post
+  const visitAt = (sx, sy, pose, secs, opts = {}) => {
+    if (tucked || dragging) return;
+    visit = { x: sx + scrollX, y: sy + scrollY, pose, until: performance.now() + secs * 1000, s: opts.s, follow: opts.follow };
+    op.classList.add("is-visiting");
+  };
+  // narrow screens: a quick trip to the right edge beside an element
+  const tripTo = (el, pose, secs) => {
+    if (!el) return;
+    const s = Math.min(96, innerWidth * .24), y = anchorY(el);
+    visitAt(root.clientWidth - s - 4, y - s / 2, pose, secs, { s });
+  };
+  // #how: hop across the four numbers, tapping each as it lands
+  const hopNumbers = () => {
+    if (!wide || tucked) return;
+    const nums = [...document.querySelectorAll("#how .num b")];
+    nums.forEach((n, i) => gsap.delayedCall(i * .42, () => {
+      const r = n.getBoundingClientRect();
+      visitAt(r.left + r.width * .3 - lane.s * .2, r.top - lane.s * .78, "calculator", .5);
+      gsap.delayedCall(.3, () => { nod(); gsap.fromTo(n, { y: 0 }, { y: 4, duration: .08, yoyo: true, repeat: 1, ease: "power1.out" }); });
+    }));
+  };
+  // #free: one emerald scan line sweeps the checklist card
+  const scanCard = () => {
+    const card = $("#free .checklist-card"); if (!card) return;
+    card.classList.remove("is-scan"); void card.offsetWidth; card.classList.add("is-scan");
+    listen(card, "animationend", () => card.classList.remove("is-scan"), { once: true });
+  };
 
-  // the whole page: lean into fast scrolling, then straighten up
-  ScrollTrigger.create({
-    onUpdate: self => {
-      vel = self.getVelocity();
-      lean = gsap.utils.clamp(-7, 7, vel * .004);
-      place();
-      if (settle) settle.kill();
-      settle = gsap.delayedCall(.14, () => { vel = 0; lean = 0; place(); });
-    }
-  });
-
-  // ---------- one pose per section ----------
-  // later entries win; the services button wins while it is on screen, so the robot points at it
-  const SECTIONS = [["#fix", "phone", "fix"], ["#how", "calculator", "how"], ["#services", "idle", "services"],
-    ["#free", "scan", "free"], ["#video", "hello", "video"], ["#faq", "idea", "faq"], [".closing", "point-left", "closing"],
-    [".services .foot", "point-left", "services", "top 88%", "bottom 18%"]];
-  const triggers = SECTIONS.map(([sel, pose, key, start = "top 62%", end = "bottom 62%"]) => ({ pose, key, st: ScrollTrigger.create({ trigger: sel, start, end, onToggle: pick }) }));
-  function pick() {
-    const hit = [...triggers].reverse().find(t => t.st.isActive);
-    sectionPose = hit ? hit.pose : "idle";
-    section = hit ? hit.key : "top";
-    if (!atHome) refresh();
-  }
-
-  // ---------- the eye follows a mouse cursor ----------
-  let mx = null, my = null, lookRaf = 0;
+  // ---------- the mouse: the eye follows it, the robot leans in when it comes close ----------
+  let mx = null, my = null;
   const look = () => {
+    if (ac.signal.aborted) return;
     const L = layers[cur];
     if (!L || !L.eye || mx === null) return;
     const r = L.eye.getBoundingClientRect();
     const dx = mx - (r.left + r.width / 2), dy = my - (r.top + r.height / 2), d = Math.hypot(dx, dy) || 1;
-    const k = Math.min(1, d / 260) * (gsap.getProperty(art, "scaleX") < 0 ? -1 : 1);
+    const k = Math.min(1, d / 260) * flip;
     gsap.to(L.eye, { xPercent: dx / d * 26 * k, yPercent: dy / d * 22 * Math.abs(k), duration: .35, ease: "power3", overwrite: "auto" });
   };
-  if (fine) {
-    addEventListener("pointermove", e => {
-      mx = e.clientX; my = e.clientY;
-      if (!lookRaf) lookRaf = requestAnimationFrame(() => { lookRaf = 0; look(); });
-    }, { passive: true });
-    root.addEventListener("mouseleave", () => { mx = null; Object.values(layers).forEach(L => L.eye && gsap.to(L.eye, { xPercent: 0, yPercent: 0, duration: .5 })); });
-  }
-
-  // ---------- point at a primary button that is hovered or focused nearby ----------
-  let unaimCall = null;
-  const aimAt = b => {
-    if (flying || tucked) return;
-    const r = b.getBoundingClientRect(), o = btn.getBoundingClientRect();
-    if (r.bottom < 0 || r.top > innerHeight) return;
-    const dx = (r.left + r.width / 2) - (o.left + o.width / 2), dy = (r.top + r.height / 2) - (o.top + o.height * .45);
-    if (Math.hypot(dx, dy) > Math.max(720, innerWidth * .72)) return;
-    let pose = null, a = 0;
-    if (dx < -Math.abs(dy) * .5) { pose = "point-left"; a = -Math.atan2(dy, -dx) * 180 / Math.PI; }
-    else if (dy > 0) { pose = "point-down"; a = Math.atan2(-dx, dy) * 180 / Math.PI; }
-    if (!pose) return;
-    if (unaimCall) unaimCall.kill();
-    override = pose; aim = gsap.utils.clamp(-24, 24, a);
-    refresh(); place();
+  const near = () => {
+    offX = offY = 0;
+    if (mx === null || dragging || tucked || fast) return;
+    const sx = px + size / 2, sy = py + size / 2;
+    const dx = mx - sx, dy = my - sy, d = Math.hypot(dx, dy) || 1;
+    if (state === "home" && mx > innerWidth * .45) { offX = -(mx / innerWidth - .7) * 26; offY = -(my / innerHeight - .5) * 18; } // depth in the hero
+    const reach = Math.max(180, size * 1.4);
+    if (d < reach) { const f = (1 - d / reach) * Math.min(14, size * .1); offX += dx / d * f; offY += dy / d * f; }
   };
-  const unaim = () => {
+  if (fine) {
+    listen(window, "pointermove", e => { mx = e.clientX; my = e.clientY; look(); near(); }, { passive: true });
+    listen(root, "mouseleave", () => { mx = null; offX = offY = 0; Object.values(layers).forEach(L => L.eye && gsap.to(L.eye, { xPercent: 0, yPercent: 0, duration: .5 })); });
+    listen(btn, "pointerenter", () => { if (!dragging) { hovering = true; op.classList.add("is-hot"); } });
+    listen(btn, "pointerleave", () => { hovering = false; op.classList.remove("is-hot"); });
+  }
+  ["scroll", "pointermove", "keydown", "touchstart", "pointerdown"].forEach(t => listen(window, t, () => { lastActive = performance.now(); wake(); }, { passive: true }));
+  // the eye follows keyboard focus as well as the mouse
+  listen(window, "keydown", e => { if (e.key === "Tab") kbd = true; });
+  listen(window, "pointerdown", () => { kbd = false; });
+  listen(document, "focusin", e => {
+    if (!kbd || btn.contains(e.target) || !e.target.getBoundingClientRect) return;
+    const r = e.target.getBoundingClientRect(); mx = r.left + r.width / 2; my = r.top + r.height / 2; look();
+  });
+
+  // ---------- reactions ----------
+  // a green button hovered or focused: in the hero it points from home; elsewhere on wide screens
+  // it flies level with the button in its lane and points
+  let unaimCall = null;
+  const pointAt = b => {
+    if (tucked || dragging || fast) return;
+    const r = b.getBoundingClientRect();
+    if (r.bottom < 0 || r.top > innerHeight) return;
     if (unaimCall) unaimCall.kill();
-    unaimCall = gsap.delayedCall(.35, () => { if (override !== "idea") override = null; aim = 0; refresh(); place(); });
+    if (state === "home" || !wide) return; // the hero keeps its one pose; narrow screens leave the dock alone
+    visitAt(lane.x, clamp(NAV + 8, innerHeight - lane.s - 8, r.top + r.height / 2 - lane.s * .45), "point-left", 30);
+    aim = 0;
+  };
+  const unpoint = () => {
+    if (unaimCall) unaimCall.kill();
+    unaimCall = gsap.delayedCall(.35, () => {
+      if (override === "point-left" || override === "point-down") override = null;
+      if (visit && visit.pose === "point-left") endVisit();
+      aim = 0;
+    });
   };
   document.querySelectorAll("main .btn:not(.btn-ghost)").forEach(b => {
-    b.addEventListener("pointerenter", () => aimAt(b));
-    b.addEventListener("focus", () => aimAt(b));
-    b.addEventListener("pointerleave", unaim);
-    b.addEventListener("blur", unaim);
+    listen(b, "pointerenter", () => pointAt(b)); listen(b, "focus", () => pointAt(b));
+    listen(b, "pointerleave", unpoint); listen(b, "blur", unpoint);
   });
+  const endVisit = () => { visit = null; op.classList.remove("is-visiting"); };
+  // ticking a tile: zip over to it and cheer; three or more and out comes the calculator
+  document.querySelectorAll("#picker .tile").forEach(t => listen(t, "click", () => {
+    ticks = document.querySelectorAll('#picker .tile[aria-pressed="true"]').length;
+    if (state === "home" || tucked) return;
+    const r = t.getBoundingClientRect(), s = wide ? lane.s : Math.min(96, innerWidth * .24);
+    visitAt(clamp(8, innerWidth - s - 8, r.right - s * .45), clamp(NAV + 8, innerHeight - s - 8, r.top - s * .7), ticks >= 3 ? "calculator" : "hello", 1.3, { s });
+    gsap.delayedCall(.45, nod);
+  }));
+  // opening a question: settle beside that row
+  document.querySelectorAll("#faq summary").forEach(sm => listen(sm, "click", () => {
+    gsap.delayedCall(.05, () => {
+      if (state === "home" || tucked || !sm.parentElement.open) return;
+      if (wide) { const r = sm.getBoundingClientRect(); visitAt(lane.x, clamp(NAV + 8, innerHeight - lane.s - 8, r.top + r.height / 2 - lane.s * .5), "idea", 2.6); }
+      else tripTo(sm, "idea", 2.6);
+      nod();
+    });
+  }));
 
-  // ---------- press: a spin and a tip ----------
-  let ideaCall = null;
-  btn.addEventListener("click", () => {
-    if (bubbleOpen) { closeTip(false); return; }
-    gsap.fromTo(tilt, { rotationY: 0 }, { rotationY: 360, duration: .8, ease: "back.out(1.3)", transformPerspective: 700 });
+  // ---------- grab it with the mouse: it follows, and a throw keeps its speed ----------
+  // (dragging is optional fun; every function stays on click, tap and keyboard, WCAG 2.5.7)
+  let grab = null, moved = false, waveOff = null;
+  if (fine) {
+    listen(btn, "pointerdown", e => {
+      if (e.button !== 0) return;
+      grab = { x: e.clientX, y: e.clientY, ox: px, oy: py, lx: e.clientX, ly: e.clientY, lt: performance.now(), vx: 0, vy: 0 };
+      moved = false;
+      btn.setPointerCapture(e.pointerId);
+    });
+    listen(btn, "pointermove", e => {
+      if (!grab) return;
+      const dx = e.clientX - grab.x, dy = e.clientY - grab.y;
+      if (!moved && Math.hypot(dx, dy) < 6) return;
+      if (!moved) { moved = true; dragging = true; hovering = false; op.classList.add("is-dragging"); root.classList.add("op-dragging"); closeTip(false); endVisit(); getSelection().removeAllRanges(); }
+      const now = performance.now(), dt = Math.max(.008, (now - grab.lt) / 1000);
+      grab.vx = grab.vx * .6 + (e.clientX - grab.lx) / dt * .4; grab.vy = grab.vy * .6 + (e.clientY - grab.ly) / dt * .4;
+      grab.lx = e.clientX; grab.ly = e.clientY; grab.lt = now;
+      px = grab.ox + dx; py = grab.oy + dy; vx = grab.vx; vy = grab.vy;
+      lean = clamp(-22, 22, grab.vx * .02);
+    });
+    const drop = () => {
+      if (!grab) return;
+      const g = grab; grab = null;
+      if (!dragging) return;
+      dragging = false; lean = 0;
+      op.classList.remove("is-dragging"); root.classList.remove("op-dragging");
+      vx = clamp(-2600, 2600, g.vx); vy = clamp(-2600, 2600, g.vy); // thrown: the spring brings it home from there
+      if (state === "home") state = "cruise";
+      gsap.fromTo(art, { rotation: -16 }, { rotation: 0, duration: 1.3, ease: "elastic.out(1, .32)" });
+      burst(1.2);
+      override = "hello";
+      if (waveOff) waveOff.kill();
+      waveOff = gsap.delayedCall(1.6, () => { if (override === "hello") override = null; });
+    };
+    listen(btn, "pointerup", drop);
+    listen(btn, "pointercancel", drop);
+  }
+
+  // ---------- press: a roll and a tip ----------
+  let ideaCall = null, presses = [];
+  // seven quick presses: a dizzy double spin, then it looks lost for a moment
+  const dizzy = () => {
+    closeTip(false); rolling = true;
     if (ideaCall) ideaCall.kill();
-    override = "idea"; aim = 0; refresh(); place();
-    ideaCall = gsap.delayedCall(3, () => { if (override === "idea") override = null; refresh(); });
+    override = "lost"; aim = 0;
+    gsap.fromTo(art, { rotation: 0 }, { rotation: 720, duration: 1.2, ease: "power2.inOut", onComplete: () => { gsap.set(art, { rotation: 0 }); rolling = false; } });
+    gsap.fromTo(bob, { y: 0 }, { y: -W * .12, duration: .6, yoyo: true, repeat: 1, ease: "power2.out" });
+    gsap.fromTo(tilt, { x: 0 }, { x: W * .03, duration: .12, yoyo: true, repeat: 9, ease: "sine.inOut", delay: 1.2 });
+    burst(1.3);
+    gsap.delayedCall(3.4, () => { if (override === "lost") override = null; });
+  };
+  listen(btn, "click", e => {
+    if (moved) { moved = false; e.preventDefault(); return; } // that was a drag, not a press
+    const now = performance.now();
+    presses = presses.filter(t => now - t < 3000); presses.push(now);
+    if (presses.length >= 7) { presses = []; dizzy(); return; }
+    if (bubbleOpen) { closeTip(false); return; }
+    roll();
+    if (ideaCall) ideaCall.kill();
+    override = "idea"; aim = 0;
+    ideaCall = gsap.delayedCall(3, () => { if (override === "idea") override = null; });
     openTip();
   });
-
-  // ---------- small reactions to the page ----------
-  const nod = () => { if (!tucked) { gsap.fromTo(bob, { y: 0 }, { y: -W * .03, duration: .1, yoyo: true, repeat: 1, ease: "power2.out" }); blink(); } };
-  document.querySelectorAll("#picker .tile, #faq summary").forEach(t => t.addEventListener("click", nod));
 
   // ---------- tuck away and bring back ----------
   const setTucked = (v, focusTo) => {
     tucked = v; store.set("cw-operator", v ? "tucked" : null);
-    closeTip(false); place();
+    closeTip(false); endVisit(); ambient();
+    gsap.to(op, { autoAlpha: v && !wide ? 0 : 1, duration: .25, overwrite: "auto" });
     if (focusTo) requestAnimationFrame(() => focusTo.focus());
   };
-  tuckBtn.addEventListener("click", () => setTucked(true, showBtn));
-  hideBtn.addEventListener("click", () => setTucked(true, showBtn));
-  showBtn.addEventListener("click", () => setTucked(false, btn));
+  listen(tuckBtn, "click", () => setTucked(true, showBtn));
+  listen(hideBtn, "click", () => setTucked(true, showBtn));
+  listen(showBtn, "click", () => setTucked(false, btn));
+  listen(window, "resize", () => { measure(); });
 
-  // ---------- keep the floating controls next to the robot ----------
-  gsap.ticker.add(() => {
-    if (!tuckBtn.hidden) {
-      const x = gsap.getProperty(op, "x"), y = gsap.getProperty(op, "y"), s = gsap.getProperty(op, "scaleX") * W;
-      tuckBtn.style.transform = `translate(${Math.round(Math.min(x + s * .8, innerWidth - 34))}px, ${Math.round(y - 4)}px)`;
+  // ---------- every frame ----------
+  let last = performance.now();
+  const frame = () => {
+    const now = performance.now(), dt = Math.min(.05, (now - last) / 1000); // a hidden tab never comes back to a jump
+    last = now;
+    const sX = scrollX, sY = scrollY;
+    const launched = sY > Math.max(24, hero.offsetHeight * .04);
+    pickStop();
+
+    // the scroll speed, smoothed: it trails a little behind fast scrolling, then settles
+    const cw = root.clientWidth;
+    scrollV += (clamp(-4000, 4000, (sY - lastSY) / Math.max(dt, .008)) - scrollV) * Math.min(1, dt * 4);
+    lastSY = sY;
+    const lag = clamp(-42, 42, -scrollV * .03);
+
+    // where it wants to be (screen coordinates) and how big
+    let tx, ty, ts, k = 24, c = 9; // a soft spring, a touch under critical damping: it glides in and settles
+    if (!launched && !dragging) {
+      if (state !== "home") { state = "home"; endVisit(); }
+      tx = homeBox.x - sX + offX; ty = homeBox.y - sY + offY; ts = homeBox.s;
+      k = 60; c = 15.5;
+    } else {
+      if (state === "home") { // take off: a crouch, a burst of thrust, then the dive down and to the right
+        state = "launch"; launchAt = now; closeTip(false);
+        gsap.fromTo(bob, { scaleY: .92, scaleX: 1.04 }, { scaleY: 1, scaleX: 1, duration: .4, ease: "back.out(2.2)" });
+        vx = wide ? 360 : 140; vy = 520; burst(1.4);
+      }
+      if (state === "launch" && now - launchAt > 650) state = "cruise";
+      if (visit && now > visit.until) endVisit();
+      if (state === "launch") { // the swoop: aim below and right of where it took off
+        tx = homeBox.x - sX + homeBox.s * .08; ty = innerHeight * .55; ts = (homeBox.s + lane.s) / 2; k = 9; c = 4.2; // drop down first, then it crosses to its lane
+      } else if (visit) {
+        ts = visit.s || (wide && visit.pose === "point-left" ? lane.s * .86 : lane.s); tx = visit.x - sX; ty = visit.y - sY;
+      } else if (wide) {
+        ts = stopPose === "point-left" ? lane.s * .86 : lane.s; // pointing from the left lane: a touch smaller, so the hand stops short of the text
+        tx = tucked ? -size - 40 : lane.x; // tucked: off the left edge
+        ty = clamp(NAV + 8, innerHeight - ts - 8, (active ? anchorY(active.at()) : innerHeight * .55) - ts * .5) + lag;
+      } else {
+        ts = lane.s; tx = lane.x; ty = lane.y;
+      }
+      if (!visit && state === "cruise" && now - lastActive > 9000 && now > wander.until) { // left alone: drift and look around
+        wander = { x: rand(-28, 10), y: rand(-36, 36), until: now + 4000 };
+        const L = layers[cur];
+        if (L && L.eye) gsap.timeline().to(L.eye, { xPercent: -30, duration: .35 }).to(L.eye, { xPercent: 30, duration: .6 }, "+=.35").to(L.eye, { xPercent: 0, duration: .35 }, "+=.35");
+      }
+      if (now < wander.until && state === "cruise" && !visit && wide) { tx += wander.x; ty += wander.y; }
+      tx += offX; ty += offY;
+    }
+    // the target itself eases, so a jump in where it wants to be (a new section, a resize) becomes a glide
+    if (!smT || state === "home") smT = { x: tx, y: ty };
+    else { const e = Math.min(1, dt * 6); smT.x += (tx - smT.x) * e; smT.y += (ty - smT.y) * e; }
+
+    // the spring, integrated semi-implicitly, with an acceleration cap (no sudden kicks) and a speed cap
+    if (!dragging) {
+      let ax = k * (smT.x - px) - c * vx, ay = k * (smT.y - py) - c * vy;
+      const am = Math.hypot(ax, ay); if (am > 5200) { ax *= 5200 / am; ay *= 5200 / am; }
+      vx += ax * dt; vy += ay * dt;
+      const sp = Math.hypot(vx, vy); if (sp > 2200) { vx *= 2200 / sp; vy *= 2200 / sp; }
+      px += vx * dt; py += vy * dt;
+      if (state === "home" && Math.hypot(tx - px, ty - py) < 2 && Math.hypot(vx, vy) < 40) { px = tx; py = ty; vx = vy = 0; } // locked to the hero
+    }
+    size += (ts - size) * Math.min(1, dt * (state === "launch" ? 2.5 : 4));
+    // always on screen, below the nav, and with its whole art box inside the window
+    if (state !== "home" && !dragging) {
+      const toSlot = !wide && !visit && state === "cruise"; // landing in the nav slot is the one time it may rise above the nav
+      const top = toSlot ? lane.y - 2 : NAV + 6 - size * .12, bot = innerHeight - size * .85;
+      if (py < top) { py = top; vy = Math.max(vy, 0); }
+      if (py > bot) { py = bot; vy = Math.min(vy, 0); }
+      if (!tucked) {
+        const lft = 2, rgt = cw - size - 2;
+        if (px < lft) { px = lft; vx = Math.max(vx, 0); }
+        if (px > rgt) { px = rgt; vx = Math.min(vx, 0); }
+      }
+    }
+
+    if (!napping && now - lastActive > 60000 && !visit && !dragging && !fast && !bubbleOpen && !tucked) nap();
+    // it only takes clicks while resting at its post: flying over the page, it never catches a click meant for the page
+    const passing = !dragging && (!!visit || state === "launch" || Math.hypot(vx, vy) > 140);
+    if (passing !== op.classList.contains("is-visiting")) op.classList.toggle("is-visiting", passing);
+    const showBadge = ticks >= 3 && state !== "home" && active && active.key === "fix" && !tucked;
+    if (showBadge !== badge.classList.contains("is-on")) badge.classList.toggle("is-on", showBadge);
+    if (showBadge && badge.textContent !== String(ticks)) badge.textContent = ticks;
+    // speed decides "flying" (hysteresis, so it never flickers between poses)
+    const sp = Math.hypot(vx, vy);
+    if (!fast && sp > 720 && state !== "home") fast = true;
+    else if (fast && (sp < 240 || state === "home")) fast = false;
+    const w = want();
+    if (w !== cur && (now - lastSwap > 320 || w === override)) show(w);
+    // it banks into turns and leans with the cursor
+    // the fly pose faces the way it travels; in the left lane the pointing pose is mirrored, so it points at the page
+    const f = cur === "fly" ? (Math.abs(vx) > 80 ? Math.sign(vx) : flip) : cur === "point-left" && wide && state !== "home" && px + size / 2 < cw / 2 ? -1 : 1;
+    if (f !== flip) { flip = f; gsap.to(art, { scaleX: flip, duration: .22, ease: "power2", overwrite: "auto" }); }
+    tilted += (clamp(-14, 14, vx * .01) + aim + lean - tilted) * Math.min(1, dt * 5);
+
+    // place it
+    const sx = px, sy = py;
+    gsap.set(op, { x: sx, y: sy, scale: size / W });
+    gsap.set(tilt, { rotation: tilted });
+    const z = !wide && sy + size * .5 < NAV + 12 ? "55" : "45"; // above the nav bar only while it is in its slot
+    if (op.style.zIndex !== z) op.style.zIndex = z;
+    tuckBtn.hidden = !(wide && state !== "home" && !tucked);
+    showBtn.hidden = !tucked;
+
+    // the flame, in the robot's own frame (undo its tilt; the canvas is drawn at full size)
+    power = Math.max(0, power - dt * 1.6);
+    if (rolling || (tucked && !wide)) flame.clear();
+    else {
+      const nz = NOZZLE[cur] || NOZZLE.idle, a = -tilted * Math.PI / 180;
+      const nx = (flip < 0 ? 1 - nz[0] : nz[0]) * W + .6 * W, ny = nz[1] * W;
+      flame.draw({ x: nx, y: ny, size: W, vx: (vx * Math.cos(a) - vy * Math.sin(a)) * .8, vy: (vx * Math.sin(a) + vy * Math.cos(a)) * .8, power, t: now / 1000, dim: napping ? .55 : 1 });
     }
     placeBubble();
-  });
+  };
 
   // ---------- start ----------
-  const init = () => { measure(); setFlight(flight.progress); pick(); place(); };
-  ScrollTrigger.addEventListener("refresh", init);
   measure();
-  const hx = homeBox.x - scrollX, hy = homeBox.y - scrollY;
-  gsap.set(op, { x: hx, y: hy, scale: homeBox.s / W });
-  setFlight(flight.progress);
+  px = homeBox.x - scrollX; py = homeBox.y - scrollY; size = homeBox.s;
+  if (tucked && !wide) gsap.set(op, { autoAlpha: 0 });
   ambient();
-  if (atHome) wave();
   loadVideo();
   ["hello", "point-down", "fly"].forEach(layer);
-  if (document.fonts) document.fonts.ready.then(() => ScrollTrigger.refresh());
+  later(() => { if (!ac.signal.aborted) loadAll(); });
+  if (document.fonts) document.fonts.ready.then(() => { if (!ac.signal.aborted) measure(); });
+  gsap.ticker.add(frame);
+  frame();
+
+  // ---------- stop: everything above, undone ----------
+  return () => {
+    ac.abort();
+    heroIO.disconnect();
+    gsap.ticker.remove(frame);
+    // every tween and delayed call on the page (bob, blink, wave, wander, hops, eye);
+    // the homepage script settles its own counters and buttons on the same "cw-motion" event
+    gsap.globalTimeline.clear();
+    video.pause(); video.classList.remove("is-playing");
+    canvas.remove();
+    Object.entries(layers).forEach(([name, L]) => { if (name !== "hello") L.el.remove(); });
+    layers.hello.el.classList.add("is-on");
+    op.querySelectorAll(".op-patch, .op-eye, .op-badge, .op-z").forEach(el => el.remove());
+    gsap.set([op, tilt, bob, art, ...Object.values(layers).map(L => L.el), bubble], { clearProps: "all" });
+    op.classList.remove("is-live", "is-hot", "is-dragging", "is-visiting");
+    root.classList.remove("op-on", "op-dragging");
+    slot.classList.remove("is-on");
+    root.style.removeProperty("--slot-x"); root.style.removeProperty("--slot-y");
+    const card = $("#free .checklist-card"); if (card) card.classList.remove("is-scan");
+    closeTip(false);
+    tuckBtn.hidden = showBtn.hidden = hideBtn.hidden = true;
+    btn.addEventListener("click", stillClick);
+  };
   }
 })();
