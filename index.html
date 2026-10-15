@@ -18,7 +18,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100,500..900&family=Hanken+Grotesk:wght@400..700&display=swap" rel="stylesheet">
-<link rel="preload" as="image" href="assets/headshot-800.webp" imagesrcset="assets/headshot-480.webp 480w, assets/headshot-800.webp 800w, assets/headshot-1200.webp 1200w" imagesizes="(max-width: 860px) 380px, 460px" fetchpriority="high">
+<link rel="preload" as="image" href="assets/hero-poster-1280.webp" imagesrcset="assets/hero-poster-1280.webp 1280w, assets/hero-poster-1920.webp 1920w" imagesizes="100vw" fetchpriority="high">
+<script>document.documentElement.classList.add("js")</script>
 <style>
   :root {
     --ink: #0B1220;
@@ -75,7 +76,8 @@
   .nav-links a { text-decoration: none; color: var(--ink-2); font-weight: 500; font-size: .95rem; }
   .nav-links a:hover { color: var(--ink); }
   .nav-links .btn { padding: 10px 16px; font-size: .95rem; }
-  @media (max-width: 720px) { .nav-links li:not(.cta-li) { display: none; } }
+  /* the full link row needs about 1000px; below that only the CTA stays */
+  @media (max-width: 1099px) { .nav-links li:not(.cta-li) { display: none; } }
 
   /* buttons */
   .btn {
@@ -100,46 +102,51 @@
   .btn-dark { background: var(--ink); color: #fff; }
   .btn-dark:hover { background: #172033; box-shadow: none; }
 
-  /* hero */
-  .hero { padding: clamp(40px, 6vw, 88px) 0 clamp(36px, 5vw, 64px); position: relative; }
-  .hero .wrap { display: grid; grid-template-columns: 1.15fr .85fr; gap: clamp(28px, 5vw, 72px); align-items: center; }
+  /* hero: a navy stage with the looping scene behind the headline and the Operator on the right.
+     No transforms, filters or z-index on the stage or its inner boxes: the Operator inside it
+     goes position: fixed when it flies, and any of those would trap it. */
+  .hero { padding: 6px clamp(8px, 1.2vw, 16px) 0; }
+  .hero-stage { position: relative; overflow: hidden; border-radius: clamp(20px, 2.4vw, 32px); background: var(--ink); color: #fff; min-height: min(84vh, 760px); display: grid; align-items: center; padding: clamp(48px, 6vw, 88px) 0 clamp(64px, 6vw, 88px); }
+  .hero-media { position: absolute; inset: 0; }
+  .hero-media img, .hero-media video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 70% 50%; }
+  /* the video covers only the scene side, so its painted area stays smaller than the poster's
+     and the poster remains the LCP element; the left edge fades so there is no seam */
+  .hero-vid { position: absolute; inset: 0 0 0 40%; overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 30%); mask-image: linear-gradient(90deg, transparent, #000 30%); }
+  .hero-media .hero-vid video { left: -66.667%; width: 166.667%; }
+  .hero-media video { opacity: 0; transition: opacity .8s ease-out; }
+  .hero-media video.is-playing { opacity: 1; }
+  .hero-media::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgb(11 18 32 / .94) 0%, rgb(11 18 32 / .8) 34%, rgb(11 18 32 / 0) 62%); }
+  .hero-inner { position: relative; display: grid; grid-template-columns: 1.15fr .85fr; gap: clamp(28px, 5vw, 72px); align-items: center; }
+  .hero-copy { grid-column: 1; grid-row: 1; }
   .hero-copy > * + * { margin-top: 22px; }
+  .hero-copy > .op-float + * { margin-top: 0; }
+  .hero h1 { color: #fff; }
+  .hero p.lede { color: rgb(255 255 255 / .86); }
+  .hero :focus-visible { outline-color: var(--emerald); }
   .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 30px; }
-  .hero-note { font-size: .95rem; color: var(--ink-3); }
-  .hero-note strong { color: var(--ink); font-weight: 600; }
+  .hero .btn-ghost { color: #fff; box-shadow: inset 0 0 0 1.5px rgb(255 255 255 / .42); }
+  .hero .btn-ghost:hover { background: rgb(255 255 255 / .12); box-shadow: inset 0 0 0 1.5px #fff; }
+  .hero-note { font-size: .95rem; color: rgb(255 255 255 / .82); }
+  .hero-note strong { color: #fff; font-weight: 600; }
   .line { display: block; }
-  .portrait { position: relative; aspect-ratio: 1; max-width: 460px; margin-inline: auto; width: 100%; }
-  .blob {
-    position: absolute; inset: 6%; border-radius: 46% 54% 52% 48% / 52% 44% 56% 48%;
-    background: radial-gradient(60% 60% at 30% 30%, var(--mint) 0%, var(--mint-2) 60%, transparent 100%),
-                radial-gradient(50% 50% at 75% 70%, rgb(16 185 129 / .35), transparent 70%);
-    animation: drift 14s ease-in-out infinite alternate;
-  }
-  .blob-2 {
-    position: absolute; inset: 14%; border-radius: 52% 48% 44% 56% / 48% 56% 44% 52%;
-    background: var(--mint); opacity: .9;
-    animation: drift 11s ease-in-out infinite alternate-reverse;
-  }
-  @keyframes drift {
-    from { transform: rotate(-4deg) scale(1); }
-    to { transform: rotate(6deg) scale(1.04); }
-  }
-  .portrait img { position: relative; z-index: 2; width: 100%; height: 100%; object-fit: contain; object-position: bottom; mask-image: linear-gradient(#000 82%, transparent 100%); }
-  .portrait .tag {
-    position: absolute; z-index: 3; left: 4%; bottom: 10%;
-    background: var(--paper-2); border: 1px solid var(--line); border-radius: 999px;
-    padding: 9px 16px 9px 12px; font-size: .9rem; display: flex; gap: 10px; align-items: center; text-decoration: none; color: var(--ink);
-    box-shadow: 0 10px 30px -14px rgb(11 18 32 / .35); transition: border-color .15s, transform .15s ease-out;
-  }
-  .portrait .tag:hover { border-color: var(--ink); transform: translateY(-2px); }
-  .portrait .tag .tag-text { display: flex; flex-direction: column; line-height: 1.2; }
-  .portrait .tag strong { font-weight: 700; }
-  .portrait .tag small { font-size: .78rem; color: var(--ink-3); font-weight: 500; }
-  .portrait .tag .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--emerald); box-shadow: 0 0 0 4px rgb(16 185 129 / .22); }
+  .who { display: inline-flex; gap: 10px; align-items: center; padding: 6px 16px 6px 6px; border-radius: 999px; text-decoration: none; color: #fff; font-size: .9rem; line-height: 1.2; background: rgb(255 255 255 / .07); box-shadow: inset 0 0 0 1px rgb(255 255 255 / .18); transition: background-color .2s, box-shadow .2s; }
+  .who:hover { background: rgb(255 255 255 / .12); box-shadow: inset 0 0 0 1px rgb(255 255 255 / .4); }
+  .who img { width: 34px; height: 34px; border-radius: 50%; box-shadow: 0 0 0 2px var(--emerald); }
+  .who span { display: flex; flex-direction: column; }
+  .who small { font-size: .78rem; color: rgb(255 255 255 / .8); font-weight: 500; }
+  .op-home { grid-column: 2; grid-row: 1; width: min(100%, 440px); aspect-ratio: 1; justify-self: center; }
+  .op-float { display: none; }
+  .hero-pause { position: absolute; right: 14px; bottom: 14px; min-height: 32px; padding: 0 14px 0 12px; border: 0; border-radius: 999px; background: rgb(11 18 32 / .62); color: #fff; box-shadow: inset 0 0 0 1px rgb(255 255 255 / .28); font: 600 .82rem/1 var(--font); display: inline-flex; align-items: center; gap: 7px; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+  .hero-pause:hover { box-shadow: inset 0 0 0 1px #fff; }
+  .hero-pause svg { width: 12px; height: 12px; fill: currentColor; }
   @media (max-width: 860px) {
-    .hero .wrap { grid-template-columns: 1fr; }
-    .portrait { max-width: 380px; order: -1; }
-    .portrait .tag { bottom: 4%; }
+    .hero-stage { min-height: 0; align-items: start; padding: 26px 0 64px; }
+    .hero-inner { display: block; }
+    .hero-media::after { background: linear-gradient(180deg, rgb(11 18 32 / .66) 0%, rgb(11 18 32 / .88) 45%, rgb(11 18 32 / .92) 100%); }
+    .hero-media img, .hero-media video { object-position: 74% 50%; }
+    /* the Operator takes the top right corner and the headline wraps around it */
+    .op-float { display: block; float: right; width: 96px; height: 96px; margin: -8px -6px 4px 6px; shape-outside: circle(50%); }
+    .op-home { display: contents; }
   }
 
   /* marquee */
@@ -298,15 +305,65 @@
   .js .hero-copy .line { clip-path: inset(0 0 100% 0); animation: unclip .9s cubic-bezier(.2,.7,.2,1) forwards; }
   .js .hero-copy .line:nth-child(2) { animation-delay: .14s; }
   .js .hero [data-reveal] { transition-delay: calc(.35s + var(--d, 0s)); }
-  .js .portrait { animation: settle 1.1s cubic-bezier(.2,.7,.2,1) both; }
   @keyframes unclip { to { clip-path: inset(0 0 -20% 0); } }
-  @keyframes settle { from { scale: .96; } to { scale: 1; } }
+
+  /* the Operator's lane: on wide screens the content leaves room at the sides for the docked
+     robot. Pure CSS, so nothing reflows when the script arrives. */
+  :root { --lane: clamp(112px, 10vw, 156px); }
+  @media (min-width: 1100px) and (prefers-reduced-motion: no-preference) {
+    main > section:not(.hero) > .wrap, footer > .wrap { width: min(var(--max), calc(100% - 2 * var(--lane))); }
+  }
+  .section-head { display: flow-root; }
+  .op-static { display: none; }
+
+  /* the Operator. Static in the hero by default (no script, reduced motion); operator.js adds
+     .is-live and drives position, scale and pose with GSAP. */
+  .op { position: relative; width: 100%; aspect-ratio: 1; --u: 4.4px; }
+  .op-tilt, .op-bob, .op-btn, .op-art, .op-pose { position: absolute; inset: 0; }
+  .op-btn { display: block; width: 100%; height: 100%; padding: 0; border: 0; background: none; border-radius: 26%; -webkit-tap-highlight-color: transparent; }
+  .op-btn:focus-visible { outline: 2px solid var(--emerald); outline-offset: -6%; border-radius: 26%; }
+  .op-pose:not(.is-on) { visibility: hidden; }
+  .op-pose img { width: 100%; height: 100%; }
+  .op-patch, .op-eye { position: absolute; pointer-events: none; }
+  .op-patch { background: #091D31; border-radius: 28%; box-shadow: 0 0 calc(var(--u) * .5) calc(var(--u) * .35) #091D31; }
+  .op-eye { background: #84F5C8; border-radius: 22%; box-shadow: 0 0 calc(var(--u) * .9) calc(var(--u) * .12) rgb(16 185 129 / .95), 0 0 calc(var(--u) * 2.6) calc(var(--u) * .5) rgb(16 185 129 / .45); }
+  .op.is-live { position: fixed; left: 0; top: 0; right: auto; width: var(--op-w); height: var(--op-w); z-index: 45; transform-origin: 0 0; will-change: transform; }
+  .op.is-live .op-pose img { filter: drop-shadow(0 calc(var(--u) * 2) calc(var(--u) * 2.4) rgb(11 18 32 / .22)); }
+  .op-slot { display: none; }
+  @media (max-width: 860px) {
+    .op { position: absolute; top: -8px; right: -6px; width: 96px; --u: .96px; }
+  }
+  @media (max-width: 1099px) {
+    .js .op-slot.is-on { display: block; flex: none; width: 52px; height: 52px; margin: 0 10px 0 auto; }
+  }
+  .op-bubble { position: fixed; z-index: 60; left: 0; top: 0; width: max-content; max-width: min(300px, calc(100vw - 24px)); padding: 14px 40px 12px 16px; border-radius: 16px 16px 4px 16px; background: var(--paper-2); color: var(--ink); box-shadow: 0 0 0 1px var(--line), 0 18px 40px -16px rgb(11 18 32 / .45); font-size: .95rem; line-height: 1.4; }
+  .op-bubble[hidden] { display: none; }
+  .op-bubble p { font-weight: 500; }
+  .op-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+  .op-actions button { min-height: 30px; padding: 0 12px; border: 0; border-radius: 999px; font: 600 .82rem/1 var(--font); background: var(--mint-2); color: var(--emerald-deep); box-shadow: inset 0 0 0 1px var(--mint); }
+  .op-actions button:hover { box-shadow: inset 0 0 0 1.5px var(--emerald-deep); }
+  .op-actions #op-hide { background: none; color: var(--ink-2); box-shadow: inset 0 0 0 1px var(--line); }
+  .op-actions #op-hide:hover { box-shadow: inset 0 0 0 1.5px var(--ink-3); }
+  .op-close, .op-tuck { position: absolute; width: 28px; height: 28px; padding: 0; border: 0; border-radius: 50%; display: grid; place-items: center; }
+  .op-close { top: 8px; right: 8px; background: none; color: var(--ink-3); }
+  .op-close:hover { color: var(--ink); background: var(--paper); }
+  .op-close svg, .op-tuck svg { width: 11px; height: 11px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; }
+  .op-tuck { position: fixed; z-index: 46; left: 0; top: 0; background: var(--paper-2); color: var(--ink-2); box-shadow: 0 0 0 1px var(--line), 0 4px 12px -4px rgb(11 18 32 / .3); opacity: .55; transition: opacity .2s; }
+  .op-tuck:hover, .op-tuck:focus-visible { opacity: 1; color: var(--ink); }
+  .op-show { position: fixed; z-index: 55; right: 0; top: 56%; width: 40px; height: 44px; padding: 0 0 0 4px; border: 0; border-radius: 14px 0 0 14px; background: var(--ink); display: grid; place-items: center; box-shadow: 0 8px 20px -8px rgb(11 18 32 / .5); }
+  .op-show[hidden], .op-tuck[hidden] { display: none; }
+  .op-show-eye { width: 12px; height: 12px; border-radius: 3px; background: #84F5C8; box-shadow: 0 0 8px 1px rgb(16 185 129 / .9); }
+  .op-show:hover .op-show-eye { transform: scale(1.15); }
+  @media (max-width: 1099px) { .op-show { top: var(--slot-y, 8px); left: var(--slot-x, auto); right: auto; width: 44px; border-radius: 14px; } }
+  .op-live { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
   @media (prefers-reduced-motion: reduce) {
     .js [data-reveal] { opacity: 1; transform: none; transition: none; }
     .js .hero-copy .line { clip-path: none; animation: none; }
-    .js .portrait { animation: none; }
-    .marquee .track, .blob, .blob-2 { animation: none; }
-    .marquee-pause { display: none; }
+    .marquee .track { animation: none; }
+    .marquee-pause, .hero-pause, .hero-media video { display: none; }
+    /* no flying companion: each section gets its pose inline instead */
+    .op-static { display: block; float: right; width: clamp(76px, 11vw, 128px); height: auto; margin: -10px 0 8px 16px; }
     html { scroll-behavior: auto; }
     * { transition-duration: .01ms !important; }
   }
@@ -428,6 +485,7 @@
       <img src="assets/logo.svg" alt="" width="34" height="34">
       Clashworks
     </a>
+    <span class="op-slot" id="op-slot" aria-hidden="true"></span>
     <ul class="nav-links">
       <li><a href="#fix">What I fix</a></li>
       <li><a href="#how">How it works</a></li>
@@ -443,8 +501,17 @@
 
 <main id="main">
 <section class="hero" id="top">
-  <div class="wrap">
+  <div class="hero-stage">
+  <div class="hero-media" aria-hidden="true">
+    <img src="assets/hero-poster-1280.webp" srcset="assets/hero-poster-1280.webp 1280w, assets/hero-poster-1920.webp 1920w" sizes="100vw" width="1920" height="1086" alt="" fetchpriority="high">
+    <div class="hero-vid"><video id="hero-video" autoplay muted loop playsinline preload="none" aria-hidden="true" tabindex="-1">
+      <source data-src="assets/hero-loop.webm" type="video/webm">
+      <source data-src="assets/hero-loop.mp4" type="video/mp4">
+    </video></div>
+  </div>
+  <div class="wrap hero-inner">
     <div class="hero-copy">
+      <span class="op-float" id="op-float" aria-hidden="true"></span>
       <h1 id="headline"><span class="line">Business problems?</span><span class="line">I have the fix.</span></h1>
       <p class="lede" data-reveal>I spent hundreds of hours learning to fix business problems with AI so you don't have to. Tell me what still happens by hand in your business, and I'll show you what to fix first. Free.</p>
       <div class="hero-actions" data-reveal>
@@ -454,13 +521,30 @@
         <a class="btn btn-ghost" data-liquid="" href="#how">How it works</a>
       </div>
       <p class="hero-note" data-reveal><strong>Two a week.</strong> Ten minutes of my time, recorded, yours to keep. No pitch on the call.</p>
+      <a class="who" href="about.html" data-reveal><img src="assets/headshot-96.webp" width="34" height="34" alt=""><span><strong>Clayton Trevino</strong><small>SMU Cox School of Business</small></span></a>
     </div>
-    <div class="portrait" data-reveal>
-      <div class="blob" aria-hidden="true"></div>
-      <div class="blob-2" aria-hidden="true"></div>
-      <img src="assets/headshot-800.webp" srcset="assets/headshot-480.webp 480w, assets/headshot-800.webp 800w, assets/headshot-1200.webp 1200w" sizes="(max-width: 860px) 380px, 460px" width="800" height="800" alt="Clayton Trevino" fetchpriority="high">
-      <a class="tag" href="about.html"><span class="dot" aria-hidden="true"></span><span class="tag-text"><strong>Clayton Trevino</strong><small>SMU Cox School of Business</small></span></a>
+    <div class="op-home" id="op-home">
+      <div class="op" id="op">
+        <div class="op-tilt"><div class="op-bob">
+          <button class="op-btn" id="op-btn" type="button" aria-label="Get a tip from the Operator" aria-controls="op-bubble" aria-expanded="false">
+            <span class="op-art"><span class="op-pose is-on" data-pose="idle"><img src="assets/operator-idle-480.webp" srcset="assets/operator-idle-480.webp 480w, assets/operator-idle-960.webp 960w" sizes="(max-width: 860px) 96px, 440px" width="480" height="480" alt="" fetchpriority="low"></span></span>
+          </button>
+        </div></div>
+      </div>
     </div>
+    <div class="op-bubble" id="op-bubble" hidden>
+      <p id="op-tip"></p>
+      <div class="op-actions">
+        <button type="button" id="op-next">Another tip</button>
+        <button type="button" id="op-hide">Hide the Operator</button>
+      </div>
+      <button type="button" class="op-close" id="op-close" aria-label="Close the tip"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 2.5l7 7M9.5 2.5l-7 7"/></svg></button>
+    </div>
+    <p class="op-live" id="op-live" role="status" aria-live="polite"></p>
+    <button type="button" class="op-tuck" id="op-tuck" aria-label="Hide the Operator" hidden><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 2.5l7 7M9.5 2.5l-7 7"/></svg></button>
+    <button type="button" class="op-show" id="op-show" aria-label="Show the Operator" hidden><span class="op-show-eye" aria-hidden="true"></span></button>
+  </div>
+  <button class="hero-pause" id="hero-pause" type="button"><svg viewBox="0 0 12 12" aria-hidden="true"><rect x="2" y="1" width="3" height="10" rx="1"/><rect x="7" y="1" width="3" height="10" rx="1"/></svg><span>Pause animation</span></button>
   </div>
 </section>
 
@@ -481,6 +565,7 @@
 <section id="fix">
   <div class="wrap">
     <div class="section-head" data-reveal>
+      <img class="op-static" src="assets/operator-phone-480.webp" width="480" height="480" alt="" loading="lazy">
       <h2>Tick what still happens by hand.</h2>
       <p class="lede">Every one of these is something I've already built a fix for. Pick yours and I'll start there.</p>
     </div>
@@ -533,6 +618,7 @@
 <section id="how">
   <div class="wrap">
     <div class="section-head" data-reveal>
+      <img class="op-static" src="assets/operator-calculator-480.webp" width="480" height="480" alt="" loading="lazy">
       <h2>How the free check works.</h2>
       <p class="lede">You get the fix before you decide anything. If it's worth building, we talk about that after.</p>
     </div>
@@ -565,6 +651,7 @@
 <section class="services" id="services">
   <div class="wrap">
     <div class="section-head" data-reveal>
+      <img class="op-static" src="assets/operator-point-left-480.webp" width="480" height="480" alt="" loading="lazy">
       <h2>Once the leak is found, here is what I build.</h2>
       <p class="lede">Every job is quoted from the free check, at a fixed price, with a number we agree on up front. If the number can't be shown 30 days after delivery, you get your fees back (<a href="terms.html#guarantee">conditions</a>).</p>
     </div>
@@ -619,6 +706,7 @@
 <section class="free" id="free">
   <div class="wrap">
     <div class="section-head" data-reveal>
+      <img class="op-static" src="assets/operator-scan-480.webp" width="480" height="480" alt="" loading="lazy">
       <h2>Take the free stuff.</h2>
       <p class="lede">The checklist takes 10 minutes on your phone. The kits are the same files I install for paying clients.</p>
     </div>
@@ -662,6 +750,7 @@
 <section id="video">
   <div class="wrap">
     <div class="section-head" data-reveal>
+      <img class="op-static" src="assets/operator-hello-480.webp" width="480" height="480" alt="" loading="lazy">
       <h2>Watch the fixes happen.</h2>
       <p class="lede">One real business problem a week, fixed on camera, with the exact prompt I used. Take it.</p>
     </div>
@@ -682,6 +771,7 @@
 <section class="faq" id="faq">
   <div class="wrap">
     <div class="section-head" data-reveal>
+      <img class="op-static" src="assets/operator-idea-480.webp" width="480" height="480" alt="" loading="lazy">
       <h2>Questions owners ask first.</h2>
       <p class="lede">Short answers. The long ones are in the free check.</p>
     </div>
@@ -716,6 +806,7 @@
 <section class="closing">
   <div class="wrap">
     <div data-reveal>
+      <img class="op-static" src="assets/operator-point-left-480.webp" width="480" height="480" alt="" loading="lazy">
       <h2>Any problems? I have the fix.</h2>
       <p>Two free checks a week. Apply now and you'll hear from me either way within seven days.</p>
       <a class="btn" data-liquid="" href="check.html">Get a free Optimization Check
@@ -749,6 +840,7 @@
 </footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.15.0/gsap.min.js" integrity="sha512-oJ8QbaQThQoJZ7oEv+29jfPM6CcP+zUxh3PKJs1vyOhx0UraUrE7PQgeItu3dOuCJyrzWpoYMsVjkkPEBzbUqw==" crossorigin="anonymous" defer></script>
+<script src="assets/operator.js" defer></script>
 <script>
 document.documentElement.classList.add("js");
 window.addEventListener("DOMContentLoaded", () => {
