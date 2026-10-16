@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script>(function(d){var m;try{m=localStorage.getItem("cw-motion")}catch(e){}if(m==="reduce"||m==="paused"||(m!=="full"&&matchMedia("(prefers-reduced-motion: reduce)").matches))d.classList.add("rm")})(document.documentElement)</script>
+<title>Services and prices. Clashworks</title>
+<meta name="description" content="Everything Clashworks does for local service businesses and rental owners, in plain words, with a starting price for each. Every job is quoted from a free video review.">
+<meta name="theme-color" content="#F5F7FA">
+<meta property="og:title" content="Services and prices. Clashworks">
+<meta property="og:description" content="The full list, in plain words, with a starting price for each. Every job is one fixed price, quoted from a free video review.">
+<meta property="og:image" content="https://clashworks.co/assets/headshot-mint-512.webp">
+<meta property="og:url" content="https://clashworks.co/services.html">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<link rel="canonical" href="https://clashworks.co/services.html">
+<link rel="icon" href="assets/favicon-64.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<style>
+  /* self-hosted, latin subset (every character the site uses); no request to Google */
+  @font-face { font-family: "Archivo"; font-style: normal; font-weight: 500 900; font-stretch: 100%; font-display: swap; src: url(assets/fonts/archivo-latin.woff2) format("woff2"); }
+  @font-face { font-family: "Hanken Grotesk"; font-style: normal; font-weight: 400 700; font-display: swap; src: url(assets/fonts/hanken-grotesk-latin.woff2) format("woff2"); }
+</style>
+<style>
+  :root {
+    --ink: #0B1220;
+    --ink-2: #3B4453;
+    --ink-3: #6B7280;
+    --paper: #F5F7FA;
+    --paper-2: #FFFFFF;
+    --line: #E3E8EF;
+    --emerald: #10B981;
+    --emerald-deep: #047857;
+    --mint: #D1FAE5;
+    --mint-2: #ECFDF5;
+    --radius: 14px;
+    --max: 1360px;
+    --font: "Hanken Grotesk", "Segoe UI", system-ui, sans-serif;
+    --display: "Archivo", "Hanken Grotesk", "Segoe UI", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+  body { font-family: var(--font); color: var(--ink); background: var(--paper); line-height: 1.5; font-size: 17px; overflow-x: hidden; }
+  img { max-width: 100%; display: block; }
+  a { color: inherit; }
+  :focus-visible { outline: 2px solid var(--emerald-deep); outline-offset: 3px; border-radius: 6px; }
+  .skip { position: absolute; left: -999px; top: 8px; background: var(--ink); color: #fff; padding: 8px 12px; z-index: 100; }
+  .skip:focus { left: 8px; }
+
+  .wrap { width: min(var(--max), calc(100% - clamp(32px, 5vw, 72px))); margin-inline: auto; }
+  h1, h2, h3 { font-family: var(--display); font-weight: 700; letter-spacing: -0.02em; line-height: 1.05; }
+  h1 { font-size: clamp(2.4rem, 1.4rem + 4.2vw, 4.6rem); font-weight: 800; letter-spacing: -0.035em; }
+  h2 { font-size: clamp(1.9rem, 1.3rem + 2.4vw, 3.2rem); letter-spacing: -0.025em; }
+  h3 { font-size: 1.25rem; line-height: 1.25; }
+  p.lede { font-size: clamp(1.05rem, 0.95rem + 0.5vw, 1.3rem); color: var(--ink-2); max-width: 36em; }
+
+  /* nav (same as the homepage; links to its sections go back to index.html) */
+  .nav { position: sticky; top: 0; z-index: 50; transition: background-color .25s, box-shadow .25s; }
+  .nav.is-stuck { background: rgb(245 247 250 / .78); backdrop-filter: blur(14px) saturate(160%); box-shadow: 0 1px 0 var(--line); }
+  .nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 68px; }
+  .brand { display: inline-flex; align-items: center; gap: 10px; font-family: var(--display); font-weight: 700; text-decoration: none; font-size: 1.05rem; letter-spacing: -0.01em; }
+  .brand img { width: 34px; height: 34px; }
+  .nav-links { display: flex; gap: 26px; align-items: center; list-style: none; }
+  .nav-links a { text-decoration: none; color: var(--ink-2); font-weight: 500; font-size: .95rem; }
+  .nav-links a:hover, .nav-links a[aria-current] { color: var(--ink); }
+  .nav-links a[aria-current] { font-weight: 700; }
+  .nav-links a:not(.btn) { background: linear-gradient(currentColor, currentColor) 0 100% / 0 1.5px no-repeat; padding-bottom: 3px; transition: background-size .3s cubic-bezier(.2,.7,.2,1), color .2s; }
+  .nav-links a:not(.btn):hover, .nav-links a:not(.btn):focus-visible { background-size: 100% 1.5px; }
+  .nav-links .btn { padding: 10px 16px; font-size: .95rem; }
+  @media (max-width: 1099px) { .nav-links li:not(.cta-li) { display: none; } }
+
+  /* buttons (the green press button itself comes from assets/ui.css) */
+  .btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--emerald); color: var(--ink); text-decoration: none;
+    font-weight: 700; padding: 15px 22px; border-radius: 999px; border: 0;
+  }
+
+  /* page head */
+  .page-head { padding: clamp(40px, 6vw, 88px) 0 clamp(8px, 2vw, 24px); }
+  .page-head .wrap { display: grid; grid-template-columns: 1fr auto; gap: clamp(20px, 4vw, 64px); align-items: center; }
+  .page-head h1 { margin-bottom: 18px; }
+  .page-head .lede a { color: var(--emerald-deep); font-weight: 600; }
+  .page-head img { width: clamp(120px, 16vw, 220px); height: auto; }
+  @media (max-width: 720px) { .page-head .wrap { grid-template-columns: 1fr; } .page-head img { display: none; } }
+
+  /* the four groups, each a plain grid of cards */
+  .group { padding: clamp(36px, 5vw, 64px) 0 0; }
+  .group-head { margin-bottom: clamp(18px, 2.4vw, 28px); }
+  .group-head h2 { font-size: clamp(2rem, 1.4rem + 2.4vw, 3rem); }
+  .group-head p { margin-top: 8px; color: var(--ink-2); font-size: 1.08rem; max-width: 36em; }
+  .svc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); gap: 18px; list-style: none; }
+  .svc { display: flex; flex-direction: column; background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; }
+  .svc h3 { margin-bottom: 10px; }
+  .svc .what { color: var(--ink-2); font-size: 1rem; margin-bottom: 20px; }
+  .svc .price { margin-top: auto; font: 800 1.75rem/1 var(--display); letter-spacing: -.02em; }
+  .svc .price small { display: block; margin-top: 8px; font: 600 .9rem/1.35 var(--font); letter-spacing: 0; color: var(--ink-2); }
+  .svc .btn { align-self: flex-start; margin-top: 20px; }
+  @media (max-width: 560px) { .svc .btn { align-self: stretch; } }
+
+  /* closing note */
+  .fine { padding: clamp(40px, 6vw, 80px) 0 clamp(48px, 7vw, 96px); }
+  .fine p { max-width: 40em; color: var(--ink-2); font-size: 1.05rem; }
+  .fine p strong { color: var(--ink); }
+  .fine a { color: var(--emerald-deep); font-weight: 600; }
+
+  /* footer */
+  footer { padding: 36px 0 44px; border-top: 1px solid var(--line); }
+  footer .wrap { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; align-items: center; color: var(--ink-3); font-size: .93rem; }
+  footer ul { display: flex; gap: 18px; list-style: none; flex-wrap: wrap; }
+  footer a { text-decoration: none; color: var(--ink-2); font-weight: 500; }
+  footer a:hover { color: var(--ink); }
+
+  html.rm { scroll-behavior: auto; }
+  .rm * { transition-duration: .01ms !important; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition-duration: .01ms !important; } }
+</style>
+<link rel="stylesheet" href="assets/ui.css">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "BreadcrumbList",
+ "itemListElement": [
+  { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://clashworks.co/" },
+  { "@type": "ListItem", "position": 2, "name": "Services and prices", "item": "https://clashworks.co/services.html" }
+ ]
+}
+</script>
+<style>
+  /* after ui.css, which sets a larger h2 for the homepage sections */
+  .group-head h2 { font-size: clamp(2rem, 1.4rem + 2.4vw, 3rem); }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a class="brand" href="index.html" aria-label="Clashworks home">
+      <img src="assets/logo.svg" alt="" width="34" height="34">
+      Clashworks
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html#packages">Packages</a></li>
+      <li><a href="services.html" aria-current="page">Services</a></li>
+      <li><a href="index.html#how">How it works</a></li>
+      <li><a href="index.html#builds">What I've built</a></li>
+      <li><a href="index.html#faq">FAQ</a></li>
+      <li><a href="about.html">Who I am</a></li>
+      <li class="cta-li"><a class="btn btn-press" href="check.html">Free video review</a></li>
+    </ul>
+  </div>
+</header>
+
+<main id="main">
+<section class="page-head">
+  <div class="wrap">
+    <div>
+      <span class="kicker">The full list</span>
+      <h1>Services and prices.</h1>
+      <p class="lede">Every job starts with a free video review, then gets one fixed price and one number we agree on first. If we can't show you that agreed number 30 days after delivery, you get your fees back (<a href="terms.html#guarantee">conditions</a>). Prices below are where each one starts.</p>
+    </div>
+    <img src="assets/operator-point-left-still-480.webp" width="480" height="480" alt="" loading="lazy">
+  </div>
+</section>
+
+<section class="group" id="fix" aria-labelledby="g-fix">
+  <div class="wrap">
+    <div class="group-head">
+      <h2 id="g-fix">Fix</h2>
+      <p>Stop losing customers this week.</p>
+    </div>
+    <ul class="svc-grid">
+      <li class="svc">
+        <h3>One Quick Fix</h3>
+        <p class="what">Try one thing first: a text that goes out on its own when you miss a call, a quote form that always asks for a phone number, or automatic review requests after each job. Each one comes with a counter, so you can see what it brings in.</p>
+        <p class="price">from $500<small>About 1 week</small></p>
+        <a class="btn btn-press" href="check.html" aria-label="Get my free video review: One Quick Fix">Get my free video review</a>
+      </li>
+      <li class="svc">
+        <h3>Never Miss a Customer</h3>
+        <p class="what">All three quick fixes, plus an instant reply to every new inquiry, and every step from someone finding you to calling you checked and fixed.</p>
+        <p class="price">from $1,500<small>About 2 weeks</small></p>
+        <a class="btn btn-press" href="check.html" aria-label="Get my free video review: Never Miss a Customer">Get my free video review</a>
+      </li>
+      <li class="svc">
+        <h3>Get Found on Google</h3>
+        <p class="what">Your Google Maps listing cleaned up, automatic review requests, a page for each service, and a monthly check on whether Google and ChatGPT suggest you when someone asks.</p>
+        <p class="price">from $2,000<small>to set up, then from $500 a month</small></p>
+        <a class="btn btn-press" href="check.html" aria-label="Get my free video review: Get Found on Google">Get my free video review</a>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section class="group" id="build" aria-labelledby="g-build">
+  <div class="wrap">
+    <div class="group-head">
+      <h2 id="g-build">Build</h2>
+      <p>Websites, and the tools that run your week.</p>
+    </div>
+    <ul class="svc-grid">
+      <li class="svc">
+        <h3>One-Page Website</h3>
+        <p class="what">A one-page website for one service. It has a quote form that asks for a phone number, a tap-to-call button, and a counter for calls and requests. It loads fast on a phone.</p>
+        <p class="price">from $800<small>About 1 week</small></p>
+        <a class="btn btn-press" href="check.html" aria-label="Get my free video review: One-Page Website">Get my free video review</a>
+      </li>
+      <li class="svc">
+        <h3>New Website</h3>
+        <p class="what">Five to eight pages that load fast on a phone, with the quote form and the automatic missed-call text built in, and a count of calls and form requests from day one. Rental owners can add direct booking, so guests book with you.</p>
+        <p class="price">from $2,500<small>About 2 to 3 weeks</small></p>
+        <a class="btn btn-press" href="check.html" aria-label="Get my free video review: New Website">Get my free video review</a>
+      </li>
+      <li class="svc">
+        <h3>One Chore, Gone</h3>
+        <p class="what">Pick the chore you hate most: quotes, appointment reminders, chasing payments, answers to the same five questions, or a daily report. I make it run on its own.</p>
+        <p class="price">from $1,000<small>About 1 week</small></p>
+        <a class="btn btn-press" href="check.html" aria-label="Get my free video review: One Chore, Gone">Get my free video review</a>
+      </li>
+      <li class="svc">
+        <h3>Rental Owner Reports</h3>
+        <p class="what">For property managers and rental owners with 3 or more units. All your bookings land in one sheet every day, double bookings get flagged, and your owners get a monthly report with revenue and occupancy. If it ever stops, you get an alert.</p>
+        <p class="price">from $1,500<small>to set up, then from $150 a month</small></p>
+        <a class="btn btn-press" href="check.html" aria-label="Get my free video review: Rental Owner Reports">Get my free video review</a>
+      </li>
+      <li class="svc">
+        <h3>A Custom Tool for Your Team</h3>
+        <p class="what">A tool built for how your team works. It starts with a short paid call that ends in a one-page plan and a fixed price.</p>
+        <p class="price">from $3,000<small>Quoted after the paid $300 call, which is credited to the build</small></p>
+        <a class="btn btn-press" href="check.html" aria-label="Get my free video review: A Custom Tool for Your Team">Get my free video review</a>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section class="group" id="market" aria-labelledby="g-market">
+  <div class="wrap">
+    <div class="group-head">
+      <h2 id="g-market">Market</h2>
+      <p>More of the right people finding what we fixed.</p>
+    </div>
+    <ul class="svc-grid">
+      <li class="svc">
+        <h3>Written Game Plan</h3>
+        <p class="what">The written version of the free video review: what to fix first, in order of what pays back most, with three nearby competitors checked and a look at whether ChatGPT suggests you.</p>
+        <p class="price">from $1,000<small>About 1 week. Credited to your first project</small></p>
+        <a class="btn btn-press" href="check.html" aria-label="Get my free video review: Written Game Plan">Get my free video review</a>
+      </li>
+      <li class="svc">
+        <h3>AI Search Check-in</h3>
+        <p class="what">Each month I ask ChatGPT and Google the questions your customers ask, tell you whether they suggest you, and fix your pages when you're missing. No promises on where you show up, just the monthly numbers.</p>
+        <p class="price">from $250 a month</p>
+        <a class="btn btn-press" href="check.html" aria-label="Get my free video review: AI Search Check-in">Get my free video review</a>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section class="group" id="run" aria-labelledby="g-run">
+  <div class="wrap">
+    <div class="group-head">
+      <h2 id="g-run">Run</h2>
+      <p>Keep it working after I leave.</p>
+    </div>
+    <ul class="svc-grid">
+      <li class="svc">
+        <h3>Front Desk Training</h3>
+        <p class="what">I teach your office the shortcuts, on your own accounts. Two hours with you or your office manager, one workflow set up and running, and a one-page cheat sheet.</p>
+        <p class="price">from $750<small>Half a day, with the setup</small></p>
+        <a class="btn btn-press" href="check.html" aria-label="Get my free video review: Front Desk Training">Get my free video review</a>
+      </li>
+      <li class="svc">
+        <h3>Website Upkeep</h3>
+        <p class="what">Hosting, a check that your site is up, security updates, up to two hours of edits a month, and a one-line monthly report.</p>
+        <p class="price">from $75 a month<small>Sold with a new website or a one-page website</small></p>
+        <a class="btn btn-press" href="check.html" aria-label="Get my free video review: Website Upkeep">Get my free video review</a>
+      </li>
+      <li class="svc">
+        <h3>Monthly Upkeep</h3>
+        <p class="what">I keep everything I've set up running and improve one thing a month, with a one-page report of the numbers.</p>
+        <p class="price">from $500 a month</p>
+        <a class="btn btn-press" href="check.html" aria-label="Get my free video review: Monthly Upkeep">Get my free video review</a>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section class="fine">
+  <div class="wrap">
+    <p>Every job is scoped from the free video review, gets one fixed price, and is counted from day one. I don't run ad budgets and I don't promise rankings or lead counts. Not sure which one fits? <a href="check.html">Start with the free video review</a> and I'll tell you.</p>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-meta"><span>&copy; 2026 Clashworks, run by Clayton Trevino. Dallas, Texas.</span><button type="button" class="rm-switch" role="switch" aria-checked="false" hidden><span class="knob" aria-hidden="true"></span>Reduce motion</button></div>
+    <ul>
+      <li><a href="about.html">Who I am</a></li>
+      <li><a href="privacy.html">Privacy</a></li>
+      <li><a href="terms.html">Terms</a></li>
+      <li><a href="accessibility.html">Accessibility</a></li>
+      <li><a href="https://www.youtube.com/@clashworkshq">YouTube</a></li>
+      <li><a href="https://www.tiktok.com/@clashworkshq">TikTok</a></li>
+      <li><a href="https://www.instagram.com/clashworkshq">Instagram</a></li>
+      <li><a href="https://x.com/clashworkshq">X</a></li>
+      <li><a href="https://www.linkedin.com/company/clashworks">LinkedIn</a></li>
+      <li><a href="https://github.com/Clashworkshq">GitHub</a></li>
+    </ul>
+  </div>
+</footer>
+
+<script>
+document.documentElement.classList.add("js");
+const nav = document.getElementById("nav");
+const onScroll = () => nav.classList.toggle("is-stuck", scrollY > 8);
+onScroll(); addEventListener("scroll", onScroll, { passive: true });
+</script>
+<script src="assets/motion.js" defer></script>
+</body>
+</html>

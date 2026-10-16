@@ -1,21 +1,22 @@
 # Clashworks
 
-> Clashworks is Clayton Trevino's AI operations business in Dallas, Texas. He fixes how local service businesses and property or rental operators get and answer leads (websites, quote forms, missed-call text-back, reviews, booking sync, AI search visibility) and documents every fix in public. Clayton is a Finance and Real Estate major at SMU's Cox School of Business. Every paid fix ships with tracking and a Measured-or-Free guarantee: one number agreed up front, measured 30 days after delivery, full refund of fees if it cannot be shown. No promises on rankings or lead counts.
+> Clashworks is Clayton Trevino's AI operations business in Dallas, Texas. He fixes how local service businesses and property or rental operators get and answer leads (websites, quote forms, a text that goes out on its own when you miss a call, reviews, booking sync, AI search visibility) and documents every fix in public. Clayton is a Finance and Real Estate major at SMU's Cox School of Business. Every paid fix ships with tracking and a Measured-or-Free guarantee: one number agreed up front, measured 30 days after delivery, full refund of fees if it cannot be shown. No promises on rankings or lead counts.
 
 ## Start here
 
 - [Home](https://clashworks.co/): who it is for, the services, how pricing and the guarantee work, and the FAQ
-- [Free Optimization Check](https://clashworks.co/check.html): apply for a free 10-minute review of a website, Google listing, and how the business runs; two a week, reply within seven days
+- [Free video review](https://clashworks.co/check.html): apply for a free 10-minute video review of a website, Google listing, and how the business runs; two a week, reply within seven days
+- [Services and prices](https://clashworks.co/services.html): the full list of 13 offers in plain words, each with a starting price
 - [Who I am](https://clashworks.co/about.html): Clayton Trevino's background, how he works, and what he has built
 - [The stack](https://clashworks.co/stack.html): the AI tools and setup behind the work, as shown in reel 01
 
 ## Services
 
-- Fix: Quick Install (one kit installed and tracked), Leak Fix (quote form, missed-call text-back, review system, end to end), Local Engine (Google listing, reviews, service pages, monthly AI search check)
-- Build: Landing Page, Website Rebuild, Automation Sprint, Owner Report and Booking Sync for rental operators, Custom Build
-- Market: Marketing Audit, AI Search Visibility
-- Run: Front Desk Training, Site Care, Ops Retainer
-- Every job is fixed-price, quoted from the free check
+- Fix: One Quick Fix (one tool set up with a counter), Never Miss a Customer (quote form, automatic missed-call text, review requests, end to end), Get Found on Google (Maps listing, reviews, service pages, monthly check of Google and ChatGPT)
+- Build: One-Page Website, New Website, One Chore, Gone, Rental Owner Reports for rental operators, A Custom Tool for Your Team
+- Market: Written Game Plan, AI Search Check-in (a monthly check of whether ChatGPT and Google suggest you)
+- Run: Front Desk Training, Website Upkeep, Monthly Upkeep
+- Every job is fixed-price, quoted from the free video review
 
 ## Policies
 

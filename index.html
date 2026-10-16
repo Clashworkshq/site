@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Clashworks. Business problems? I have the fix.</title>
-<meta name="description" content="Clayton Trevino, Finance and Real Estate major at SMU's Cox School of Business, spent hundreds of hours learning to fix business problems with AI so you don't have to. Free 10-minute Optimization Check for local businesses, two a week.">
+<title>Clashworks. More jobs, more nights off, one fixed price.</title>
+<meta name="description" content="Free 10-minute video review for local service businesses. I find what's costing you jobs and set up simple tools to fix it, at one fixed price.">
 <meta name="theme-color" content="#F5F7FA">
-<meta property="og:title" content="Clashworks. Business problems? I have the fix.">
-<meta property="og:description" content="Free 10-minute Optimization Check for local businesses. Tell me what still happens by hand and I'll show you what to fix first.">
+<meta property="og:title" content="Clashworks. More jobs, more nights off, one fixed price.">
+<meta property="og:description" content="Missed calls, slow quotes, late payments. I set up simple tools that handle them for you. Start with a free 10-minute video.">
 <meta property="og:image" content="https://clashworks.co/assets/headshot-mint-512.webp">
 <meta property="og:url" content="https://clashworks.co/">
 <meta property="og:type" content="website">
@@ -20,10 +20,55 @@
   @font-face { font-family: "Archivo"; font-style: normal; font-weight: 500 900; font-stretch: 100%; font-display: swap; src: url(assets/fonts/archivo-latin.woff2) format("woff2"); }
   @font-face { font-family: "Hanken Grotesk"; font-style: normal; font-weight: 400 700; font-display: swap; src: url(assets/fonts/hanken-grotesk-latin.woff2) format("woff2"); }
 </style>
-<link rel="preload" as="image" href="assets/hero-poster-1280.webp" imagesrcset="assets/hero-poster-1280.webp 1280w, assets/hero-poster-1920.webp 1920w" imagesizes="100vw" fetchpriority="high">
+<!-- preloaded so the first paint (no longer held by a stylesheet) is already in the real fonts, with no swap shift -->
+<link rel="preload" href="assets/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/hanken-grotesk-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 <!-- html.rm (Reduce motion) comes from the visitor's switch or, if they never used it, their system setting -->
 <script>(function(d){d.classList.add("js");var m;try{m=localStorage.getItem("cw-motion")}catch(e){}if(m==="reduce"||m==="paused"||(m!=="full"&&matchMedia("(prefers-reduced-motion: reduce)").matches))d.classList.add("rm")})(document.documentElement)</script>
+<!-- deep links (index.html#faq) land on their section. ui.css and liquid.css arrive after the browser's own
+     jump and change the page height above it, so this jumps again (instantly, never smooth) once the HTML
+     is in, as each of those stylesheets lands, and once the window has loaded (images). Links to retired sections
+     (#fix, #services, #free, #video) are rewritten to the section that replaced them first. It stops for
+     good once the reader scrolls, taps or presses a key, follows another link, or drags the scrollbar
+     (a scroll away from the section that no layout change explains); reload and back/forward keep the
+     browser's restored position. Without JS the <noscript> stylesheets block rendering, so no fix is needed. -->
+<script>(function(){
+  var h;try{h=decodeURIComponent(location.hash.slice(1))}catch(e){return}
+  if(!h)return;
+  var map={fix:"top",services:"packages",free:"checklist",video:"builds"};
+  var to=Object.prototype.hasOwnProperty.call(map,h)?map[h]:"";
+  if(to)history.replaceState(null,"","#"+to);else to=h;
+  var nav=performance.getEntriesByType&&performance.getEntriesByType("navigation")[0];
+  if(nav&&nav.type&&nav.type!=="navigate")return;
+  var d=document.documentElement,moved=false,lastY=null,lastDoc=null,lastOff=null,ro;
+  var el=function(){return document.getElementById(to)};
+  // where the reader should be: the section top under the scroll padding, within the page's scroll range
+  var want=function(e){var y=scrollY+e.getBoundingClientRect().top-(parseFloat(getComputedStyle(d).scrollPaddingTop)||0);return Math.round(Math.max(0,Math.min(y,d.scrollHeight-d.clientHeight)))};
+  var mark=function(){var e=el();if(!e)return;lastY=scrollY;lastDoc=scrollY+e.getBoundingClientRect().top;lastOff=Math.abs(scrollY-want(e))};
+  var go=function(){var e=el();if(moved||!e)return;var y=want(e);if(Math.abs(scrollY-y)>1)scrollTo({top:y,behavior:"instant"});mark()};
+  var stop=function(){moved=true;cleanup()};
+  // a scroll by the reader moves the page with the section staying put in the document and ends farther
+  // from it; the browser's own jump moves toward it, and a layout change moves the section itself
+  var onScroll=function(){var e=el();if(!e){stop();return}
+    var doc=scrollY+e.getBoundingClientRect().top,off=Math.abs(scrollY-want(e));
+    if(lastY!==null&&Math.abs(scrollY-lastY)>=1&&Math.abs(doc-lastDoc)<1&&off>lastOff+1){stop();return}
+    lastY=scrollY;lastDoc=doc;lastOff=off};
+  var IN=["wheel","touchstart","keydown","pointerdown"];
+  var cleanup=function(){moved=true;document.removeEventListener("load",onLoad,true);IN.forEach(function(t){removeEventListener(t,stop,true)});removeEventListener("scroll",onScroll);removeEventListener("hashchange",stop);if(ro)ro.disconnect()};
+  IN.forEach(function(t){addEventListener(t,stop,{capture:true,passive:true})});
+  addEventListener("scroll",onScroll,{passive:true});
+  addEventListener("hashchange",stop);
+  if(window.ResizeObserver){ro=new ResizeObserver(mark);ro.observe(d)}
+  // each non-blocking stylesheet (media="print" until it loads) is switched on here, a moment before its
+  // own onload would, so the jump happens in the same task and no frame shows the page in the wrong place
+  var loaded=false,wait=function(){return document.querySelector('link[rel="stylesheet"][media="print"]')};
+  var settle=function(){if(loaded&&!wait())setTimeout(function(){go();cleanup()},1000)};
+  var onLoad=function(ev){var t=ev.target;if(t.tagName!=="LINK"||t.rel!=="stylesheet")return;if(t.media==="print"&&t.hasAttribute("onload"))t.media="all";go();settle()};
+  document.addEventListener("load",onLoad,true);
+  document.addEventListener("DOMContentLoaded",go);
+  addEventListener("load",function(){loaded=true;go();settle();setTimeout(cleanup,10000)});
+})()</script>
 <style>
   :root {
     --ink: #0B1220;
@@ -118,31 +163,15 @@
   .btn .arr { display: inline-grid; flex: none; width: 18px; height: 18px; overflow: hidden; }
   .btn .arr svg { grid-area: 1 / 1; transition: transform .38s cubic-bezier(.2,.7,.2,1); }
   .btn .arr svg + svg { transform: translateX(-140%); }
-  .btn:is(:hover, :focus-visible, .is-beam) .arr svg:first-child { transform: translateX(140%); }
-  .btn:is(:hover, :focus-visible, .is-beam) .arr svg + svg { transform: none; }
-  /* one lap of light around the border of a green button on hover, focus or tap */
-  @property --beam { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
-  .btn .beam { position: absolute; inset: 0; z-index: 1; border-radius: inherit; padding: 2px; pointer-events: none; opacity: 0;
-    background: conic-gradient(from var(--beam), transparent 0deg 280deg, rgb(255 255 255 / .95) 340deg, transparent 360deg);
-    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor;
-    mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); }
-  .btn.is-beam .beam { animation: beam .95s cubic-bezier(.4,0,.2,1); }
-  @keyframes beam { 0% { --beam: 0deg; opacity: 0; } 12%, 85% { opacity: 1; } 100% { --beam: 360deg; opacity: 0; } }
+  .btn:is(:hover, :focus-visible) .arr svg:first-child { transform: translateX(140%); }
+  .btn:is(:hover, :focus-visible) .arr svg + svg { transform: none; }
 
-  /* hero: a navy stage with the looping scene behind the headline and the Operator on the right.
-     No transforms, filters or z-index on the stage or its inner boxes: the Operator inside it
-     goes position: fixed when it flies, and any of those would trap it. */
+  /* hero: a navy stage, copy on the left and the console on the right with the Operator perched on it
+     (console and perch styles live in assets/ui.css). No transforms, filters or z-index on the stage
+     or its inner boxes: the Operator inside it goes position: fixed when it flies, and any of those
+     would trap it. */
   .hero { padding: 6px clamp(8px, 1.2vw, 16px) 0; }
   .hero-stage { position: relative; overflow: hidden; border-radius: clamp(20px, 2.4vw, 32px); background: var(--ink); color: #fff; min-height: min(84vh, 760px); display: grid; align-items: center; padding: clamp(48px, 6vw, 88px) 0 clamp(64px, 6vw, 88px); }
-  .hero-media { position: absolute; inset: 0; }
-  .hero-media img, .hero-media video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 70% 50%; }
-  /* the video covers only the scene side, so its painted area stays smaller than the poster's
-     and the poster remains the LCP element; the left edge fades so there is no seam */
-  .hero-vid { position: absolute; inset: 0 0 0 40%; overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 30%); mask-image: linear-gradient(90deg, transparent, #000 30%); }
-  .hero-media .hero-vid video { left: -66.667%; width: 166.667%; }
-  .hero-media video { opacity: 0; transition: opacity .8s ease-out; }
-  .hero-media video.is-playing { opacity: 1; }
-  .hero-media::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgb(11 18 32 / .94) 0%, rgb(11 18 32 / .8) 34%, rgb(11 18 32 / 0) 62%); }
   .hero-inner { position: relative; display: grid; grid-template-columns: 1.15fr .85fr; gap: clamp(28px, 5vw, 72px); align-items: center; }
   .hero-copy { grid-column: 1; grid-row: 1; }
   .hero-copy > * + * { margin-top: 22px; }
@@ -156,12 +185,6 @@
   .hero-note { font-size: .95rem; color: rgb(255 255 255 / .82); }
   .hero-note strong { color: #fff; font-weight: 600; }
   .line { display: block; }
-  .who { display: inline-flex; gap: 10px; align-items: center; padding: 6px 16px 6px 6px; border-radius: 999px; text-decoration: none; color: #fff; font-size: .9rem; line-height: 1.2; background: rgb(255 255 255 / .07); box-shadow: inset 0 0 0 1px rgb(255 255 255 / .18); transition: background-color .2s, box-shadow .2s; }
-  .who:hover { background: rgb(255 255 255 / .12); box-shadow: inset 0 0 0 1px rgb(255 255 255 / .4); }
-  .who img { width: 34px; height: 34px; border-radius: 50%; box-shadow: 0 0 0 2px var(--emerald); }
-  .who span { display: flex; flex-direction: column; }
-  .who small { font-size: .78rem; color: rgb(255 255 255 / .8); font-weight: 500; }
-  .op-home { grid-column: 2; grid-row: 1; width: min(118%, 580px); aspect-ratio: 1; justify-self: center; }
   .op-float { display: none; }
   /* the hero's copy of the site-wide Reduce motion switch, where the moving things start */
   .hero-stage .rm-switch { position: absolute; right: 14px; bottom: 14px; background: rgb(11 18 32 / .62); color: #fff; box-shadow: inset 0 0 0 1px rgb(255 255 255 / .28); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
@@ -171,199 +194,18 @@
   @media (max-width: 860px) {
     .hero-stage { min-height: 0; align-items: start; padding: 26px 0 64px; }
     .hero-inner { display: block; }
-    .hero-media::after { background: linear-gradient(180deg, rgb(11 18 32 / .66) 0%, rgb(11 18 32 / .88) 45%, rgb(11 18 32 / .92) 100%); }
-    .hero-media img, .hero-media video { object-position: 74% 50%; }
     /* the Operator takes the top right corner and the headline wraps around it */
-    /* only as tall as the first two headline lines, so "I have the fix." keeps its full width */
+    /* only as tall as the eyebrow and the first headline line, so the rest keeps its full width */
     .op-float { display: block; float: right; width: var(--opf); height: calc(var(--opf) * .84); margin: -18px -8px 0 4px; }
     .op-home { display: contents; }
   }
-
-  /* marquee */
-  .marquee { border-block: 1px solid var(--line); background: var(--paper-2); overflow: hidden; padding: 14px 0; --gap: 44px; }
-  .marquee .track { display: flex; gap: var(--gap); width: max-content; animation: scroll 42s linear infinite; }
-  .marquee:hover .track { animation-play-state: paused; }
-  .marquee ul { display: flex; gap: var(--gap); list-style: none; align-items: center; white-space: nowrap; font-weight: 600; color: var(--ink-2); font-size: .95rem; }
-  .marquee li { display: flex; align-items: center; gap: 12px; }
-  .marquee li::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--emerald); }
-  @keyframes scroll { to { transform: translateX(calc(-50% - var(--gap) / 2)); } }
-  .marquee .track { mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
 
   /* sections */
   section { padding: clamp(64px, 9vw, 120px) 0; }
   .section-head { max-width: 40em; margin-bottom: clamp(28px, 4vw, 48px); }
   .section-head p { margin-top: 14px; }
 
-  /* picker */
-  .picker-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-  @media (max-width: 900px) { .picker-grid { grid-template-columns: repeat(2, 1fr); } }
-  .tile {
-    display: flex; flex-direction: column; gap: 14px; align-items: flex-start; text-align: left;
-    background: var(--paper-2); border: 1.5px solid var(--line); border-radius: var(--radius);
-    padding: 20px; min-height: 130px; color: var(--ink);
-    transition: transform .15s ease-out, border-color .15s, background-color .2s, box-shadow .2s;
-  }
-  .tile svg { width: 26px; height: 26px; stroke: var(--ink); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; transition: stroke .2s; }
-  .tile span { font-weight: 600; font-size: 1rem; line-height: 1.25; }
-  .tile:hover { transform: translateY(-2px); border-color: var(--ink); }
-  .tile[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); box-shadow: 0 14px 30px -18px rgb(11 18 32 / .6); }
-  .tile[aria-pressed="true"] svg { stroke: var(--emerald); }
-  .tile .check { margin-left: auto; margin-top: -4px; width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--line); display: grid; place-items: center; align-self: flex-end; position: absolute; right: 16px; top: 16px; transition: background-color .2s, border-color .2s; }
-  .tile { position: relative; }
-  .tile .check svg { width: 13px; height: 13px; stroke: var(--ink); opacity: 0; transition: opacity .15s; stroke-width: 3; }
-  .tile[aria-pressed="true"] .check { background: var(--emerald); border-color: var(--emerald); }
-  .tile[aria-pressed="true"] .check svg { opacity: 1; }
-  .picker-bar {
-    margin-top: 22px; display: flex; align-items: center; justify-content: space-between; gap: 18px; flex-wrap: wrap;
-    background: var(--paper-2); border: 1.5px solid var(--line); border-radius: var(--radius); padding: 18px 20px;
-  }
-  .picker-bar .count { font-size: 1.1rem; font-weight: 600; }
-  .picker-bar .count b { font-family: var(--display); font-size: 1.6rem; font-weight: 800; letter-spacing: -0.02em; display: inline-block; min-width: 1.2em; color: var(--emerald-deep); }
-  .picker-bar .hint { color: var(--ink-3); font-size: .95rem; }
-  /* your list: each ticked tile sends a chip flying into the bar */
-  .tray { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; margin-top: 10px; }
-  .tray:empty { display: none; }
-  .chip { display: inline-flex; align-items: center; gap: 7px; padding: 5px 11px 5px 9px; border-radius: 999px; background: var(--ink); color: #fff; font-size: .82rem; font-weight: 600; line-height: 1.2; }
-  .chip::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--emerald); flex: none; }
-  .chip-fly { position: fixed; z-index: 70; left: 0; top: 0; margin: 0; pointer-events: none; }
-
-  /* how it works */
-  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; counter-reset: step; }
-  @media (max-width: 800px) { .steps { grid-template-columns: 1fr; } }
-  .step { background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--radius); padding: 26px 24px 28px; position: relative; }
-  .step::before { counter-increment: step; content: counter(step); display: inline-grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--mint); color: var(--emerald-deep); font-weight: 800; margin-bottom: 18px; }
-  .step h3 { margin-bottom: 8px; }
-  .step p { color: var(--ink-2); font-size: 1rem; }
-  .step .time { display: inline-block; margin-top: 16px; font-size: .9rem; font-weight: 600; color: var(--ink-3); }
-  /* an emerald line fills along the steps as they scroll by (across on wide screens, down the side on
-     phones, where the cards also stack as you read) */
-  .steps { position: relative; }
-  .steps::before, .steps-line { content: ""; position: absolute; left: 0; right: 0; top: -16px; height: 3px; border-radius: 3px; pointer-events: none; }
-  .steps::before { background: var(--line); }
-  .steps-line { background: var(--emerald); transform-origin: 0 50%; transform: scaleX(var(--p, 0)); }
-  @media (max-width: 800px) {
-    .steps::before, .steps-line { left: -11px; right: auto; top: 0; bottom: 0; width: 3px; height: auto; }
-    .steps-line { transform-origin: 50% 0; transform: scaleY(var(--p, 0)); }
-    html:not(.rm) .step { position: sticky; top: calc(86px + var(--i, 0) * 14px); box-shadow: 0 -10px 24px -20px rgb(11 18 32 / .45); }
-    .step:nth-child(2) { --i: 1; } .step:nth-child(3) { --i: 2; }
-  }
-
-  /* numbers */
-  .numbers { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: 48px; padding-top: 40px; border-top: 1px solid var(--line); }
-  @media (max-width: 800px) { .numbers { grid-template-columns: repeat(2, 1fr); } }
-  .num b { display: block; font-family: var(--display); font-size: clamp(2.2rem, 1.6rem + 2.4vw, 3.4rem); font-weight: 800; letter-spacing: -0.03em; line-height: 1; }
-  .num > span { color: var(--ink-2); font-size: .98rem; display: block; margin-top: 8px; max-width: 16em; }
-  /* odometer: each digit is a strip of 0 to 9 that rolls into place; the real number stays in the text */
-  .num .vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; margin: 0; }
-  .odo { display: inline-flex; height: 1em; overflow: hidden; vertical-align: top; font-variant-numeric: tabular-nums; }
-  .odo i { display: block; height: 1em; font-style: normal; }
-  .odo i::before { content: "0\A 1\A 2\A 3\A 4\A 5\A 6\A 7\A 8\A 9"; display: block; white-space: pre; line-height: 1; transform: translateY(calc(var(--d, 0) * -1em)); transition: transform 1.3s cubic-bezier(.2,.75,.15,1) calc(var(--k, 0) * .12s); }
-  .odo-reset i::before { transition: none; }
-
-  /* free */
-  .free { background: var(--paper-2); border-block: 1px solid var(--line); }
-  .free-grid { display: grid; grid-template-columns: 1.05fr .95fr; gap: 28px; align-items: start; }
-  @media (max-width: 900px) { .free-grid { grid-template-columns: 1fr; } }
-  .checklist-card { background: var(--ink); color: #fff; border-radius: var(--radius); padding: clamp(24px, 3vw, 36px); position: relative; overflow: hidden; }
-  .checklist-card::before { content: ""; position: absolute; width: 360px; height: 360px; right: -140px; top: -160px; border-radius: 50%; background: radial-gradient(circle, rgb(16 185 129 / .45), transparent 65%); }
-  .checklist-card h3 { font-size: 1.7rem; letter-spacing: -0.025em; position: relative; }
-  .checklist-card p { color: rgb(255 255 255 / .78); margin-top: 10px; position: relative; max-width: 30em; }
-  .checklist-card ul { list-style: none; margin-top: 18px; display: grid; gap: 8px; position: relative; font-size: .98rem; }
-  .checklist-card li { display: flex; gap: 10px; align-items: flex-start; color: rgb(255 255 255 / .9); }
-  /* the Operator scans the card once: an emerald line sweeps top to bottom */
-  .checklist-card::after { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 2px; background: linear-gradient(90deg, transparent, #84F5C8 30%, #84F5C8 70%, transparent); box-shadow: 0 0 18px 4px rgb(16 185 129 / .5); opacity: 0; pointer-events: none; }
-  .checklist-card.is-scan::after { animation: scanline 1.6s cubic-bezier(.4,0,.2,1); }
-  @keyframes scanline { 0% { top: 0; opacity: 0; } 12%, 88% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
-  .checklist-card li svg { width: 18px; height: 18px; stroke: var(--emerald); flex: none; margin-top: 3px; }
-  .get { margin-top: 26px; position: relative; display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
-  .get span { color: rgb(255 255 255 / .7); font-size: .93rem; }
-  .kits { display: grid; gap: 12px; }
-  .kit { display: grid; grid-template-columns: 44px 1fr auto; gap: 16px; align-items: center; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; text-decoration: none; transition: border-color .15s, transform .15s ease-out; }
-  .kit:hover { border-color: var(--ink); transform: translateX(3px); }
-  .kit .ic { width: 44px; height: 44px; border-radius: 12px; background: var(--mint); display: grid; place-items: center; }
-  .kit .ic svg { width: 22px; height: 22px; stroke: var(--emerald-deep); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-  .kit h3 { font-size: 1.05rem; }
-  .kit p { color: var(--ink-3); font-size: .93rem; margin-top: 3px; }
-  .kit .when { font-size: .85rem; font-weight: 600; color: var(--emerald-deep); background: var(--mint-2); border: 1px solid var(--mint); padding: 6px 10px; border-radius: 999px; white-space: nowrap; }
-  .kit-soon { cursor: default; }
-  .kit-soon:hover { border-color: var(--line); transform: none; }
-  .kit-soon .when { color: var(--ink-3); background: transparent; border-color: var(--line); }
-  @media (max-width: 520px) { .kit { grid-template-columns: 44px 1fr; } .kit .when { grid-column: 2; justify-self: start; } }
-
-  /* services */
-  .services { background: var(--paper-2); border-top: 1px solid var(--line); }
-  .lines { display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(20px, 3vw, 40px); border-top: 1px solid var(--ink); padding-top: 26px; }
-  @media (max-width: 960px) { .lines { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 560px) { .lines { grid-template-columns: 1fr; } }
-  .line-col h3 { font-size: 1.35rem; letter-spacing: -0.02em; display: flex; align-items: center; gap: 10px; }
-  .line-col h3::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--emerald); flex: none; }
-  .line-col > p { color: var(--ink-2); margin-top: 8px; font-size: .98rem; min-height: 3.6em; }
-  .line-col ul { list-style: none; margin-top: 18px; border-top: 1px solid var(--line); }
-  .line-col li { padding: 12px 0; border-bottom: 1px solid var(--line); }
-  .line-col li strong { display: block; font-weight: 600; }
-  .line-col li span { color: var(--ink-3); font-size: .93rem; }
-  /* Services slide sideways: on wide screens hscroll.js adds .on, pins .hs-pin under the nav and
-     moves the columns left as the page scrolls down. Without it (phones, Reduce motion, no JS) the grid above stays. */
-  .hs-rail { display: none; }
-  .services { overflow-x: clip; } /* the wide row must never let the page scroll sideways (clip, unlike hidden, keeps sticky working) */
-  .hs.on .hs-pin { position: sticky; top: var(--hs-top, 76px); margin-inline: calc(-1 * var(--lane)); padding-inline: var(--lane);
-    -webkit-mask-image: linear-gradient(90deg, transparent calc(var(--lane) * .3), #000 var(--lane)); mask-image: linear-gradient(90deg, transparent calc(var(--lane) * .3), #000 var(--lane)); }
-  .hs.on .lines { display: flex; gap: clamp(20px, 2.4vw, 32px); width: max-content; border-top: 0; padding-top: 0; counter-reset: col; will-change: translate; }
-  .hs.on .line-col { flex: none; width: clamp(380px, 36vw, 520px); padding: 22px 28px 12px; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); counter-increment: col; }
-  .hs.on .line-col::after { content: counter(col, decimal-leading-zero); position: absolute; top: 18px; right: 24px; font: 800 2.6rem/1 var(--display); letter-spacing: -0.04em; color: var(--line); }
-  .hs.on .line-col::before { inset: 0; }
-  .hs.on .line-col > p { min-height: 0; margin-top: 6px; }
-  .hs.on .line-col ul { margin-top: 14px; }
-  .hs.on .line-col li { padding: 8px 0; line-height: 1.4; }
-  .hs.on .line-col li span { font-size: .9rem; }
-  .hs.on .hs-rail { display: flex; align-items: center; gap: 18px; margin-top: 16px; }
-  .hs-bar { position: relative; width: clamp(120px, 14vw, 200px); height: 2px; background: var(--line); border-radius: 2px; overflow: hidden; }
-  .hs-bar i { position: absolute; inset: 0; background: var(--emerald); transform: scaleX(var(--p, 0)); transform-origin: left; }
-  .hs-rail ol { display: flex; gap: 16px; list-style: none; font-size: .85rem; color: var(--ink-3); }
-  .hs-rail li.is-on { color: var(--ink); font-weight: 600; }
-  .services .foot { margin-top: 30px; display: flex; gap: 18px; align-items: center; flex-wrap: wrap; justify-content: space-between; }
-  .services .foot p { color: var(--ink-2); max-width: 40em; }
-  .services .foot p strong { color: var(--ink); font-weight: 600; }
-  /* the guarantee lights up word by word as it scrolls in (the script wraps each word in .w) */
-  .lit .w { color: var(--ink-3); background: linear-gradient(var(--mint), var(--mint)) 0 92% / 0 38% no-repeat; transition: color .3s, background-size .5s cubic-bezier(.2,.7,.2,1); }
-  .lit .w.on { color: var(--ink); background-size: 100% 38%; }
-
-  /* a soft light follows the cursor across the service columns and the kit cards; each card
-     gets the same pointer position in its own coordinates, so the glow flows from one to the next */
-  .line-col, .kit { position: relative; isolation: isolate; }
-  .line-col::before, .kit::before { content: ""; position: absolute; z-index: -1; pointer-events: none; border-radius: var(--radius); opacity: 0; transition: opacity .35s; }
-  .line-col::before { inset: -12px -14px; background: radial-gradient(280px circle at var(--sx, 50%) var(--sy, 50%), var(--mint-2), rgb(236 253 245 / 0) 70%); }
-  .kit::before { inset: 0; background: radial-gradient(240px circle at var(--sx, 50%) var(--sy, 50%), var(--mint-2), rgb(236 253 245 / 0) 70%); }
-  /* the card's edge catches the same light */
-  .kit::after { content: ""; position: absolute; inset: -1px; border-radius: inherit; padding: 1.5px; pointer-events: none; opacity: 0; transition: opacity .35s;
-    background: radial-gradient(180px circle at calc(var(--sx, 50%) + 1px) calc(var(--sy, 50%) + 1px), var(--emerald), rgb(16 185 129 / 0) 70%);
-    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor;
-    mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); }
-  .spot.is-lit .line-col::before, .spot.is-lit .kit::before, .spot.is-lit .kit::after { opacity: 1; }
-
-  /* video */
-  .video-card { display: grid; grid-template-columns: 1.2fr .8fr; gap: 0; background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
-  @media (max-width: 860px) { .video-card { grid-template-columns: 1fr; } }
-  .video-frame { aspect-ratio: 16 / 9; background: var(--ink); position: relative; display: grid; place-items: center; color: #fff; }
-  .video-frame .play { width: 74px; height: 74px; border-radius: 50%; background: var(--emerald); display: grid; place-items: center; box-shadow: 0 0 0 12px rgb(16 185 129 / .18); }
-  .video-frame .play svg { width: 26px; height: 26px; fill: var(--ink); margin-left: 4px; }
-  .video-frame .eta { position: absolute; bottom: 16px; left: 16px; font-size: .9rem; color: rgb(255 255 255 / .8); }
-  .video-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
-  .video-copy { padding: clamp(24px, 3vw, 36px); display: flex; flex-direction: column; gap: 14px; justify-content: center; }
-  .video-copy p { color: var(--ink-2); }
-  .video-copy .btn { align-self: flex-start; }
-
-  /* closing */
-  .closing { background: var(--ink); color: #fff; position: relative; overflow: hidden; }
-  .closing::before { content: ""; position: absolute; inset: auto -10% -60% -10%; height: 70%; background: radial-gradient(50% 100% at 50% 100%, rgb(16 185 129 / .38), transparent 70%); }
-  .closing .wrap { position: relative; display: grid; grid-template-columns: 1.2fr .8fr; gap: 32px; align-items: center; }
-  @media (max-width: 860px) { .closing .wrap { grid-template-columns: 1fr; } }
-  .closing h2 { color: #fff; }
-  .closing p { color: rgb(255 255 255 / .78); margin-top: 16px; max-width: 32em; }
-  .closing .btn { margin-top: 28px; }
-  .closing .side { border-left: 1px solid rgb(255 255 255 / .14); padding-left: 28px; color: rgb(255 255 255 / .8); font-size: 1rem; }
-  .closing .side strong { color: #fff; display: block; margin-bottom: 6px; }
-  @media (max-width: 860px) { .closing .side { border-left: 0; border-top: 1px solid rgb(255 255 255 / .14); padding: 24px 0 0; } }
+  /* the body sections (proof, wins, how, packages, builds, founder, checklist, closing) live in assets/ui.css */
 
   /* footer */
   /* faq: plain disclosure list, one line each, opens in place */
@@ -399,7 +241,11 @@
   .js [data-reveal].in { opacity: 1; transform: none; }
   .js .hero-copy .line { clip-path: inset(0 0 100% 0); animation: unclip .9s cubic-bezier(.2,.7,.2,1) forwards; }
   .js .hero-copy .line:nth-child(2) { animation-delay: .14s; }
-  .js .hero [data-reveal] { transition-delay: calc(.35s + var(--d, 0s)); }
+  /* the hero lede and note are the largest text on a phone's first screen (the LCP element), so they are
+     never hidden and never wait for the script: they only rise into place, on CSS alone, from first paint */
+  .js .hero [data-reveal] { opacity: 1; transform: none; transition: none; animation: hero-rise .55s cubic-bezier(.2,.7,.2,1) .35s backwards; }
+  .js .hero .hero-note[data-reveal] { animation-delay: .43s; }
+  @keyframes hero-rise { from { transform: translateY(18px); } }
   @keyframes unclip { to { clip-path: inset(0 0 -20% 0); } }
   /* section headings rise from behind their own bottom edge, like the hero headline
      (the script wraps each heading's text in .rise) */
@@ -429,8 +275,6 @@
   .op-flame { position: absolute; top: 0; pointer-events: none; }
   /* flying or on a short visit over the page, it never blocks a click */
   .op.is-visiting .op-btn { pointer-events: none; }
-  .op-badge { position: absolute; right: 8%; top: 6%; z-index: 3; min-width: calc(var(--u) * 15); height: calc(var(--u) * 15); padding: 0 calc(var(--u) * 3); border-radius: 999px; display: grid; place-items: center; background: var(--emerald); color: var(--ink); font: 800 calc(var(--u) * 9)/1 var(--display); box-shadow: 0 0 0 calc(var(--u) * 1.4) #fff, 0 calc(var(--u) * 2) calc(var(--u) * 4) rgb(11 18 32 / .25); transform: scale(0); transition: transform .35s cubic-bezier(.34,1.56,.64,1); pointer-events: none; }
-  .op-badge.is-on { transform: scale(1); }
   .op-z { position: absolute; left: 60%; top: 10%; z-index: 3; font: 800 calc(var(--u) * 9)/1 var(--display); color: var(--emerald); text-shadow: 0 0 calc(var(--u) * 1.5) #fff; opacity: 0; pointer-events: none; }
   /* a throw never selects the page text it passes over */
   .op-dragging, .op-dragging * { -webkit-user-select: none; user-select: none; }
@@ -481,26 +325,177 @@
   /* Reduce motion (html.rm, set in <head> from the switch or the system setting): nothing moves
      on its own, nothing follows the pointer, the Operator stays put in the hero and each
      section shows a still pose inline instead */
-  .rm.js [data-reveal] { opacity: 1; transform: none; transition: none; }
+  .rm.js [data-reveal] { opacity: 1; transform: none; transition: none; animation: none; }
   .rm.js .hero-copy .line { clip-path: none; animation: none; }
   .rm.js [data-reveal] h2 .rise { transform: none; }
-  .rm .marquee .track { animation: none; }
-  .rm .hero-media video { display: none; }
-  .rm .spot .line-col::before, .rm .spot .kit::before, .rm .spot .kit::after { display: none; }
-  .rm .lit .w { color: var(--ink); background-size: 100% 38%; }
-  .rm .btn .beam, .rm .checklist-card::after { display: none; }
-  .rm .steps-line { transform: none; }
   .rm::view-transition-group(*), .rm::view-transition-old(*), .rm::view-transition-new(*) { animation: none !important; }
   .rm .op-static { display: block; float: right; width: clamp(76px, 11vw, 128px); height: auto; margin: -10px 0 8px 16px; }
   html.rm { scroll-behavior: auto; }
   .rm *, .rm *::before, .rm *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
-  /* without the script, the system setting alone still stops the strip */
+  /* without the script, the system setting alone still stops smooth scrolling */
   @media (prefers-reduced-motion: reduce) {
-    html:not(.js) .marquee .track { animation: none; }
     html:not(.js) { scroll-behavior: auto; }
   }
 </style>
-<link rel="stylesheet" href="assets/liquid.css">
+<!-- the first screen (tokens, buttons, hero, console) is styled inline from a copy of assets/ui.css
+     (critical:start to critical:end), so it paints without waiting for a stylesheet; the full files
+     load without blocking the first paint. Phone LCP median 1044 ms before, 830 ms after (lcp.js). -->
+<style id="critical-css">
+:root {
+  --navy: #0B1220;
+  --navy-2: #121B2E;
+  --em: #10B981;
+  --em-deep: #047857;
+  --mint: #D1FAE5;
+  --paper: #F5F7FA;
+}
+
+/* headings */
+h2 { font-weight: 800; font-size: clamp(38px, 5vw, 64px); }
+
+.kicker {
+  display: block; margin-bottom: 14px;
+  font: 700 13px/1.2 var(--font, "Hanken Grotesk", system-ui, sans-serif);
+  letter-spacing: .14em; text-transform: uppercase; color: var(--em-deep);
+}
+.kicker.on-navy { color: var(--mint); } /* mint, so the hero keeps one emerald element */
+
+/* shared button bits (these combine with the existing .btn base) */
+.btn.btn-beam, .btn.btn-press { min-height: 48px; justify-content: center; white-space: nowrap; }
+.btn-beam .arr, .btn-press .arr { transition: translate .2s; }
+.btn-beam:hover .arr, .btn-press:hover .arr { translate: 4px 0; }
+
+/* 1. Beam: for navy surfaces. A light travels the rim all the time, so phones see it too. */
+@property --a { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+@keyframes ui-spin { to { --a: 360deg; } }
+@keyframes ui-sheen { 0%, 60% { translate: -120% 0; } 85%, 100% { translate: 120% 0; } }
+.btn.btn-beam {
+  color: var(--navy); background: var(--em);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--mint) 45%, transparent) inset, 0 10px 40px -8px rgb(16 185 129 / .7);
+}
+.btn.btn-beam:hover { background: var(--em); box-shadow: 0 0 0 1px color-mix(in srgb, var(--mint) 45%, transparent) inset, 0 14px 44px -8px rgb(16 185 129 / .85); }
+.btn.btn-beam::before {
+  content: ""; position: absolute; inset: -2px; z-index: -2;
+  background: conic-gradient(from var(--a, 0deg), transparent 0 70%, var(--mint) 80%, transparent 90%);
+  animation: ui-spin 3.2s linear infinite;
+}
+.btn.btn-beam::after, .btn.btn-beam:hover::after {
+  content: ""; position: absolute; inset: 2px; z-index: -1; border-radius: inherit;
+  background: var(--em);
+  transform: none; transition: none;
+}
+.btn-beam .sheen {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background: linear-gradient(105deg, transparent 35%, rgb(255 255 255 / .55) 50%, transparent 65%);
+  translate: -120% 0; animation: ui-sheen 4.5s ease-in-out infinite;
+}
+.btn-beam > span:not(.sheen) { position: relative; z-index: 1; }
+.btn.btn-beam:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+
+/* 2. Press: for paper surfaces. A hard edge under the face; pressing sinks it. */
+.btn.btn-press {
+  color: #fff; background: #047857;
+  box-shadow: 0 5px 0 #03543c, 0 12px 24px -10px rgb(4 120 87 / .6);
+  transition: translate .08s, box-shadow .08s;
+}
+.btn.btn-press:hover { background: #047857; box-shadow: 0 5px 0 #03543c, 0 12px 24px -10px rgb(4 120 87 / .6); }
+.btn.btn-press::after { display: none; }
+.btn.btn-press:active { translate: 0 4px; transform: none; box-shadow: 0 1px 0 #03543c, 0 4px 10px -6px rgb(4 120 87 / .6); }
+
+/* 3. Ghost: calm outline, no blur. White on navy; add .on-paper for dark text. */
+.btn-ghost { min-height: 48px; justify-content: center; color: #fff; background: transparent; box-shadow: inset 0 0 0 1.5px rgb(255 255 255 / .4); }
+.btn-ghost:hover { background: transparent; box-shadow: inset 0 0 0 1.5px #fff; }
+.btn-ghost.on-paper { color: var(--navy); box-shadow: inset 0 0 0 1.5px rgb(11 18 32 / .3); }
+.btn-ghost.on-paper:hover { box-shadow: inset 0 0 0 1.5px var(--navy); }
+
+/* Reduce motion: nothing moves on its own, presses are instant */
+.rm .btn.btn-beam::before, .rm .btn-beam .sheen { animation: none; }
+.rm .btn-beam .sheen { display: none; }
+.rm .btn-beam, .rm .btn-press, .rm .btn-ghost,
+.rm .btn-beam .arr, .rm .btn-press .arr { transition: none; animation: none; }
+
+/* ---------- hero: copy left, the console right (below on phones) ----------
+   Nothing here may set transform, filter, backdrop-filter or z-index on the stage, the console or the
+   perch: the Operator inside goes position: fixed when it flies, and any of those would trap it. */
+.hero-stage { background: var(--navy); }
+.hero-stage::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(560px 380px at 78% 40%, rgb(16 185 129 / .2), transparent 70%),
+    linear-gradient(rgb(255 255 255 / .035) 1px, transparent 1px) 0 0 / 44px 44px,
+    linear-gradient(90deg, rgb(255 255 255 / .035) 1px, transparent 1px) 0 0 / 44px 44px;
+  -webkit-mask-image: radial-gradient(ellipse at 60% 40%, #000 30%, transparent 80%);
+  mask-image: radial-gradient(ellipse at 60% 40%, #000 30%, transparent 80%);
+}
+.hero h1 { font-size: clamp(42px, 1.6rem + 4.2vw, 82px); }
+.hero h1 em { font-style: normal; color: var(--em); }
+.hero-copy .kicker { margin-bottom: 0; }
+
+/* the console: tap what eats your week; console.js writes the readout, button and bubble */
+.console {
+  grid-column: 2; grid-row: 1; position: relative; margin-top: 120px;
+  padding: 24px; border-radius: 24px; color: #fff; background: var(--navy-2);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / .1), 0 30px 80px -40px rgb(16 185 129 / .35);
+}
+/* the Operator's home on wide screens: perched on the top right corner, about 210 px */
+.console .op-home { position: absolute; top: -132px; right: -22px; width: 210px; aspect-ratio: 1; pointer-events: none; }
+.console .op { --u: 2.1px; }
+.console-bubble {
+  position: absolute; right: 196px; top: -92px; max-width: 220px; padding: 10px 14px;
+  border-radius: 14px 14px 4px 14px; background: #fff; color: var(--navy);
+  font: 600 14px/1.35 var(--font, "Hanken Grotesk", system-ui, sans-serif);
+  box-shadow: 0 12px 30px -14px rgb(11 18 32 / .6); pointer-events: none;
+}
+.console-title { font-size: 22px; line-height: 1.2; letter-spacing: -.01em; color: #fff; }
+/* the title and its line stay clear of the robot on the corner */
+.console-title, .console-sub { padding-right: 150px; }
+.console-sub { margin-top: 6px; font-size: 15px; color: rgb(255 255 255 / .72); }
+.console-chips { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 18px; }
+.console-chips .tile {
+  display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 10px 12px;
+  border-radius: 12px; border: 1px solid rgb(255 255 255 / .12); background: rgb(255 255 255 / .04);
+  color: rgb(255 255 255 / .92); font: 600 15px/1.25 var(--font, "Hanken Grotesk", system-ui, sans-serif); text-align: left;
+  transition: background-color .15s, border-color .15s;
+}
+.console-chips .tile:hover { border-color: rgb(209 250 229 / .5); }
+.console-chips .tile:focus-visible { outline: 2px solid var(--em); outline-offset: 2px; }
+.console-chips .tile[aria-pressed="true"] { background: rgb(16 185 129 / .14); border-color: var(--em); color: #fff; }
+.console-chips .box {
+  flex: none; width: 20px; height: 20px; border-radius: 6px; border: 2px solid rgb(255 255 255 / .4);
+  display: grid; place-items: center; transition: background-color .15s, border-color .15s;
+}
+.console-chips .tile[aria-pressed="true"] .box { background: var(--em); border-color: var(--em); }
+.console-chips .tile[aria-pressed="true"] .box::after {
+  content: ""; width: 9px; height: 5px; border: solid var(--navy); border-width: 0 0 2.5px 2.5px; rotate: -45deg; translate: 0 -1px;
+}
+.readout {
+  display: flex; align-items: center; gap: 12px; margin: 18px 0; padding: 14px 16px; min-height: 66px;
+  border-radius: 12px; background: var(--navy); border: 1px dashed rgb(16 185 129 / .45);
+}
+.readout .scan { flex: none; width: 10px; height: 10px; border-radius: 3px; background: var(--em); box-shadow: 0 0 10px var(--em); }
+.readout p { font: 600 15px/1.35 var(--font, "Hanken Grotesk", system-ui, sans-serif); color: var(--mint); }
+/* one emerald button per screen (the hero primary), so the console button is an outline that greens up with picks */
+.console-cta { display: flex; width: 100%; }
+.console-cta.is-ready { color: var(--mint); box-shadow: inset 0 0 0 1.5px var(--em); }
+
+@media (max-width: 860px) {
+  /* phones: the Operator's home is #op-float beside the headline, so the console is not its anchor */
+  .console { position: static; margin-top: 36px; padding: 18px 16px; }
+  .console-title, .console-sub { padding-right: 0; }
+  .console-bubble { display: none; }
+  .console-chips { gap: 8px; }
+  .console-chips .tile { gap: 8px; padding: 10px; font-size: 14px; }
+}
+@media (max-width: 560px) {
+  .hero-actions .btn { width: 100%; }
+}
+.rm .console-chips .tile, .rm .console-chips .box { transition: none; }
+/* deep links (index.html#faq) land below the 68px sticky nav from the first paint; liquid.css sets the same on every page */
+html { scroll-padding-top: 88px; }
+</style>
+<link rel="stylesheet" href="assets/ui.css" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="assets/liquid.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="assets/ui.css"><link rel="stylesheet" href="assets/liquid.css"></noscript>
 <script type="application/ld+json">
 {
  "@context": "https://schema.org",
@@ -512,7 +507,7 @@
    "url": "https://clashworks.co/",
    "logo": "https://clashworks.co/assets/logo.svg",
    "image": "https://clashworks.co/assets/headshot-mint-512.webp",
-   "description": "AI operations fixes for local service businesses: quote forms, missed-call text-back, review systems, tracking. Free 10-minute Optimization Check, two a week.",
+   "description": "Free 10-minute video review for local service businesses. I find what's costing you jobs and set up simple tools to fix it, at one fixed price.",
    "address": {
     "@type": "PostalAddress",
     "addressLocality": "Dallas",
@@ -556,10 +551,18 @@
    "mainEntity": [
     {
      "@type": "Question",
-     "name": "What does the free Optimization Check actually cost?",
+     "name": "Is the free video really free?",
      "acceptedAnswer": {
       "@type": "Answer",
-      "text": "Nothing, and there is no pitch on the recording. I pick two applications a week, spend ten minutes on your website, your Google listing, and how you run things, and record exactly what I would fix first. The recording is yours whether we ever work together or not."
+      "text": "Yes. You fill out a 2-minute form, and I take two a week. I spend 10 minutes on your website, Google listing and how you run things, and record what I'd fix first. You hear back within 7 days either way. No pitch, and you keep it."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Do I need to learn anything technical?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "No. I set everything up and show you how it works in plain words. You approve the wording of any message before it goes out to a customer."
      }
     },
     {
@@ -567,23 +570,15 @@
      "name": "Do you need my passwords?",
      "acceptedAnswer": {
       "@type": "Answer",
-      "text": "Never. If we do paid work, you add me as a user on your own accounts with the lowest access that does the job, and you remove me when it is done. Your accounts stay yours."
+      "text": "Never. You add me as a user on your own accounts, with the least access the job needs, and you remove me when I'm done. Your accounts stay yours."
      }
     },
     {
      "@type": "Question",
-     "name": "What does “measured or free” mean?",
+     "name": "What does “your money back” mean, exactly?",
      "acceptedAnswer": {
       "@type": "Answer",
-      "text": "Every fix ships with tracking, and we agree on one number up front: quote requests a week, calls answered, reviews a month. Half is paid after the baseline is recorded, half on delivery. If the number cannot be shown 30 days after delivery, you get a full refund of my fees within 15 days. It does not promise the number goes up, and it does not apply if the tracking is removed. Full conditions are on the Terms page."
-     }
-    },
-    {
-     "@type": "Question",
-     "name": "How long does a fix take?",
-     "acceptedAnswer": {
-      "@type": "Answer",
-      "text": "A single kit install is about a week. A full Leak Fix, all three kits plus the path from visitor to phone call, is about two. Bigger builds get a fixed timeline in the quote before anything starts."
+      "text": "Before I start, we agree on one number, like quote requests a week or calls answered, and I set up a counter for it. You pay half once we've written down your starting number and half when it's done. If I can't show you that number 30 days after I finish, I refund my fees within 15 days. It's not a promise the number goes up, and it doesn't apply if the counter gets removed. Full conditions are on the Terms page."
      }
     },
     {
@@ -591,15 +586,7 @@
      "name": "Will this get me to the top of Google?",
      "acceptedAnswer": {
       "@type": "Answer",
-      "text": "I do not promise rankings or lead counts, because nobody can honestly make those promises. I promise the fix, the tracking, and an honest number at 30 days."
-     }
-    },
-    {
-     "@type": "Question",
-     "name": "You are a student. Why should I trust you with my business?",
-     "acceptedAnswer": {
-      "@type": "Answer",
-      "text": "Because nothing here rests on trust. You get the free check first and decide after. Every claim on this site is backed by something I built, and where I do not have a number yet, the site says so. If I get something wrong, I say so on camera."
+      "text": "I don't promise rankings or a number of new customers, because nobody can honestly promise those. I promise the fix, a counter that shows what it's doing, and an honest number at 30 days."
      }
     }
    ]
@@ -620,14 +607,13 @@
     </a>
     <span class="op-slot" id="op-slot" aria-hidden="true"></span>
     <ul class="nav-links">
-      <li><a href="#fix">What I fix</a></li>
+      <li><a href="#packages">Packages</a></li>
+      <li><a href="services.html">Services</a></li>
       <li><a href="#how">How it works</a></li>
-      <li><a href="#services">Services</a></li>
-      <li><a href="#free">Free kits</a></li>
-      <li><a href="#video">Videos</a></li>
-      <li><a href="#faq">Questions</a></li>
+      <li><a href="#builds">What I've built</a></li>
+      <li><a href="#faq">FAQ</a></li>
       <li><a href="about.html">Who I am</a></li>
-      <li class="cta-li"><a class="btn" data-liquid="" href="check.html">Get a free check</a></li>
+      <li class="cta-li"><a class="btn btn-press" href="check.html">Free video review</a></li>
     </ul>
   </div>
 </header>
@@ -635,271 +621,193 @@
 <main id="main">
 <section class="hero" id="top">
   <div class="hero-stage">
-  <div class="hero-media" aria-hidden="true">
-    <img src="assets/hero-poster-1280.webp" srcset="assets/hero-poster-1280.webp 1280w, assets/hero-poster-1920.webp 1920w" sizes="100vw" width="1920" height="1086" alt="" fetchpriority="high">
-    <div class="hero-vid"><video id="hero-video" autoplay muted loop playsinline preload="none" aria-hidden="true" tabindex="-1">
-      <source data-src="assets/hero-loop.webm" type="video/webm">
-      <source data-src="assets/hero-loop.mp4" type="video/mp4">
-    </video></div>
-  </div>
   <div class="wrap hero-inner">
     <div class="hero-copy">
       <span class="op-float" id="op-float" aria-hidden="true"></span>
-      <h1 id="headline"><span class="line">Business problems?</span><span class="line">I have the fix.</span></h1>
-      <p class="lede" data-reveal>I spent hundreds of hours learning to fix business problems with AI so you don't have to. Tell me what still happens by hand in your business, and I'll show you what to fix first. Free.</p>
+      <span class="kicker on-navy">For local service businesses and rental owners</span>
+      <h1 id="headline"><span class="line">More jobs. More nights off.</span><span class="line"><em>One fixed price.</em></span></h1>
+      <p class="lede" data-reveal>I set up simple tools that text back missed calls, follow up on quotes and chase late payments for you.</p>
       <div class="hero-actions">
-        <a class="btn" data-liquid="" href="check.html">Get a free Optimization Check
+        <a class="btn btn-beam" href="check.html"><span class="sheen" aria-hidden="true"></span><span>Get my free video review</span>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
         </a>
-        <a class="btn btn-ghost" data-liquid="" href="#how">How it works</a>
+        <a class="btn btn-ghost" href="#packages">See the 4 packages</a>
       </div>
-      <p class="hero-note" data-reveal><strong>Two a week.</strong> Ten minutes of my time, recorded, yours to keep. No pitch on the call.</p>
-      <a class="who" href="about.html" data-reveal><img src="assets/headshot-96.webp" width="34" height="34" alt=""><span><strong>Clayton Trevino</strong><small>SMU Cox School of Business</small></span></a>
+      <p class="hero-note" data-reveal><strong>Free. No pitch.</strong> Every fix is one fixed price, and you get your money back if we can't show you the number at 30 days.</p>
     </div>
-    <div class="op-home" id="op-home">
-      <div class="op" id="op">
-        <div class="op-tilt"><div class="op-bob">
-          <button class="op-btn" id="op-btn" type="button" aria-label="Get a tip from the Operator" aria-controls="op-bubble" aria-expanded="false">
-            <span class="op-art"><span class="op-pose is-on" data-pose="hello"><img src="assets/operator-hello-480.webp" srcset="assets/operator-hello-480.webp 480w, assets/operator-hello-960.webp 960w, assets/operator-hello-1280.webp 1280w" sizes="(max-width: 860px) 112px, 580px" width="480" height="480" alt="" fetchpriority="low"></span></span>
-          </button>
-        </div></div>
+    <div class="console" role="group" aria-labelledby="console-title">
+      <div class="op-home" id="op-home">
+        <div class="op" id="op">
+          <div class="op-tilt"><div class="op-bob">
+            <button class="op-btn" id="op-btn" type="button" aria-label="Get a tip from ClashBot" aria-controls="op-bubble" aria-expanded="false">
+              <span class="op-art"><span class="op-pose is-on" data-pose="hello"><img src="assets/operator-hello-480.webp" srcset="assets/operator-hello-480.webp 480w, assets/operator-hello-960.webp 960w, assets/operator-hello-1280.webp 1280w" sizes="(max-width: 860px) 112px, 210px" width="480" height="480" alt="" fetchpriority="low"></span></span>
+            </button>
+          </div></div>
+        </div>
       </div>
+      <p class="console-bubble" id="console-bubble" aria-hidden="true">Hi, I'm ClashBot. Tick what eats your week.</p>
+      <h2 class="console-title" id="console-title">What still eats your week?</h2>
+      <p class="console-sub">Tap any that sound like you.</p>
+      <div class="console-chips" id="picker">
+        <button class="tile" type="button" aria-pressed="false" data-value="Missed calls"><span class="box" aria-hidden="true"></span>Missed calls on a job</button>
+        <button class="tile" type="button" aria-pressed="false" data-value="Quoting and estimates"><span class="box" aria-hidden="true"></span>Writing quotes at night</button>
+        <button class="tile" type="button" aria-pressed="false" data-value="Invoicing and chasing payment"><span class="box" aria-hidden="true"></span>Chasing late payments</button>
+        <button class="tile" type="button" aria-pressed="false" data-value="Scheduling and reminders"><span class="box" aria-hidden="true"></span>Appointment reminders</button>
+        <button class="tile" type="button" aria-pressed="false" data-value="Asking for reviews"><span class="box" aria-hidden="true"></span>Asking for reviews</button>
+        <button class="tile" type="button" aria-pressed="false" data-value="Answering the same questions over and over"><span class="box" aria-hidden="true"></span>Same questions all day</button>
+        <button class="tile" type="button" aria-pressed="false" data-value="Owner reports"><span class="box" aria-hidden="true"></span>Owner reports</button>
+        <button class="tile" type="button" aria-pressed="false" data-value="Double bookings"><span class="box" aria-hidden="true"></span>Double bookings</button>
+      </div>
+      <div class="readout"><span class="scan" aria-hidden="true"></span><p id="readout" aria-live="polite">Waiting for your picks. I'll tell you where I'd start.</p></div>
+      <a class="btn btn-ghost console-cta" id="picker-cta" href="check.html"><span id="cta-label">Get my free video review</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
     </div>
     <div class="op-bubble" id="op-bubble" hidden>
       <p id="op-tip"></p>
       <div class="op-actions">
         <button type="button" id="op-next">Another tip</button>
-        <button type="button" id="op-hide">Hide the Operator</button>
+        <button type="button" id="op-hide">Hide ClashBot</button>
       </div>
       <button type="button" class="op-close" id="op-close" aria-label="Close the tip"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 2.5l7 7M9.5 2.5l-7 7"/></svg></button>
     </div>
     <p class="op-live" id="op-live" role="status" aria-live="polite"></p>
-    <button type="button" class="op-tuck" id="op-tuck" hidden><span class="op-show-eye" aria-hidden="true"></span>Hide Operator</button>
-    <button type="button" class="op-show" id="op-show" hidden><span class="op-show-eye" aria-hidden="true"></span><span class="op-show-text">Show Operator</span></button>
+    <button type="button" class="op-tuck" id="op-tuck" hidden><span class="op-show-eye" aria-hidden="true"></span>Hide ClashBot</button>
+    <button type="button" class="op-show" id="op-show" hidden><span class="op-show-eye" aria-hidden="true"></span><span class="op-show-text">Show ClashBot</span></button>
   </div>
   <button type="button" class="rm-switch" role="switch" aria-checked="false" hidden><span class="knob" aria-hidden="true"></span>Reduce motion</button>
   </div>
 </section>
 
-<div class="marquee-row">
-<div class="marquee" aria-hidden="true">
-  <div class="track">
-    <ul>
-      <li>Quotes typed by hand</li><li>Missed calls that never get a text back</li><li>Contact forms with no phone field</li><li>Reminders from memory</li><li>Invoices chased one by one</li><li>Reviews nobody asks for</li><li>The same question answered ten times a day</li><li>Hours wrong on Google</li>
-    </ul>
-    <ul>
-      <li>Quotes typed by hand</li><li>Missed calls that never get a text back</li><li>Contact forms with no phone field</li><li>Reminders from memory</li><li>Invoices chased one by one</li><li>Reviews nobody asks for</li><li>The same question answered ten times a day</li><li>Hours wrong on Google</li>
-    </ul>
+<section class="proof" id="proof" aria-label="Real numbers so far">
+  <div class="wrap row">
+    <div class="stat"><b>44</b><span>straight days a rental owner's bookings synced on their own</span><small>as of Oct 15</small></div>
+    <div class="stat"><b>$0</b><span>a day to run that sync</span></div>
+    <div class="stat"><b>94</b><span>pages launched with 0 automated accessibility issues</span></div>
+    <div class="stat"><b>1</b><span>free tool you can take today, the quote form</span></div>
   </div>
-</div>
-</div>
+</section>
 
-<section id="fix">
+<section class="wins-sec" id="wins">
   <div class="wrap">
     <div class="section-head" data-reveal>
-      <img class="op-static" src="assets/operator-phone-still-480.webp" width="480" height="480" alt="" loading="lazy">
-      <h2>Tick what still happens by hand.</h2>
-      <p class="lede">Every one of these is something I've already built a fix for. Pick yours and I'll start there.</p>
+      <span class="kicker">What you get</span>
+      <h2>What changes for you.</h2>
     </div>
-    <div class="picker-grid" id="picker" data-reveal>
-      <button class="tile" data-liquid="soft" type="button" aria-pressed="false" data-value="Quoting and estimates">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
-        <span>Quoting and estimates</span><i class="check"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L20 7"/></svg></i>
-      </button>
-      <button class="tile" data-liquid="soft" type="button" aria-pressed="false" data-value="Scheduling and reminders">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-        <span>Scheduling and reminders</span><i class="check"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L20 7"/></svg></i>
-      </button>
-      <button class="tile" data-liquid="soft" type="button" aria-pressed="false" data-value="Following up with leads">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.4 8.4 0 0 1-3.7-.8L3 21l1.9-5.3A8.4 8.4 0 1 1 21 11.5z"/></svg>
-        <span>Following up with leads</span><i class="check"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L20 7"/></svg></i>
-      </button>
-      <button class="tile" data-liquid="soft" type="button" aria-pressed="false" data-value="Invoicing and chasing payment">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1z"/><path d="M14 8H9.5a1.5 1.5 0 0 0 0 3h5a1.5 1.5 0 0 1 0 3H8M12 6v2M12 14v2"/></svg>
-        <span>Invoicing and chasing payment</span><i class="check"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L20 7"/></svg></i>
-      </button>
-      <button class="tile" data-liquid="soft" type="button" aria-pressed="false" data-value="Asking for reviews">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>
-        <span>Asking for reviews</span><i class="check"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L20 7"/></svg></i>
-      </button>
-      <button class="tile" data-liquid="soft" type="button" aria-pressed="false" data-value="Answering the same questions over and over">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/></svg>
-        <span>Answering the same questions</span><i class="check"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L20 7"/></svg></i>
-      </button>
-      <button class="tile" data-liquid="soft" type="button" aria-pressed="false" data-value="Posting on social media">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
-        <span>Posting on social media</span><i class="check"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L20 7"/></svg></i>
-      </button>
-      <button class="tile" data-liquid="soft" type="button" aria-pressed="false" data-value="Bookkeeping and reports">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18"/><path d="M8 17V11M13 17V7M18 17v-4"/></svg>
-        <span>Bookkeeping and reports</span><i class="check"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L20 7"/></svg></i>
-      </button>
-    </div>
-    <div class="picker-bar" data-reveal>
-      <div>
-        <div class="count" aria-live="polite"><b id="count">0</b> <span id="count-label">things I'd automate first</span></div>
-        <div class="hint" id="hint">Tick a few. They come with you into the application.</div>
-        <ul class="tray" id="tray" aria-hidden="true"></ul>
-      </div>
-      <a class="btn" data-liquid="" id="picker-cta" href="check.html">Get my fix
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-      </a>
+    <div class="wins">
+      <div class="win money" data-reveal><svg class="win-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg><h3>Make more money</h3><p>Missed callers get a text before they try the next company. Quotes get a follow-up.</p></div>
+      <div class="win time" data-reveal><svg class="win-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><h3>Get your nights back</h3><p>Reminders, follow-ups and owner reports go out on their own.</p></div>
+      <div class="win cost" data-reveal><svg class="win-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg><h3>Pay less</h3><p>One fixed price, agreed before you pay. Hosting itself can cost about $0 a month.</p></div>
     </div>
   </div>
 </section>
 
-<section id="how">
+<section class="how" id="how">
   <div class="wrap">
     <div class="section-head" data-reveal>
       <img class="op-static" src="assets/operator-calculator-still-480.webp" width="480" height="480" alt="" loading="lazy">
-      <h2>How the free check works.</h2>
-      <p class="lede">You get the fix before you decide anything. If it's worth building, we talk about that after.</p>
+      <span class="kicker">How it works</span>
+      <h2>Easy to start. Easy to say no.</h2>
     </div>
     <div class="steps">
       <div class="step" data-reveal>
-        <h3>Apply</h3>
-        <p>Fourteen quick questions about your business and where the time goes. Or just tell me what you want built.</p>
+        <h3>Tell me what eats your week</h3>
+        <p>Tick the chores you still do yourself.</p>
         <span class="time">2 minutes</span>
       </div>
       <div class="step" data-reveal>
-        <h3>I record a check</h3>
-        <p>Your website, your Google listing, and how you run things. I find the leak costing you the most and say exactly what I'd fix first.</p>
-        <span class="time">10 minutes, on video</span>
+        <h3>Apply for a free video</h3>
+        <p>I take two a week, check your website and Google listing, then show you the one fix that helps most.</p>
+        <span class="time">Reply within 7 days</span>
       </div>
       <div class="step" data-reveal>
-        <h3>You get the fix</h3>
-        <p>The recording is yours whether we ever work together or not. If you want it built, the price is fixed and measured. No results, no fee.</p>
-        <span class="time">Within 7 days</span>
+        <h3>Say yes, and I set it up</h3>
+        <p>We pick one number to watch, and if I can't show it to you at 30 days, you get your money back.</p>
+        <span class="time">1 to 2 weeks</span>
       </div>
-    </div>
-    <div class="numbers" data-reveal>
-      <div class="num"><b data-count="2">2</b><span>free checks a week, so each one gets real attention</span></div>
-      <div class="num"><b data-count="10">10</b><span>minutes of recorded, specific advice you keep</span></div>
-      <div class="num"><b data-count="3">3</b><span>build kits from real fixes, each released free with its video</span></div>
-      <div class="num"><b>$0</b><span>cost to find out what's leaking</span></div>
     </div>
   </div>
 </section>
 
-<section class="services" id="services">
+<section class="packages" id="packages">
   <div class="wrap">
     <div class="section-head" data-reveal>
       <img class="op-static" src="assets/operator-point-left-still-480.webp" width="480" height="480" alt="" loading="lazy">
-      <h2>Once the leak is found, here is what I build.</h2>
-      <p class="lede">Every job is quoted from the free check, at a fixed price, with a number we agree on up front. If the number can't be shown 30 days after delivery, you get your fees back (<a href="terms.html#guarantee">conditions</a>).</p>
+      <span class="kicker">Packages</span>
+      <h2>Pick one. I'll set it up.</h2>
+      <p class="lede">Each one is quoted from your free video at one fixed price.</p>
     </div>
-    <div class="hs" data-hs><div class="hs-pin">
-    <div class="lines spot" data-reveal>
-      <div class="line-col">
-        <h3>Fix</h3>
-        <p>Stop the leak that's costing you leads this week.</p>
-        <ul>
-          <li><strong>Quick Install</strong><span>One kit, installed and tracked. Quote form, missed-call text-back, or the review system.</span></li>
-          <li><strong>Leak Fix</strong><span>All three kits plus the path from visitor to phone call, fixed end to end.</span></li>
-          <li><strong>Local Engine</strong><span>Google listing, reviews, service pages, and a monthly check on where Google and AI search name you.</span></li>
-        </ul>
+    <div class="packs" data-reveal>
+      <div class="pack" data-pkg="One Quick Fix">
+        <h3><a href="check.html" aria-label="One Quick Fix: start with a free video review">One Quick Fix</a></h3>
+        <p class="what">Try one thing first: a missed-call text, a quote form or review requests.</p>
+        <p class="price">from $500<small>About 1 week</small></p>
       </div>
-      <div class="line-col">
-        <h3>Build</h3>
-        <p>Websites, landing pages, and the tools that run your week.</p>
-        <ul>
-          <li><strong>Landing Page</strong><span>One page for one service, built to turn a visitor into a call. Same build as this site.</span></li>
-          <li><strong>Website Rebuild</strong><span>Five to eight pages, fast on a phone, tracking live from day one. Rental operators can add direct booking.</span></li>
-          <li><strong>Automation Sprint</strong><span>One workflow off your plate in a week: quotes, reminders, invoices, the FAQ replies.</span></li>
-          <li><strong>Owner Report and Booking Sync</strong><span>For rental and property operators: bookings pulled into one sheet every day, double bookings flagged, and a monthly owner report.</span></li>
-          <li><strong>Custom Build</strong><span>An internal app or a multi-step automation, scoped and fixed-priced.</span></li>
-        </ul>
+      <div class="pack feat" data-pkg="Never Miss a Customer">
+        <span class="badge">Most complete</span><h3><a href="check.html" aria-label="Never Miss a Customer: start with a free video review">Never Miss a Customer</a></h3>
+        <p class="what">All three quick fixes, plus an instant reply to every new inquiry.</p>
+        <p class="price">from $1,500<small>About 2 weeks</small></p>
       </div>
-      <div class="line-col">
-        <h3>Market</h3>
-        <p>More of the right people reaching the thing we fixed.</p>
-        <ul>
-          <li><strong>Marketing Audit</strong><span>The written version of the free check, with a fix list ranked by return. Credited to your first project.</span></li>
-          <li><strong>AI Search Visibility</strong><span>A fixed set of the questions your customers ask ChatGPT and Google, checked every month, with the pages fixed when you're missing.</span></li>
-        </ul>
+      <div class="pack" data-pkg="One Chore, Gone">
+        <h3><a href="check.html" aria-label="One Chore, Gone: start with a free video review">One Chore, Gone</a></h3>
+        <p class="what">Quotes, reminders, late payments or the same five questions, done on their own.</p>
+        <p class="price">from $1,000<small>About 1 week</small></p>
       </div>
-      <div class="line-col">
-        <h3>Run</h3>
-        <p>Keep it working after I leave.</p>
-        <ul>
-          <li><strong>Front Desk Training</strong><span>Two hours with you or your office manager on your own accounts, plus one workflow installed and running. Cheat sheet included.</span></li>
-          <li><strong>Site Care</strong><span>Hosting, updates, and a couple of hours of edits a month.</span></li>
-          <li><strong>Ops Retainer</strong><span>The automations keep running, one improvement a month, a one-page report.</span></li>
-        </ul>
+      <div class="pack" data-pkg="Rental Owner Reports">
+        <h3><a href="check.html" aria-label="Rental Owner Reports: start with a free video review">Rental Owner Reports</a></h3>
+        <p class="what">Bookings in one sheet daily, double bookings flagged, monthly owner reports.</p>
+        <p class="price">from $1,500<small>Then from $150 a month</small></p>
       </div>
     </div>
-    <div class="hs-rail" aria-hidden="true"><span class="hs-bar"><i></i></span><ol><li>Fix</li><li>Build</li><li>Market</li><li>Run</li></ol></div>
-    </div></div>
-    <div class="foot" data-reveal>
-      <p><strong class="lit">Fixed price, one number, 30 days.</strong> Every job is scoped from the free check and measured from day one. I don't run ad budgets and I don't promise rankings or lead counts.</p>
-      <a class="btn" data-liquid="" href="check.html">Start with the free check
+    <p class="else"><strong>Need something else?</strong> Websites, your Google listing and custom tools are on <a href="services.html">the full list</a>.</p>
+  </div>
+</section>
+
+<section class="builds" id="builds">
+  <div class="wrap">
+    <div class="section-head" data-reveal>
+      <img class="op-static" src="assets/operator-scan-still-480.webp" width="480" height="480" alt="" loading="lazy">
+      <span class="kicker on-navy">What I've built</span>
+      <h2>Real things, running right now.</h2>
+    </div>
+    <div class="bgrid spot" role="region" aria-label="Six builds" tabindex="0">
+      <div class="build" data-reveal><span class="tag time">Saves time</span><h3>Bookings that type themselves</h3><p>Bookings land in one sheet every morning.</p><p class="num">44 days straight<small>$0 a run, as of Oct 15</small></p></div>
+      <div class="build" data-reveal><span class="tag cost">Pays less</span><h3>A booking site that skips the middleman</h3><p>Built so guests can book direct and the owner keeps the fee.</p><p class="num">5 homes, 61 pages<small>Live Oct 2026. Direct bookings: TBD</small></p></div>
+      <div class="build" data-reveal><span class="tag money">Makes money</span><h3>A website that sorts your leads</h3><p>Real buyers get flagged for a follow-up.</p><p class="num">Live Sept 2026<small>Leads a week: TBD</small></p></div>
+      <div class="build" data-reveal><span class="tag money">Makes money</span><h3>Found when buyers ask AI</h3><p>24 buyer questions to ChatGPT, Google and Perplexity.</p><p class="num">0 of 24 before<small>Re-check Oct 28</small></p></div>
+      <div class="build" data-reveal><span class="tag money">Makes money</span><h3>A quote form you can call back</h3><p>Phone required, no captcha, counts its own leads.</p><p class="num"><a href="https://github.com/Clashworkshq/quote-form">Free on GitHub</a><small>Public since Sept 2026</small></p></div>
+      <div class="build" data-reveal><span class="tag cost">Pays less</span><h3>Sites that pass the checks</h3><p>Checked for screen readers, keyboards and phones.</p><p class="num">0 issues, 94 pages<small>Automated checks</small></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="me" id="me">
+  <div class="wrap me-grid">
+    <div class="me-pics" data-reveal>
+      <img class="face" src="assets/headshot-480.webp" width="480" height="480" alt="Clayton Trevino" loading="lazy">
+      <img class="op-static" src="assets/operator-idea-still-480.webp" width="480" height="480" alt="" loading="lazy">
+    </div>
+    <div class="me-copy" data-reveal>
+      <span class="kicker">Who you're working with</span>
+      <h2>It's just me. And the robot.</h2>
+      <p>I'm Clayton Trevino, Finance and Real Estate at SMU Cox. I spent hundreds of hours learning to fix business problems with AI so you don't have to. No sales team, no handoff. You talk to the person who builds it.</p>
+      <a class="btn btn-ghost on-paper" href="about.html">More about me
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
       </a>
     </div>
   </div>
 </section>
 
-<section class="free" id="free">
+<section class="checklist" id="checklist">
   <div class="wrap">
-    <div class="section-head" data-reveal>
-      <img class="op-static" src="assets/operator-scan-still-480.webp" width="480" height="480" alt="" loading="lazy">
-      <h2>Take the free stuff.</h2>
-      <p class="lede">The checklist takes 10 minutes on your phone. The kits are the same files I install for paying clients.</p>
-    </div>
-    <div class="free-grid">
-      <div class="checklist-card" data-reveal>
-        <h3>The Lead Leak Checklist</h3>
-        <p>Fifteen yes-or-no questions that find where your website and Google listing lose customers. Count your no's.</p>
-        <ul>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>Does your form ask for a phone number?</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>Does a missed call get a text back within five minutes?</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>Is there a way to ask for a review after every job?</li>
-        </ul>
-        <div class="get">
-          <a class="btn" data-liquid="" href="get-checklist.html">Send me the checklist
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-          </a>
-          <span>One field, your email. No newsletter unless you ask.</span>
-        </div>
+    <div class="checklist-card" data-reveal>
+      <div>
+        <h2>Not ready to talk? Take the free checklist.</h2>
+        <p>Fifteen yes-or-no questions that find where your website and Google listing lose customers.</p>
       </div>
-      <div class="kits spot">
-        <div class="kit kit-soon" data-reveal>
-          <div class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8"/></svg></div>
-          <div><h3>The quote form</h3><p>Captures a lead you can actually call back. Phone required, no captcha, tracks itself.</p></div>
-          <span class="when">Coming with video 1</span>
-        </div>
-        <div class="kit kit-soon" data-reveal>
-          <div class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.6a2 2 0 0 1-.5 2.1L8.1 9.6a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.8.3 1.7.5 2.6.7a2 2 0 0 1 1.7 2z"/></svg></div>
-          <div><h3>Missed-call text-back</h3><p>A text goes out the moment a call is missed, so the customer doesn't dial the next company.</p></div>
-          <span class="when">Coming with video 3</span>
-        </div>
-        <div class="kit kit-soon" data-reveal>
-          <div class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg></div>
-          <div><h3>The review request system</h3><p>Asks every customer the day after the job, inside Google's 2026 rules. Reply templates included.</p></div>
-          <span class="when">Coming with video 8</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section id="video">
-  <div class="wrap">
-    <div class="section-head" data-reveal>
-      <img class="op-static" src="assets/operator-hello-still-480.webp" width="480" height="480" alt="" loading="lazy">
-      <h2>Watch the fixes happen.</h2>
-      <p class="lede">One real business problem a week, fixed on camera, with the exact prompt I used. Take it.</p>
-    </div>
-    <div class="video-card" data-reveal>
-      <div class="video-frame" id="video-frame">
-        <div class="play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 4v16l13-8z"/></svg></div>
-        <span class="eta">First video: in production</span>
-      </div>
-      <div class="video-copy">
-        <h3>The form you cannot call back.</h3>
-        <p>Most local business websites have a contact form that only collects a name and an email. Here is what that costs, and the fix I built in an afternoon.</p>
-        <a class="btn btn-dark" data-liquid="" href="https://www.youtube.com/@clashworkshq">Subscribe on YouTube</a>
-      </div>
+      <a class="btn btn-press" href="get-checklist.html">Send me the checklist
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
     </div>
   </div>
 </section>
@@ -907,55 +815,51 @@
 <section class="faq" id="faq">
   <div class="wrap">
     <div class="section-head" data-reveal>
-      <img class="op-static" src="assets/operator-idea-still-480.webp" width="480" height="480" alt="" loading="lazy">
-      <h2>Questions owners ask first.</h2>
-      <p class="lede">Short answers. The long ones are in the free check.</p>
+      <img class="op-static" src="assets/operator-hello-still-480.webp" width="480" height="480" alt="" loading="lazy">
+      <span class="kicker">Questions</span>
+      <h2>Short answers.</h2>
     </div>
     <div>
-      <details open class="is-open" data-reveal>
-        <summary data-liquid="glow"><span>What does the free Optimization Check actually cost?</span><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary>
-        <div class="answer"><p>Nothing, and there is no pitch on the recording. I pick two applications a week, spend ten minutes on your website, your Google listing, and how you run things, and record exactly what I would fix first. The recording is yours whether we ever work together or not.</p></div>
+      <details data-reveal>
+        <summary data-liquid="glow"><span>Is the free video really free?</span><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary>
+        <div class="answer"><p>Yes. You fill out a 2-minute form, and I take two a week. I spend 10 minutes on your website, Google listing and how you run things, and record what I'd fix first. You hear back within 7 days either way. No pitch, and you keep it.</p></div>
+      </details>
+      <details data-reveal>
+        <summary data-liquid="glow"><span>Do I need to learn anything technical?</span><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary>
+        <div class="answer"><p>No. I set everything up and show you how it works in plain words. You approve the wording of any message before it goes out to a customer.</p></div>
       </details>
       <details data-reveal>
         <summary data-liquid="glow"><span>Do you need my passwords?</span><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary>
-        <div class="answer"><p>Never. If we do paid work, you add me as a user on your own accounts with the lowest access that does the job, and you remove me when it is done. Your accounts stay yours.</p></div>
+        <div class="answer"><p>Never. You add me as a user on your own accounts, with the least access the job needs, and you remove me when I'm done. Your accounts stay yours.</p></div>
       </details>
       <details data-reveal>
-        <summary data-liquid="glow"><span>What does “measured or free” mean?</span><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary>
-        <div class="answer"><p>Every fix ships with tracking, and we agree on one number up front: quote requests a week, calls answered, reviews a month. Half is paid after the baseline is recorded, half on delivery. If the number cannot be shown 30 days after delivery, you get a full refund of my fees within 15 days. It does not promise the number goes up, and it does not apply if the tracking is removed. <a href="terms.html#guarantee">Full conditions</a>.</p></div>
-      </details>
-      <details data-reveal>
-        <summary data-liquid="glow"><span>How long does a fix take?</span><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary>
-        <div class="answer"><p>A single kit install is about a week. A full Leak Fix, all three kits plus the path from visitor to phone call, is about two. Bigger builds get a fixed timeline in the quote before anything starts.</p></div>
+        <summary data-liquid="glow"><span>What does “your money back” mean, exactly?</span><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary>
+        <div class="answer"><p>Before I start, we agree on one number, like quote requests a week or calls answered, and I set up a counter for it. You pay half once we've written down your starting number and half when it's done. If I can't show you that number 30 days after I finish, I refund my fees within 15 days. It's not a promise the number goes up, and it doesn't apply if the counter gets removed. <a href="terms.html#guarantee">Full conditions</a>.</p></div>
       </details>
       <details data-reveal>
         <summary data-liquid="glow"><span>Will this get me to the top of Google?</span><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary>
-        <div class="answer"><p>I do not promise rankings or lead counts, because nobody can honestly make those promises. I promise the fix, the tracking, and an honest number at 30 days.</p></div>
-      </details>
-      <details data-reveal>
-        <summary data-liquid="glow"><span>You are a student. Why should I trust you with my business?</span><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary>
-        <div class="answer"><p>Because nothing here rests on trust. You get the free check first and decide after. Every claim on this site is backed by something I built, and where I do not have a number yet, the site says so. If I get something wrong, I say so on camera.</p></div>
+        <div class="answer"><p>I don't promise rankings or a number of new customers, because nobody can honestly promise those. I promise the fix, a counter that shows what it's doing, and an honest number at 30 days.</p></div>
       </details>
     </div>
   </div>
 </section>
-<section class="closing">
+
+<section class="closing" id="closing">
   <div class="wrap">
     <div data-reveal>
       <img class="op-static" src="assets/operator-point-left-still-480.webp" width="480" height="480" alt="" loading="lazy">
-      <h2>Any problems? I have the fix.</h2>
-      <p>Two free checks a week. Apply now and you'll hear from me either way within seven days.</p>
-      <a class="btn" data-liquid="" href="check.html">Get a free Optimization Check
+      <h2>Find out what's costing you jobs. Free.</h2>
+      <p>I take two a week, and you hear back within 7 days either way.</p>
+      <a class="btn btn-beam" href="check.html"><span class="sheen" aria-hidden="true"></span><span>Get my free video review</span>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
       </a>
-    </div>
-    <div class="side" data-reveal>
-      <strong>Already know what you want built?</strong>
-      Say so in the form. I'll reply with three questions and a fixed price, no recording needed.
+      <p class="small">Already know what you want? Say so in the form. I'll reply with three questions and a fixed price.</p>
     </div>
   </div>
 </section>
 </main>
+
+<div class="sticky" id="sticky" hidden><span>Free 10-min review</span><a class="btn btn-beam" href="check.html" aria-label="Get mine: a free 10-minute video review"><span class="sheen" aria-hidden="true"></span><span>Get mine</span></a></div>
 
 <footer>
   <div class="wrap">
@@ -977,6 +881,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.15.0/gsap.min.js" integrity="sha512-oJ8QbaQThQoJZ7oEv+29jfPM6CcP+zUxh3PKJs1vyOhx0UraUrE7PQgeItu3dOuCJyrzWpoYMsVjkkPEBzbUqw==" crossorigin="anonymous" defer></script>
 <script src="assets/operator-flame.js" defer></script>
+<script src="assets/console.js" defer></script>
 <script src="assets/operator.js" defer></script>
 <script>
 document.documentElement.classList.add("js");
@@ -984,7 +889,6 @@ window.addEventListener("DOMContentLoaded", () => {
   const root = document.documentElement;
   const reduce = () => root.classList.contains("rm"); // the site-wide Reduce motion switch (assets/motion.js)
   const fine = matchMedia("(hover: hover) and (pointer: fine)").matches;
-  const FORM = "check.html";
 
   // nav glass once scrolled, and the reading progress line under it
   const nav = document.getElementById("nav");
@@ -1002,55 +906,6 @@ window.addEventListener("DOMContentLoaded", () => {
   onScroll();
   addEventListener("scroll", () => { if (!navRaf) navRaf = requestAnimationFrame(onScroll); }, { passive: true });
   addEventListener("resize", onScroll);
-
-  // picker
-  const tiles = [...document.querySelectorAll("#picker .tile")];
-  const count = document.getElementById("count");
-  const label = document.getElementById("count-label");
-  const hint = document.getElementById("hint");
-  const cta = document.getElementById("picker-cta");
-  const update = () => {
-    const picked = tiles.filter(t => t.getAttribute("aria-pressed") === "true").map(t => t.dataset.value);
-    const n = picked.length;
-    count.textContent = n;
-    label.textContent = n === 1 ? "thing I'd automate first" : "things I'd automate first";
-    hint.textContent = n === 0 ? "Tick a few. They come with you into the application."
-      : n < 3 ? "Good start. Most owners tick three or four."
-      : n < 6 ? "That's a real week back. Send it over."
-      : "Honestly, this is my favorite kind of mess. Send it.";
-    cta.href = n ? `${FORM}?byhand=${encodeURIComponent(picked.join(","))}` : FORM;
-    if (!reduce() && window.gsap) gsap.fromTo(count, { scale: 1.25 }, { scale: 1, duration: .35, ease: "back.out(2)" });
-  };
-  // your list: a ticked tile sends a chip arcing into the bar; unticking takes it back out
-  const tray = document.getElementById("tray");
-  const toTray = t => {
-    const chip = document.createElement("li"); chip.className = "chip"; chip.dataset.v = t.dataset.value;
-    chip.textContent = t.querySelector("span").textContent;
-    tray.append(chip);
-    if (reduce() || !chip.animate) return;
-    const a = t.getBoundingClientRect(), b = chip.getBoundingClientRect();
-    if (a.bottom < 0 || a.top > innerHeight) return;
-    const fly = chip.cloneNode(true); fly.classList.add("chip-fly"); document.body.append(fly);
-    chip.style.visibility = "hidden";
-    const sx = a.left + a.width / 2 - b.width / 2, sy = a.top + a.height / 2 - b.height / 2;
-    const anim = fly.animate([
-      { transform: `translate(${sx}px, ${sy}px) scale(.5)`, opacity: 0 },
-      { transform: `translate(${(sx + b.left) / 2}px, ${Math.min(sy, b.top) - 70}px) scale(1.08)`, opacity: 1, offset: .45 },
-      { transform: `translate(${b.left}px, ${b.top}px) scale(1)`, opacity: 1 }
-    ], { duration: 700, easing: "cubic-bezier(.3,.6,.2,1)" });
-    anim.onfinish = anim.oncancel = () => { fly.remove(); chip.style.visibility = ""; chip.animate([{ transform: "scale(1.18)" }, { transform: "scale(1)" }], { duration: 240, easing: "ease-out" }); };
-  };
-  const fromTray = t => {
-    const chip = [...tray.children].find(c => c.dataset.v === t.dataset.value); if (!chip) return;
-    if (reduce() || !chip.animate) return chip.remove();
-    chip.animate([{ transform: "scale(1)", opacity: 1 }, { transform: "scale(.5)", opacity: 0 }], { duration: 180 }).onfinish = () => chip.remove();
-  };
-  tiles.forEach(t => t.addEventListener("click", () => {
-    const on = t.getAttribute("aria-pressed") !== "true";
-    t.setAttribute("aria-pressed", on ? "true" : "false");
-    on ? toTray(t) : fromTray(t);
-    update();
-  }));
 
   // section headings rise from behind their bottom edge as they reveal (CSS; this adds the inner box)
   document.querySelectorAll("main [data-reveal] h2").forEach(h => {
@@ -1073,6 +928,22 @@ window.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll("[data-reveal]").forEach(el => io.observe(el));
   // anything already in view on load (hero) shows immediately
   document.querySelectorAll(".hero [data-reveal]").forEach(el => el.classList.add("in"));
+
+  // phone bar: shown once the hero button and the whole console (its own button included) have scrolled
+  // away above, hidden again when the closing section arrives, so it never covers a way to the form
+  // (toggles [hidden], so it is out of the tab order while hidden; CSS shows it under 560 px only)
+  const sticky = document.getElementById("sticky");
+  const heroBtn = document.querySelector("#top .hero-actions .btn-beam");
+  const consoleBox = document.querySelector("#top .console");
+  const closing = document.getElementById("closing");
+  if (sticky && heroBtn && consoleBox && closing) {
+    let heroGone = false, consoleGone = false, atClosing = false;
+    const sync = () => { sticky.hidden = !heroGone || !consoleGone || atClosing; };
+    const above = es => { const e = es[es.length - 1]; return !e.isIntersecting && e.boundingClientRect.bottom < 0; };
+    new IntersectionObserver(es => { heroGone = above(es); sync(); }).observe(heroBtn);
+    new IntersectionObserver(es => { consoleGone = above(es); sync(); }).observe(consoleBox);
+    new IntersectionObserver(es => { atClosing = es[es.length - 1].isIntersecting; sync(); }).observe(closing);
+  }
 
   // faq: the answer slides open and closed instead of jumping, and the plus turns into a cross
   document.querySelectorAll("#faq details").forEach(d => {
@@ -1112,65 +983,17 @@ window.addEventListener("DOMContentLoaded", () => {
     s.addEventListener("pointerleave", e => { fill.dataset.from = side(s, e); s.classList.remove("is-fill"); });
   });
 
-  // the real numbers ship in the HTML, so crawlers and AI search read them; they stay in the text as a
-  // hidden copy. On screen each digit is an odometer strip. Once the visitor has scrolled, the strips
-  // drop to zero as the row arrives and roll up to the number; numbers in view at load stay still.
-  let scrolled = false;
-  addEventListener("scroll", () => { scrolled = true; }, { once: true, passive: true });
-  const counters = [...document.querySelectorAll("[data-count]")];
-  counters.forEach(el => {
-    const v = el.dataset.count, odo = document.createElement("span"), real = document.createElement("span");
-    odo.className = "odo"; odo.setAttribute("aria-hidden", "true");
-    [...v].forEach((d, i) => { const c = document.createElement("i"); c.style.setProperty("--k", i); c.style.setProperty("--d", d); odo.append(c); });
-    real.className = "vh"; real.textContent = v;
-    el.textContent = ""; el.append(odo, real);
-  });
-  const roll = (el, on) => [...el.querySelectorAll(".odo i")].forEach((c, i) => c.style.setProperty("--d", on ? el.dataset.count[i] : 0));
-  const cio = new IntersectionObserver(entries => entries.forEach(e => {
-    const el = e.target;
-    if (!e.isIntersecting) return;
-    if (!scrolled || reduce()) { cio.unobserve(el); return; }
-    if (e.intersectionRatio < .4) { // still faded out: drop to zero without rolling
-      if (!el.dataset.armed) { el.dataset.armed = "1"; const odo = el.querySelector(".odo"); odo.classList.add("odo-reset"); roll(el, false); odo.offsetWidth; odo.classList.remove("odo-reset"); }
-      return;
-    }
-    cio.unobserve(el);
-    roll(el, true);
-  }), { threshold: [0, .4] });
-  counters.forEach(el => cio.observe(el));
-
-  // the guarantee lights up word by word as it scrolls up the screen, and dims again going back
-  const lit = document.querySelector(".lit");
-  if (lit) {
-    const words = lit.textContent.trim().split(/\s+/);
-    lit.textContent = "";
-    const spans = words.map((w, i) => {
-      const s = document.createElement("span"); s.className = "w"; s.textContent = w;
-      lit.append(s); if (i < words.length - 1) lit.append(" ");
-      return s;
-    });
-    let litRaf = 0;
-    const light = () => {
-      litRaf = 0;
-      const top = lit.getBoundingClientRect().top;
-      const p = Math.min(1, Math.max(0, (innerHeight * .9 - top) / (innerHeight * .35)));
-      const n = Math.round(p * spans.length);
-      spans.forEach((s, i) => s.classList.toggle("on", i < n));
-    };
-    addEventListener("scroll", () => { if (!litRaf) litRaf = requestAnimationFrame(light); }, { passive: true });
-    light();
-  }
-
-  // a soft light follows the cursor across the service columns and the kit cards
+  // a soft light follows the cursor across the build cards; each card gets the pointer position in its
+  // own coordinates, so the glow flows from one card to the next (desktop pointers only, off under Reduce motion)
   if (fine) document.querySelectorAll(".spot").forEach(group => {
-    const cards = [...group.querySelectorAll(".line-col, .kit")];
+    const cards = [...group.querySelectorAll(".build")];
     let raf = 0, mx = 0, my = 0;
     const paint = () => {
       raf = 0;
       cards.forEach(c => {
-        const r = c.getBoundingClientRect(), pad = c.classList.contains("kit") || c.closest(".hs.on") ? [0, 0] : [14, 12]; // the column's glow box overhangs it (not as a sliding card)
-        c.style.setProperty("--sx", Math.round(mx - r.left + pad[0]) + "px");
-        c.style.setProperty("--sy", Math.round(my - r.top + pad[1]) + "px");
+        const r = c.getBoundingClientRect();
+        c.style.setProperty("--sx", Math.round(mx - r.left) + "px");
+        c.style.setProperty("--sy", Math.round(my - r.top) + "px");
       });
     };
     group.addEventListener("pointermove", e => {
@@ -1182,23 +1005,29 @@ window.addEventListener("DOMContentLoaded", () => {
     group.addEventListener("pointerleave", () => group.classList.remove("is-lit"));
   });
 
-  // buttons: the arrow swaps on hover and focus, and green buttons get one lap of light round the border
+  // the builds row only takes keyboard focus when it actually scrolls sideways (the phone swipe row);
+  // on wide screens the grid fits, and a focus stop there would do nothing
+  const bgrid = document.querySelector("#builds .bgrid");
+  if (bgrid) {
+    const fit = () => { if (bgrid.scrollWidth > bgrid.clientWidth + 1) bgrid.setAttribute("tabindex", "0"); else bgrid.removeAttribute("tabindex"); };
+    fit(); addEventListener("resize", fit);
+  }
+
+  // a package card's link is counted with the package it names
+  document.querySelectorAll("#packages .pack a").forEach(a => a.addEventListener("click", () => {
+    if (window.cwTrack) window.cwTrack("Package click", { pkg: a.closest(".pack").dataset.pkg });
+  }));
+
+  // buttons: the arrow swaps on hover and focus (each button's own effect lives in assets/ui.css)
   document.querySelectorAll(".btn").forEach(b => {
     const svg = b.querySelector(":scope > svg");
-    if (svg) {
-      const arr = document.createElement("span"); arr.className = "arr"; arr.setAttribute("aria-hidden", "true");
-      svg.replaceWith(arr); arr.append(svg, svg.cloneNode(true));
-    }
-    if (b.matches(".btn-ghost, .btn-dark")) return;
-    const beam = document.createElement("i"); beam.className = "beam"; beam.setAttribute("aria-hidden", "true");
-    b.append(beam);
-    const go = () => { if (!reduce()) b.classList.add("is-beam"); };
-    beam.addEventListener("animationend", () => b.classList.remove("is-beam"));
-    ["pointerenter", "focus", "pointerdown"].forEach(t => b.addEventListener(t, go));
+    if (!svg) return;
+    const arr = document.createElement("span"); arr.className = "arr"; arr.setAttribute("aria-hidden", "true");
+    svg.replaceWith(arr); arr.append(svg, svg.cloneNode(true));
   });
 
-  // magnetic pull on the primary buttons, desktop pointers only, purely decorative
-  if (fine) document.querySelectorAll(".btn:not(.btn-ghost)").forEach(b => {
+  // magnetic pull on the hero primary only, desktop pointers only, purely decorative
+  if (fine) document.querySelectorAll(".hero-actions .btn-beam").forEach(b => {
     b.addEventListener("mousemove", e => {
       if (reduce() || !window.gsap) return;
       const r = b.getBoundingClientRect();
@@ -1210,15 +1039,12 @@ window.addEventListener("DOMContentLoaded", () => {
   // the Reduce motion switch: whatever is mid-move lands at rest
   document.addEventListener("cw-motion", e => {
     if (!e.detail.reduce) return;
-    counters.forEach(el => { cio.unobserve(el); roll(el, true); });
     document.querySelectorAll(".spot").forEach(g => g.classList.remove("is-lit"));
-    document.querySelectorAll(".btn.is-beam").forEach(b => b.classList.remove("is-beam"));
-    if (window.gsap) gsap.set([count, ...document.querySelectorAll(".btn")], { clearProps: "transform" });
+    if (window.gsap) gsap.set([...document.querySelectorAll(".btn")], { clearProps: "transform" });
   });
 });
 </script>
 <script src="assets/liquid.js" defer></script>
 <script src="assets/motion.js" defer></script>
-<script src="assets/hscroll.js" defer></script>
 </body>
 </html>

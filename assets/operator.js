@@ -1,13 +1,17 @@
-// The Operator, Clashworks' robot, plus the hero loop it lives in.
+// The Operator (public name: ClashBot), Clashworks' robot, plus the hero loop it lives in.
 // It flies itself: a spring with momentum chases a target (home in the hero, a dive down and to
 // the right on the first scroll, then a perch beside whatever section you are reading), so it
 // lags, banks into turns and overshoots like something with weight. A live flame
 // (operator-flame.js) trails behind it and stretches with speed. Pose changes are cuts inside a
-// squash, never crossfades, so two robots never show at once. It tours: taps the #how numbers,
-// scans the checklist, points at the guarantee and the last button. It reacts: points at a green
-// button you hover or focus, zips to a tile you tick, sits by the question you open, wanders when
-// left alone, rolls and gives a tip when pressed, can be grabbed and thrown. Narrow screens: home
-// is the nav slot and each stop is a short trip to the right edge. The site-wide "Reduce motion"
+// squash, never crossfades, so two robots never show at once. It has a job at each stop: hops the
+// proof numbers, does the sums by the steps, points at the featured package, stamps the build cards
+// (brand/mascot.md A3), scans the checklist, sits by the open question, points at the last button.
+// It reacts: on its console perch a tick turns it to scan and three to its calculator; elsewhere it
+// points at a green button you hover or focus, zips to a tile you tick, sits by the question you
+// open, wanders when left alone (not while the console has focus), rolls and gives a tip when
+// pressed, can be grabbed and thrown. Hidden, it hides everywhere, and so does its console bubble.
+// Narrow screens: home is beside the headline, the dock is the nav slot and each stop is a short
+// trip to the right edge, kept clear of the phone sticky bar. The site-wide "Reduce motion"
 // switch (assets/motion.js, html.rm) stops all of it, and turning it off restarts it with no
 // reload; under it the robot stays still in the hero and each section shows a still pose (CSS).
 // Needs gsap and operator-flame.js (both deferred).
@@ -24,20 +28,21 @@
 
   // ---------- tips: every one restates something the site already says ----------
   const TIPS = [
-    "The free Optimization Check is ten minutes of recorded advice you keep. There's no pitch on the call.",
+    "The free video review is ten minutes of advice you keep. No pitch.",
     "Does your contact form ask for a phone number? Without one, you can't call the lead back.",
     "Text back every missed call within five minutes, before the customer dials the next company.",
     "Ask every customer for a review the day after the job, inside Google's rules.",
     "Check your hours on Google. Wrong hours are one of the easiest leaks to fix.",
-    "Never hand over your passwords. Add people as users with the lowest access that does the job.",
-    "Every Clashworks fix ships with tracking and one number you agree on up front.",
+    "Never hand over your passwords. Add people as users, and remove them when they're done.",
+    "Every fix comes with a counter and one number we both watch.",
     "Answering the same question ten times a day? Write the answer once and let it send itself.",
     "The Lead Leak Checklist is fifteen yes-or-no questions. Count your no's.",
-    "There are two free checks a week, so each one gets real attention.",
+    "Missed calls get a text back the moment you miss them.",
     "Tick what still happens by hand, and your picks come with you into the application.",
-    "Every job has a fixed price and one number. If that number can't be shown 30 days after delivery, your fees come back (conditions are on the Terms page)."
+    "Every job has a fixed price and one number. If that number can't be shown 30 days after delivery, you get your money back (conditions are on the Terms page).",
+    "Writing quotes at 10 p.m.? That's my job now."
   ];
-  const TIP_ORDER = { top: [0, 9], fix: [10, 1], how: [9, 6], services: [11, 6], free: [8, 3, 2], video: [1, 2], faq: [5, 4], closing: [9, 0] };
+  const TIP_ORDER = { top: [10, 0], proof: [6, 3], how: [9, 6], packages: [11, 6], builds: [12, 2], checklist: [8, 3, 2], faq: [5, 4], closing: [0, 1] };
   const shown = new Set();
   const nextTip = where => {
     if (shown.size === TIPS.length) shown.clear();
@@ -96,6 +101,7 @@
   const later = fn => ("requestIdleCallback" in window ? requestIdleCallback(fn, { timeout: 2000 }) : setTimeout(fn, 900));
   const whenLoaded = fn => document.readyState === "complete" ? later(fn) : addEventListener("load", () => later(fn), { once: true });
   let stop = null;
+  const stamped = new WeakSet(); // build cards already stamped: once per card per page view
   const boot = () => { if (!stop && !reduce() && window.gsap && window.OperatorFlame) stop = start(); };
   // under Reduce motion the still hero robot keeps its flame: one frame, drawn once (and again on resize)
   let stillCanvas = null;
@@ -133,6 +139,7 @@
   const root = document.documentElement;
   const tilt = op.querySelector(".op-tilt"), bob = op.querySelector(".op-bob"), art = op.querySelector(".op-art");
   const hero = $(".hero-stage"), slot = $("#op-slot"), float = $("#op-float"), home = $("#op-home");
+  const sticky = $("#sticky"), conBubble = $("#console-bubble");
   const clamp = (lo, hi, v) => Math.max(lo, Math.min(hi, v)), rand = (a, b) => a + Math.random() * (b - a);
   const NAV = 68;
 
@@ -180,13 +187,12 @@
     layers.hello = { el, img: el.querySelector("img"), eye: addEye(el, "hello") };
   }
   const loadAll = () => Object.keys(EYES).forEach(layer);
-  // the count badge: at three or more ticked tiles it holds up the number with its calculator
-  const badge = document.createElement("i"); badge.className = "op-badge"; badge.setAttribute("aria-hidden", "true");
-  tilt.append(badge);
   // napping: little z's drift up from its head
   const zs = [0, 1, 2].map(() => { const z = document.createElement("i"); z.className = "op-z"; z.setAttribute("aria-hidden", "true"); z.textContent = "z"; tilt.append(z); return z; });
 
   let tucked = store.get("cw-operator") === "tucked";
+  // on its console perch the ticks set the pose: one or two, it scans them; three or more, out comes the calculator
+  const consolePose = () => ticks >= 3 ? "calculator" : ticks > 0 ? "scan" : null;
   let heroPose = "hello", stopPose = "idle", override = null, hovering = false, dragging = false, rolling = false, fast = false;
   let aim = 0, lean = 0, offX = 0, offY = 0, lastActive = performance.now(), ticks = 0, napping = false, kbd = false;
 
@@ -220,8 +226,9 @@
     if (napping) return cur;
     if (dragging) return "fly";
     if (override) return override;
-    if (state === "home") return heroPose; // one pose in the hero, no automatic changes
+    if (state === "home") return consolePose() || heroPose; // on the perch: hello, or the console's tick pose
     if (fast) return "fly";
+    if (visit && visit.pose) return visit.pose; // a short visit (pointing, a tick, a hop) shows its own pose
     return hovering ? "hello" : stopPose;
   };
 
@@ -277,11 +284,11 @@
   };
   const nod = () => { if (!tucked) { gsap.fromTo(bob, { y: 0 }, { y: -W * .05, duration: .12, yoyo: true, repeat: 1, ease: "power2.out" }); blink(); burst(.6); } };
 
-  // ---------- the hero loop ----------
+  // ---------- the hero loop (retired on the homepage: with no #hero-video all of this stays off) ----------
   const video = $("#hero-video");
   let videoReady = false;
   const loadVideo = () => {
-    if (videoReady || (navigator.connection && navigator.connection.saveData)) return;
+    if (!video || videoReady || (navigator.connection && navigator.connection.saveData)) return;
     videoReady = true;
     video.querySelectorAll("source").forEach(s => { s.src = s.dataset.src; });
     listen(video, "playing", () => video.classList.add("is-playing"), { once: true });
@@ -289,11 +296,11 @@
     video.play().catch(() => {});
   };
   // the loop only plays while the hero is on screen
-  const heroIO = new IntersectionObserver(([e]) => {
+  const heroIO = video ? new IntersectionObserver(([e]) => {
     if (!videoReady) return;
     e.isIntersecting ? video.play().catch(() => {}) : video.pause();
-  });
-  heroIO.observe(hero);
+  }) : null;
+  if (heroIO) heroIO.observe(hero);
 
   // ---------- layout: home in the hero, a dock in the side lane (wide) or the nav slot (narrow) ----------
   root.classList.add("op-on");
@@ -310,7 +317,7 @@
     Object.values(layers).forEach(L => { if (L.img.srcset) L.img.sizes = sizes(); });
     if (wide) {
       // the empty lane left of the content: the robot faces right, so from here it faces the page
-      const mL = $("#fix > .wrap").getBoundingClientRect().left;
+      const mL = $("#how > .wrap").getBoundingClientRect().left;
       const s = Math.round(clamp(110, 200, mL * 1.15)); // only the art's transparent margin may reach past the lane
       lane = { x: Math.max(4, mL / 2 - s / 2), s }; // and the whole art box stays inside the window
     } else {
@@ -334,37 +341,66 @@
 
   // ---------- one stop per section: where the robot perches and what it does there ----------
   const openRow = () => $("#faq details[open] summary") || $("#faq summary");
+  // the build card nearest the middle of the screen (on phones the cards are a sideways swipe row)
+  // (read at most every 100 ms: the frame loop asks for it every frame while the robot is at #builds)
+  let nbAt = -1e9, nb = null;
+  const nearestBuild = () => {
+    const now = performance.now();
+    if (nb && now - nbAt < 100) return nb;
+    nbAt = now;
+    let best = null, bd = Infinity;
+    document.querySelectorAll("#builds .build").forEach(c => {
+      const r = c.getBoundingClientRect(), d = Math.hypot(r.left + r.width / 2 - innerWidth / 2, r.top + r.height / 2 - innerHeight / 2);
+      if (d < bd) { bd = d; best = c; }
+    });
+    return (nb = best);
+  };
+  // act: once, half a second after it arrives; each: once per element the stop settles on (the build cards)
   const STOPS = [
-    { sel: "#fix", key: "fix", pose: () => ticks >= 3 ? "calculator" : "phone", at: () => $("#picker") },
-    { sel: "#how", key: "how", pose: () => "calculator", at: () => $("#how .numbers"), act: () => hopNumbers() },
-    { sel: "#services", key: "services", pose: () => "idle", at: () => $("#services .lines") },
-    { sel: ".services .foot", key: "services", pose: () => "point-left", at: () => $(".services .foot .lit") || $(".services .foot") },
-    { sel: "#free", key: "free", pose: () => "scan", at: () => $("#free .checklist-card"), act: () => scanCard() },
-    { sel: "#video", key: "video", pose: () => "hello", at: () => $("#video .video-card") },
+    { sel: "#proof", key: "proof", pose: () => "calculator", at: () => $("#proof .row"), act: () => hopNumbers(), wideOnly: true },
+    { sel: "#how", key: "how", pose: () => "calculator", at: () => $("#how .steps") },
+    { sel: "#packages", key: "packages", pose: () => "point-left", at: () => $("#packages .pack.feat") },
+    { sel: "#builds", key: "builds", pose: () => "scan", at: nearestBuild, each: card => stampCard(card) },
+    { sel: "#checklist", key: "checklist", pose: () => "scan", at: () => $("#checklist .checklist-card"), act: () => scanCard() },
     { sel: "#faq", key: "faq", pose: () => "idea", at: openRow },
-    { sel: ".closing", key: "closing", pose: () => "point-left", at: () => $(".closing .btn") }
+    { sel: "#closing", key: "closing", pose: () => "point-left", at: () => $("#closing .btn") }
   ].map(s => ({ ...s, el: $(s.sel), done: false }));
-  let active = null;
+  let active = null, arrived = null, eachWait = null;
+  const onScreen = el => { const r = el && el.getBoundingClientRect(); return !!r && r.bottom > NAV && r.top < innerHeight; };
   const pickStop = () => {
     let hit = null;
     for (const s of STOPS) {
       if (!s.el) continue;
       const r = s.el.getBoundingClientRect();
-      if (r.top < innerHeight * .62 && r.bottom > innerHeight * .38) hit = s; // later stops win (the services foot beats services)
+      if (r.top < innerHeight * .62 && r.bottom > innerHeight * .38) hit = s; // later stops win
     }
-    if (hit !== active) {
-      active = hit;
-      section = hit ? hit.key : "top";
-      if (hit && state === "cruise") {
+    if (hit !== active) { active = hit; section = hit ? hit.key : "top"; }
+    // arriving counts once it is cruising, so a launch straight into a stop (the first scroll lands on
+    // #proof) still does that stop's job
+    if (state === "cruise" && active !== arrived) {
+      const s = arrived = active;
+      if (s) {
         burst(.5);
-        if (!hit.done && hit.act) { // only if the reader is still there half a second later; otherwise next visit
+        // a wide-only job (the number hop) leaves phones the short trip below instead
+        if (!s.done && s.act && (wide || !s.wideOnly)) { // only if the reader is still there half a second later; otherwise next visit
           gsap.delayedCall(.5, () => {
-            const el = hit.at(), r = el && el.getBoundingClientRect();
-            if (active !== hit || !r || r.bottom < NAV || r.top > innerHeight) return;
-            hit.done = true; hit.act();
+            if (active !== s || !onScreen(s.at())) return;
+            s.done = true; s.act();
           });
         }
-        else if (!wide && !hit.tripped && !tucked) { hit.tripped = true; tripTo(hit.at(), hit.pose(), 2.6); }
+        else if (!wide && !s.tripped && !tucked) { s.tripped = true; tripTo(s.at(), s.pose(), 2.6); }
+      }
+    }
+    // a per-element job: the element it settles on for half a second gets it, once
+    if (active && active.each && state === "cruise" && !tucked) {
+      const el = active.at();
+      if (el && el !== eachWait && !stamped.has(el)) {
+        eachWait = el;
+        const s = active;
+        gsap.delayedCall(.5, () => {
+          if (eachWait === el) eachWait = null;
+          if (active === s && !tucked && s.at() === el && onScreen(el)) s.each(el);
+        });
       }
     }
     if (active) stopPose = active.pose();
@@ -388,21 +424,30 @@
     const s = Math.min(96, innerWidth * .24), y = anchorY(el);
     visitAt(root.clientWidth - s - 4, y - s / 2, pose, secs, { s });
   };
-  // #how: hop across the four numbers, tapping each as it lands
+  // #proof: hop across the four numbers, tapping each as it lands
   const hopNumbers = () => {
     if (!wide || tucked) return;
-    const nums = [...document.querySelectorAll("#how .num b")];
+    const nums = [...document.querySelectorAll("#proof .stat b")];
     nums.forEach((n, i) => gsap.delayedCall(i * .42, () => {
       const r = n.getBoundingClientRect();
       visitAt(r.left + r.width * .3 - lane.s * .2, r.top - lane.s * .78, "calculator", .5);
       gsap.delayedCall(.3, () => { nod(); gsap.fromTo(n, { y: 0 }, { y: 4, duration: .08, yoyo: true, repeat: 1, ease: "power1.out" }); });
     }));
   };
-  // #free: one emerald scan line sweeps the checklist card
+  // #checklist: one emerald scan line sweeps the checklist card
   const scanCard = () => {
-    const card = $("#free .checklist-card"); if (!card) return;
+    const card = $("#checklist .checklist-card"); if (!card) return;
     card.classList.remove("is-scan"); void card.offsetWidth; card.classList.add("is-scan");
     listen(card, "animationend", () => card.classList.remove("is-scan"), { once: true });
+  };
+  // #builds: the stamp (brand/mascot.md A3). The emerald core hops onto the card's top right as a check
+  // badge for 1.6 s (ui.css), once per card per page view. Every card there is something Clayton built.
+  const stampCard = card => {
+    if (!card || stamped.has(card)) return;
+    stamped.add(card);
+    card.classList.add("is-stamped");
+    nod();
+    gsap.delayedCall(1.6, () => card.classList.remove("is-stamped"));
   };
 
   // ---------- the mouse: the eye follows it, the robot leans in when it comes close ----------
@@ -469,9 +514,13 @@
   // ticking a tile: zip over to it and cheer; three or more and out comes the calculator
   document.querySelectorAll("#picker .tile").forEach(t => listen(t, "click", () => {
     ticks = document.querySelectorAll('#picker .tile[aria-pressed="true"]').length;
-    if (state === "home" || tucked) return;
+    if (tucked) return;
+    if (state === "home") { nod(); return; } // on the perch it stays put; want() turns it to scan or calculator
     const r = t.getBoundingClientRect(), s = wide ? lane.s : Math.min(96, innerWidth * .24);
-    visitAt(clamp(8, innerWidth - s - 8, r.right - s * .45), clamp(NAV + 8, innerHeight - s - 8, r.top - s * .7), ticks >= 3 ? "calculator" : "hello", 1.3, { s });
+    const vx0 = clamp(8, innerWidth - s - 8, r.right - s * .45), vy0 = clamp(NAV + 8, innerHeight - s - 8, r.top - s * .7);
+    // a long trip (the left lane to the console on the right takes about a second) stays longer, so it still cheers
+    const far = clamp(0, 1, Math.hypot(vx0 - px, vy0 - py) / 1400);
+    visitAt(vx0, vy0, ticks >= 3 ? "calculator" : "hello", 1.3 + far, { s });
     gsap.delayedCall(.45, nod);
   }));
   // opening a question: settle beside that row
@@ -554,9 +603,17 @@
   const setTucked = (v, focusTo) => {
     tucked = v; store.set("cw-operator", v ? "tucked" : null);
     window.cwTrack?.(v ? "Operator hidden" : "Operator shown");
-    closeTip(false); endVisit(); ambient();
-    gsap.to(op, { autoAlpha: v && !wide ? 0 : 1, duration: .25, overwrite: "auto" });
+    closeTip(false); endVisit(); ambient(); hideAll();
     if (focusTo) requestAnimationFrame(() => focusTo.focus());
+  };
+  // hidden means hidden everywhere: on the perch too (wide screens used to leave it there), and the
+  // console bubble beside the perch goes with it; both come back on show
+  let gone = null;
+  const hideAll = (instant = false) => {
+    if (conBubble) conBubble.hidden = tucked;
+    if (gone === tucked) return;
+    gone = tucked;
+    instant ? gsap.set(op, { autoAlpha: tucked ? 0 : 1 }) : gsap.to(op, { autoAlpha: tucked ? 0 : 1, duration: .25, overwrite: "auto" });
   };
   listen(tuckBtn, "click", () => setTucked(true, showBtn));
   listen(hideBtn, "click", () => setTucked(true, showBtn));
@@ -581,7 +638,7 @@
     // where it wants to be (screen coordinates) and how big
     let tx, ty, ts, k = 24, c = 9; // a soft spring, a touch under critical damping: it glides in and settles
     if (!launched && !dragging) {
-      if (state !== "home") { state = "home"; endVisit(); }
+      if (state !== "home") { state = "home"; endVisit(); arrived = null; }
       tx = homeBox.x - sX + offX; ty = homeBox.y - sY + offY; ts = homeBox.s;
       k = 60; c = 15.5;
     } else {
@@ -603,7 +660,9 @@
       } else {
         ts = lane.s; tx = lane.x; ty = lane.y;
       }
-      if (!visit && state === "cruise" && now - lastActive > 9000 && now > wander.until) { // left alone: drift and look around
+      const ae = document.activeElement;
+      if (ae && ae.closest && ae.closest("#picker")) wander.until = 0; // the console has focus: no idle wander
+      else if (!visit && state === "cruise" && now - lastActive > 9000 && now > wander.until) { // left alone: drift and look around
         wander = { x: rand(-28, 10), y: rand(-36, 36), until: now + 4000 };
         const L = layers[cur];
         if (L && L.eye) gsap.timeline().to(L.eye, { xPercent: -30, duration: .35 }).to(L.eye, { xPercent: 30, duration: .6 }, "+=.35").to(L.eye, { xPercent: 0, duration: .35 }, "+=.35");
@@ -628,7 +687,9 @@
     // always on screen, below the nav, and with its whole art box inside the window
     if (state !== "home" && !dragging) {
       const toSlot = !wide && !visit && state === "cruise"; // landing in the nav slot is the one time it may rise above the nav
-      const top = toSlot ? lane.y - 2 : NAV + 6 - size * .12, bot = innerHeight - size * .85;
+      let top = toSlot ? lane.y - 2 : NAV + 6 - size * .12, bot = innerHeight - size * .85;
+      // the phone sticky bar: the whole robot box stays 8 px above it while it shows (read only when not [hidden])
+      if (sticky && !sticky.hidden) { const st = sticky.getBoundingClientRect(); if (st.height) bot = Math.min(bot, st.top - 8 - size); }
       if (py < top) { py = top; vy = Math.max(vy, 0); }
       if (py > bot) { py = bot; vy = Math.min(vy, 0); }
       if (!tucked) {
@@ -642,9 +703,6 @@
     // it only takes clicks while resting at its post: flying over the page, it never catches a click meant for the page
     const passing = !dragging && (!!visit || state === "launch" || Math.hypot(vx, vy) > 140);
     if (passing !== op.classList.contains("is-visiting")) op.classList.toggle("is-visiting", passing);
-    const showBadge = ticks >= 3 && state !== "home" && active && active.key === "fix" && !tucked;
-    if (showBadge !== badge.classList.contains("is-on")) badge.classList.toggle("is-on", showBadge);
-    if (showBadge && badge.textContent !== String(ticks)) badge.textContent = ticks;
     // speed decides "flying" (hysteresis, so it never flickers between poses)
     const sp = Math.hypot(vx, vy);
     if (!fast && sp > 720 && state !== "home") fast = true;
@@ -668,7 +726,7 @@
 
     // the flame, in the robot's own frame (undo its tilt; the canvas is drawn at full size)
     power = Math.max(0, power - dt * 1.6);
-    if (rolling || (tucked && !wide)) flame.clear();
+    if (rolling || tucked) flame.clear();
     else {
       const nz = NOZZLE[cur] || NOZZLE.idle, a = -tilted * Math.PI / 180;
       const nx = (flip < 0 ? 1 - nz[0] : nz[0]) * W + .6 * W, ny = nz[1] * W;
@@ -680,9 +738,9 @@
   // ---------- start ----------
   measure();
   px = homeBox.x - scrollX; py = homeBox.y - scrollY; size = homeBox.s;
-  if (tucked && !wide) gsap.set(op, { autoAlpha: 0 });
+  hideAll(true);
   ambient();
-  loadVideo();
+  if (video) loadVideo();
   ["hello", "point-down", "fly"].forEach(layer);
   later(() => { if (!ac.signal.aborted) loadAll(); });
   if (document.fonts) document.fonts.ready.then(() => { if (!ac.signal.aborted) measure(); });
@@ -692,22 +750,24 @@
   // ---------- stop: everything above, undone ----------
   return () => {
     ac.abort();
-    heroIO.disconnect();
+    if (heroIO) heroIO.disconnect();
     gsap.ticker.remove(frame);
     // every tween and delayed call on the page (bob, blink, wave, wander, hops, eye);
     // the homepage script settles its own counters and buttons on the same "cw-motion" event
     gsap.globalTimeline.clear();
-    video.pause(); video.classList.remove("is-playing");
+    if (video) { video.pause(); video.classList.remove("is-playing"); }
     canvas.remove();
     Object.entries(layers).forEach(([name, L]) => { if (name !== "hello") L.el.remove(); });
     layers.hello.el.classList.add("is-on");
-    op.querySelectorAll(".op-patch, .op-eye, .op-badge, .op-z").forEach(el => el.remove());
+    op.querySelectorAll(".op-patch, .op-eye, .op-z").forEach(el => el.remove());
     gsap.set([op, tilt, bob, art, ...Object.values(layers).map(L => L.el), bubble], { clearProps: "all" });
     op.classList.remove("is-live", "is-hot", "is-dragging", "is-visiting");
     root.classList.remove("op-on", "op-dragging");
     slot.classList.remove("is-on");
     root.style.removeProperty("--slot-x"); root.style.removeProperty("--slot-y");
-    const card = $("#free .checklist-card"); if (card) card.classList.remove("is-scan");
+    const card = $("#checklist .checklist-card"); if (card) card.classList.remove("is-scan");
+    document.querySelectorAll("#builds .build.is-stamped").forEach(c => c.classList.remove("is-stamped"));
+    if (conBubble) conBubble.hidden = false; // the still robot shows in the hero, so its bubble does too
     closeTip(false);
     tuckBtn.hidden = showBtn.hidden = hideBtn.hidden = true;
     btn.addEventListener("click", stillClick);
