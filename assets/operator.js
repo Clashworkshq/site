@@ -10,8 +10,9 @@
 // points at a green button you hover or focus, zips to a tile you tick, sits by the question you
 // open, wanders when left alone (not while the console has focus), rolls and gives a tip when
 // pressed, can be grabbed and thrown. Hidden, it hides everywhere, and so does its console bubble.
-// Narrow screens: home is beside the headline, the dock is the nav slot and each stop is a short
-// trip to the right edge, kept clear of the phone sticky bar. The site-wide "Reduce motion"
+// Narrow screens: home is beside the headline, the dock is the nav slot (it rides the page up to the nav,
+// then hops along it into the slot, never over the headline) and each stop is a short trip to the right
+// edge, kept clear of the phone sticky bar. The site-wide "Reduce motion"
 // switch (assets/motion.js, html.rm) stops all of it, and turning it off restarts it with no
 // reload; under it the robot stays still in the hero and each section shows a still pose (CSS).
 // Needs gsap and operator-flame.js (both deferred).
@@ -334,7 +335,7 @@
   // Positions are screen coordinates of the robot box's top left; size is its width in px. Working on the
   // screen, not the page, means a mouse-wheel notch never jerks it: it trails a smoothed scroll speed instead.
   let state = "home", launchAt = 0;
-  let px = 0, py = 0, vx = 0, vy = 0, size = 112, tilted = 0;
+  let px = 0, py = 0, vx = 0, vy = 0, size = 112, tilted = 0, homeLock = false;
   let lastSY = scrollY, scrollV = 0, smT = null;
   let visit = null;   // { x, y } page target, pose, until, trip (narrow screens)
   let wander = { x: 0, y: 0, until: 0 };
@@ -417,6 +418,16 @@
     if (tucked || dragging) return;
     visit = { x: sx + scrollX, y: sy + scrollY, pose, until: performance.now() + secs * 1000, s: opts.s, follow: opts.follow };
     op.classList.add("is-visiting");
+  };
+  // narrow screens: when a trip's spot scrolls off, it blinks back to the slot (gone at once, then fades in
+  // there) instead of flying across whatever scrolled in, the hero text included
+  let blinking = false;
+  const blinkToSlot = () => {
+    if (blinking) return;
+    blinking = true;
+    gsap.set(tilt, { autoAlpha: 0 });
+    px = lane.x; py = lane.y; size = lane.s; vx = vy = 0; smT = null;
+    gsap.to(tilt, { autoAlpha: 1, duration: .25, delay: .08, onComplete: () => { blinking = false; } });
   };
   // narrow screens: a quick trip to the right edge beside an element
   const tripTo = (el, pose, secs) => {
@@ -626,7 +637,9 @@
     const now = performance.now(), dt = Math.min(.05, (now - last) / 1000); // a hidden tab never comes back to a jump
     last = now;
     const sX = scrollX, sY = scrollY;
-    const launched = sY > Math.max(24, hero.offsetHeight * .04);
+    // narrow screens ride the page in the home spot (clear of the text) until the whole robot is up at the
+    // nav, then hop sideways into the slot; flying any earlier put it over the headline scrolling up below it
+    const launched = sY > Math.max(24, wide ? hero.offsetHeight * .04 : homeBox.y + homeBox.s - NAV);
     pickStop();
 
     // the scroll speed, smoothed: it trails a little behind fast scrolling, then settles
@@ -645,11 +658,16 @@
       if (state === "home") { // take off: a crouch, a burst of thrust, then the dive down and to the right
         state = "launch"; launchAt = now; closeTip(false);
         gsap.fromTo(bob, { scaleY: .92, scaleX: 1.04 }, { scaleY: 1, scaleX: 1, duration: .4, ease: "back.out(2.2)" });
-        vx = wide ? 360 : 140; vy = 520; burst(1.4);
+        vx = wide ? 360 : 0; vy = wide ? 520 : 0; burst(1.4);
+        if (!wide && homeLock) { px = homeBox.x - sX + offX; py = homeBox.y - sY + offY; } // a flick moved the page this frame: start from where home is now
       }
       if (state === "launch" && now - launchAt > 650) state = "cruise";
       if (visit && now > visit.until) endVisit();
-      if (state === "launch") { // the swoop: aim below and right of where it took off
+      // narrow: a trip whose spot has scrolled off screen ends with a blink back to the slot
+      if (visit && !wide && (visit.y - sY < NAV - 20 || visit.y - sY > innerHeight - 40)) { endVisit(); blinkToSlot(); }
+      if (state === "launch" && !wide) { // narrow: the hop along the nav into the slot (a dive would cross the headline)
+        ts = lane.s; tx = lane.x; ty = lane.y; k = 120; c = 22;
+      } else if (state === "launch") { // the swoop: aim below and right of where it took off
         tx = homeBox.x - sX + homeBox.s * .08; ty = innerHeight * .55; ts = (homeBox.s + lane.s) / 2; k = 9; c = 4.2; // drop down first, then it crosses to its lane
       } else if (visit) {
         ts = visit.s || (wide && visit.pose === "point-left" ? lane.s * .86 : lane.s); tx = visit.x - sX; ty = visit.y - sY;
@@ -671,25 +689,30 @@
       tx += offX; ty += offY;
     }
     // the target itself eases, so a jump in where it wants to be (a new section, a resize) becomes a glide
-    if (!smT || state === "home") smT = { x: tx, y: ty };
+    if (!smT || state === "home" || (state === "launch" && !wide)) smT = { x: tx, y: ty }; // the phone hop to the slot goes at once
     else { const e = Math.min(1, dt * 6); smT.x += (tx - smT.x) * e; smT.y += (ty - smT.y) * e; }
 
     // the spring, integrated semi-implicitly, with an acceleration cap (no sudden kicks) and a speed cap
-    if (!dragging) {
+    if (!dragging && !blinking) {
       let ax = k * (smT.x - px) - c * vx, ay = k * (smT.y - py) - c * vy;
-      const am = Math.hypot(ax, ay); if (am > 5200) { ax *= 5200 / am; ay *= 5200 / am; }
+      const cap = state === "launch" && !wide ? 16000 : 5200; // the phone hop is short and quick
+      const am = Math.hypot(ax, ay); if (am > cap) { ax *= cap / am; ay *= cap / am; }
       vx += ax * dt; vy += ay * dt;
       const sp = Math.hypot(vx, vy); if (sp > 2200) { vx *= 2200 / sp; vy *= 2200 / sp; }
       px += vx * dt; py += vy * dt;
-      if (state === "home" && Math.hypot(tx - px, ty - py) < 2 && Math.hypot(vx, vy) < 40) { px = tx; py = ty; vx = vy = 0; } // locked to the hero
+      if (state === "home" && Math.hypot(tx - px, ty - py) < 2 && Math.hypot(vx, vy) < 40) { px = tx; py = ty; vx = vy = 0; homeLock = true; } // locked to the hero
+      else if (state === "home" && homeLock && !wide) { px = tx; py = ty; vx = vy = 0; } // narrow: once home it scrolls with the page, never trailing onto the text
+      if (state !== "home") homeLock = false;
     }
-    size += (ts - size) * Math.min(1, dt * (state === "launch" ? 2.5 : 4));
+    size += (ts - size) * Math.min(1, dt * (state === "launch" ? (wide ? 2.5 : 30) : 4)); // phones: shrinks faster than it drops into the slot
     // always on screen, below the nav, and with its whole art box inside the window
     if (state !== "home" && !dragging) {
-      const toSlot = !wide && !visit && state === "cruise"; // landing in the nav slot is the one time it may rise above the nav
+      const toSlot = !wide && !visit; // landing in the nav slot is the one time it may rise above the nav
       let top = toSlot ? lane.y - 2 : NAV + 6 - size * .12, bot = innerHeight - size * .85;
       // the phone sticky bar: the whole robot box stays 8 px above it while it shows (read only when not [hidden])
       if (sticky && !sticky.hidden) { const st = sticky.getBoundingClientRect(); if (st.height) bot = Math.min(bot, st.top - 8 - size); }
+      // the phone hop into the slot stays inside the nav band (the button is the top .13 to .86 of the box)
+      if (!wide && state === "launch") bot = Math.min(bot, NAV - size * .86);
       if (py < top) { py = top; vy = Math.max(vy, 0); }
       if (py > bot) { py = bot; vy = Math.min(vy, 0); }
       if (!tucked) {
