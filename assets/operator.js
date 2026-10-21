@@ -422,6 +422,7 @@
   // narrow screens: when a trip's spot scrolls off, it blinks back to the slot (gone at once, then fades in
   // there) instead of flying across whatever scrolled in, the hero text included
   let blinking = false;
+  const heroCopy = $(".hero-copy");
   const blinkToSlot = () => {
     if (blinking) return;
     blinking = true;
@@ -677,6 +678,11 @@
         ty = clamp(NAV + 8, innerHeight - ts - 8, (active ? anchorY(active.at()) : innerHeight * .55) - ts * .5) + lag;
       } else {
         ts = lane.s; tx = lane.x; ty = lane.y;
+        // on its way back to the slot (a trip over, a throw) with the hero text on screen, it blinks home instead
+        if (!blinking && Math.hypot(px - lane.x, py - lane.y) > 40 && heroCopy) {
+          const r = heroCopy.getBoundingClientRect();
+          if (r.bottom > NAV && r.top < innerHeight) blinkToSlot();
+        }
       }
       const ae = document.activeElement;
       if (ae && ae.closest && ae.closest("#picker")) wander.until = 0; // the console has focus: no idle wander
