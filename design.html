@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script>(function(d){var m;try{m=localStorage.getItem("cw-motion")}catch(e){}if(m==="reduce"||m==="paused"||(m!=="full"&&matchMedia("(prefers-reduced-motion: reduce)").matches))d.classList.add("rm")})(document.documentElement)</script>
+<title>The design brief I give AI</title>
+<meta name="description" content="The brief from the DESIGN reel: what I tell AI before it builds a website, so it doesn&#x27;t make the same purple site everyone else gets.">
+<link rel="canonical" href="https://clashworks.co/design.html">
+<meta property="og:title" content="The design brief I give AI">
+<meta property="og:description" content="The brief from the DESIGN reel: what I tell AI before it builds a website, so it doesn&#x27;t make the same purple site everyone else gets.">
+<meta property="og:url" content="https://clashworks.co/design.html">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#F5F7FA">
+<link rel="icon" href="assets/favicon-64.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<style>
+  /* self-hosted, latin subset (every character the site uses); no request to Google */
+  @font-face { font-family: "Archivo"; font-style: normal; font-weight: 500 900; font-stretch: 100%; font-display: swap; src: url(assets/fonts/archivo-latin.woff2) format("woff2"); }
+  @font-face { font-family: "Hanken Grotesk"; font-style: normal; font-weight: 400 700; font-display: swap; src: url(assets/fonts/hanken-grotesk-latin.woff2) format("woff2"); }
+</style>
+<style>
+  :root {
+    --ink: #0B1220; --ink-2: #3B4453; --ink-3: #6B7280;
+    --paper: #F5F7FA; --paper-2: #FFFFFF; --line: #E3E8EF;
+    --emerald: #10B981; --emerald-deep: #047857; --mint: #D1FAE5; --mint-2: #ECFDF5;
+    --radius: 14px; --max: 1360px;
+    --font: "Hanken Grotesk", "Segoe UI", system-ui, sans-serif;
+    --display: "Archivo", "Hanken Grotesk", "Segoe UI", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { font-family: var(--font); color: var(--ink); background: var(--paper); line-height: 1.5; font-size: 17px; overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column; }
+  main { flex: 1; }
+  a { color: inherit; }
+  :focus-visible { outline: 2px solid var(--emerald-deep); outline-offset: 3px; border-radius: 6px; }
+  .skip { position: absolute; left: -999px; top: 8px; background: var(--ink); color: #fff; padding: 8px 12px; z-index: 100; }
+  .skip:focus { left: 8px; }
+  .wrap { width: min(var(--max), calc(100% - clamp(32px, 5vw, 72px))); margin-inline: auto; }
+  h1 { font-family: var(--display); font-weight: 800; letter-spacing: -0.035em; line-height: 1.05; font-size: clamp(2rem, 1.3rem + 3vw, 3.6rem); }
+  p.lede { font-size: clamp(1.05rem, 0.95rem + 0.5vw, 1.25rem); color: var(--ink-2); max-width: 34em; margin-top: 14px; }
+
+  .nav { position: sticky; top: 0; z-index: 50; background: rgb(245 247 250 / .85); backdrop-filter: blur(14px) saturate(160%); box-shadow: 0 1px 0 var(--line); }
+  .nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 68px; gap: 12px; }
+  .brand { display: inline-flex; align-items: center; gap: 10px; font-family: var(--display); font-weight: 700; text-decoration: none; font-size: 1.05rem; letter-spacing: -0.01em; }
+  .brand img { width: 34px; height: 34px; }
+  .back {
+    display: inline-flex; align-items: center; gap: 10px; min-height: 42px; padding: 0 20px 0 16px;
+    border-radius: 999px; text-decoration: none; color: var(--ink);
+    font-family: var(--display); font-weight: 600; font-size: .8rem; letter-spacing: .12em; text-transform: uppercase;
+    background: transparent; box-shadow: inset 0 0 0 1.5px var(--ink-3);
+    transition: box-shadow .15s ease-out, background-color .15s ease-out, transform .15s ease-out;
+    white-space: nowrap;
+  }
+  .back .arrow { font-family: var(--font); font-weight: 500; font-size: 1rem; line-height: 1; transition: transform .2s ease-out; }
+  .back:hover { box-shadow: inset 0 0 0 1.5px var(--ink); background: var(--paper-2); }
+  .back:hover .arrow { transform: translateX(-3px); }
+
+  .hero { padding: clamp(36px, 6vw, 80px) 0 clamp(20px, 3vw, 36px); }
+  .hero .wrap, .tools .wrap, .next .wrap, .biz .wrap { max-width: 760px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: .85rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--emerald-deep); margin-bottom: 14px; }
+  .eyebrow::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--emerald); }
+
+  .tools .wrap { display: grid; gap: 16px; }
+  .tool { background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--radius); padding: clamp(18px, 3vw, 28px); box-shadow: 0 24px 48px -36px rgb(11 18 32 / .25); }
+  .tool-head { display: flex; align-items: center; gap: 12px; }
+  .tool-head h2 { font-family: var(--display); font-weight: 800; letter-spacing: -0.02em; font-size: clamp(1.3rem, 1.1rem + 1vw, 1.7rem); line-height: 1.1; flex: 1; min-width: 0; }
+  .num { font-family: var(--display); font-weight: 700; color: var(--ink-3); font-size: .95rem; }
+  .badge { width: 30px; height: 30px; flex: none; }
+  .tool dl { display: grid; gap: 12px; margin-top: 16px; }
+  .tool dt { font-size: .78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+  .tool dd { color: var(--ink-2); margin-top: 2px; }
+  .more { display: inline-block; margin-top: 16px; color: var(--emerald-deep); font-weight: 600; text-decoration: none; }
+  .more:hover { text-decoration: underline; }
+
+  .next { padding: clamp(28px, 4vw, 48px) 0 0; }
+  .strip { background: var(--ink); color: var(--paper); border-radius: var(--radius); padding: clamp(20px, 3vw, 30px); display: flex; flex-wrap: wrap; gap: 14px 24px; align-items: center; justify-content: space-between; }
+  .strip p { max-width: 30em; }
+  .strip strong { font-family: var(--display); font-weight: 800; font-size: 1.2rem; display: block; margin-bottom: 4px; }
+  .btn { display: inline-flex; align-items: center; min-height: 46px; padding: 0 22px; border-radius: 999px; background: var(--emerald); color: var(--ink); font-weight: 700; text-decoration: none; white-space: nowrap; }
+  .btn:hover { background: #34d399; }
+
+  .biz { padding: clamp(28px, 4vw, 48px) 0 clamp(48px, 6vw, 96px); }
+  .biz .box { border: 1.5px solid var(--emerald-deep); background: var(--mint-2); border-radius: var(--radius); padding: clamp(20px, 3vw, 30px); }
+  .biz h2 { font-family: var(--display); font-weight: 800; letter-spacing: -0.02em; font-size: clamp(1.3rem, 1.1rem + 1vw, 1.6rem); }
+  .biz p { color: var(--ink-2); margin: 8px 0 18px; max-width: 34em; }
+  .biz .btn { background: var(--ink); color: var(--paper); }
+  .biz .btn:hover { background: var(--emerald-deep); }
+
+  footer { padding: 28px 0 40px; border-top: 1px solid var(--line); }
+  footer .wrap { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; align-items: center; color: var(--ink-3); font-size: .93rem; }
+  footer ul { display: flex; gap: 18px; list-style: none; flex-wrap: wrap; }
+  footer a { text-decoration: none; color: var(--ink-2); font-weight: 500; }
+  footer a:hover { color: var(--ink); }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; } }
+  /* the same, when the visitor flips the Reduce motion switch */
+  .rm *, .rm *::before, .rm *::after { transition: none !important; }
+</style>
+<link rel="stylesheet" href="assets/liquid.css">
+
+<style>
+  pre.brief { margin-top: 14px; background: var(--ink); color: var(--paper); border-radius: 12px; padding: 18px 20px;
+    font: 500 .92rem/1.6 ui-monospace, "Cascadia Mono", Consolas, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .src { margin-top: 18px; font-size: .9rem; color: var(--ink-3); }
+  .src a { color: var(--emerald-deep); }
+  .tool ul.ticks { list-style: none; display: grid; gap: 10px; margin-top: 14px; }
+  .tool ul.ticks li { padding-left: 28px; position: relative; color: var(--ink-2); }
+  .tool ul.ticks li::before { content: ""; position: absolute; left: 0; top: .35em; width: 16px; height: 16px; border-radius: 5px; background: var(--mint); box-shadow: inset 0 0 0 2px var(--emerald); }
+</style>
+</head>
+<body>
+<a class="skip" href="#tools">Skip to the list</a>
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="index.html" aria-label="Clashworks home">
+      <img src="assets/logo.svg" alt="" width="34" height="34">
+      Clashworks
+    </a>
+    <a class="back" data-liquid="" href="index.html"><span class="arrow" aria-hidden="true">&larr;</span>Home</a>
+  </div>
+</header>
+<main>
+<section class="hero">
+  <div class="wrap">
+    <div class="eyebrow">From the DESIGN reel</div>
+    <h1>The design brief I give AI.</h1>
+    <p class="lede">When you don't tell AI anything, it picks the average: purple gradient, a vague headline, three rounded boxes. This is the brief I paste in first. Copy it and swap in your own color and fonts.</p>
+  </div>
+</section>
+<section class="tools" id="tools">
+  <div class="wrap">
+    <article class="tool">
+      <div class="tool-head"><span class="num">01</span><h2>Copy this</h2></div>
+      <pre class="brief">Design brief (read before you build anything)
+1. Accent color: #10B981. One color only. Everything else is neutral.
+2. The accent goes on what people click: buttons and links. Not on body text.
+3. Never use: purple-to-blue gradients, &quot;Build the future&quot; style headlines, three rounded cards with emoji icons, stock photos.
+4. Fonts: Archivo for headlines, Hanken Grotesk for text.
+5. The headline says what the business does and for whom, in plain words.
+6. Before you say it is done: open the site in a real browser at phone and desktop width, screenshot both, and fix anything that breaks.</pre>
+    </article>
+    <article class="tool">
+      <div class="tool-head"><span class="num">02</span><h2>Why one color</h2></div>
+      <p style="color:var(--ink-2);margin-top:12px">One accent color tells people where to look. If everything is colorful, nothing stands out, and the button you want clicked gets lost.</p>
+    </article>
+    <article class="tool">
+      <div class="tool-head"><span class="num">03</span><h2>Why the ban list</h2></div>
+      <p style="color:var(--ink-2);margin-top:12px">Those four things are what AI reaches for by default. Naming them is the fastest way to get something that doesn't look like every other AI site.</p>
+    </article>
+    <article class="tool">
+      <div class="tool-head"><span class="num">04</span><h2>Why the screenshot step</h2></div>
+      <p style="color:var(--ink-2);margin-top:12px">AI will tell you a page looks great without ever seeing it. Making it open the site at phone size and look at a screenshot catches the overlaps and cut-off text before your visitors do. I use Playwright for this, a free tool that drives a real browser.</p>
+    </article>
+
+  </div>
+</section>
+<section class="next">
+  <div class="wrap">
+    <div class="strip">
+      <p><strong>Building an AI startup from zero</strong>One build per reel, each one tested on real work first.</p>
+      <a class="btn" href="https://www.instagram.com/clashworkshq/" rel="noopener">Follow @clashworkshq</a>
+    </div>
+  </div>
+</section>
+<section class="biz">
+  <div class="wrap">
+    <div class="box">
+      <h2>Run a local business?</h2>
+      <p>The free video review shows where your website and Google listing are losing customers: missed calls, dead forms, no reviews.</p>
+      <a class="btn" href="check.html?utm_source=site&amp;utm_medium=page&amp;utm_campaign=design">Get my free video review</a>
+    </div>
+  </div>
+</section>
+</main>
+<footer>
+  <div class="wrap">
+    <div class="foot-meta"><span>&copy; 2026 Clashworks, run by Clayton Trevino. Dallas, Texas.</span><button type="button" class="rm-switch" role="switch" aria-checked="false" hidden><span class="knob" aria-hidden="true"></span>Reduce motion</button></div>
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">Who I am</a></li>
+      <li><a href="check.html">Free video review</a></li>
+      <li><a href="privacy.html">Privacy</a></li>
+      <li><a href="terms.html">Terms</a></li>
+      <li><a href="accessibility.html">Accessibility</a></li>
+      <li><a href="https://www.youtube.com/@clashworkshq">YouTube</a></li>
+      <li><a href="https://www.linkedin.com/company/clashworks">LinkedIn</a></li>
+    </ul>
+  </div>
+</footer>
+<script src="assets/liquid.js" defer></script>
+<script src="assets/motion.js" defer></script>
+</body>
+</html>
