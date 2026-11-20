@@ -1,0 +1,1685 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="A rehearsal game from A Midsummer Night's Dream, made for ENGL 2313 at SMU.">
+<title>Quince's Rehearsal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Alegreya:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+/* Layout: a moonlit map of Athens and the wood (canvas) with Quince's prompt book beside it; scenes open as a script sheet over the map. */
+:root {
+  --night: #0e1719;      /* the wood near Athens, at night */
+  --panel: #152326;      /* prompt book board */
+  --rule: #2a3c3f;
+  --moon: #d3dcd8;       /* main text, moonlight */
+  --muted: #8ea29f;
+  --lantern: #f0b64a;    /* Moonshine's lantern: the one accent */
+  --part: #d8d0bc;       /* an actor's part, paper */
+  --ink: #221d15;
+  --fright: #e07259;
+  --ok: #8fc4a2;
+  --court: #b9a7d8;
+  --scrim: #070d0ee6;
+  --display: "IM Fell English", "Iowan Old Style", Georgia, serif;
+  --prefix: "IM Fell English SC", "Iowan Old Style", Georgia, serif;
+  --body: "Alegreya", "Iowan Old Style", Georgia, serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { min-height: 100%; }
+body {
+  margin: 0;
+  background: var(--night);
+  color: var(--moon);
+  font-family: var(--body);
+  font-size: 17px;
+  line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 24px 40px;
+  background-image:
+    radial-gradient(ellipse 60% 40% at 85% -5%, #f0b64a14, transparent 70%),
+    radial-gradient(ellipse 80% 50% at 10% 110%, #1f3a3a55, transparent 70%);
+  background-attachment: fixed;
+}
+body.locked { overflow: hidden; }
+.wrap { max-width: 1180px; margin: 0 auto; }
+h1, h2, h3 { font-family: var(--display); font-weight: 400; text-wrap: balance; margin: 0; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--lantern); outline-offset: 3px; }
+
+.mast { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 24px; border-bottom: 1px solid var(--rule); padding-bottom: 12px; margin-bottom: 20px; }
+.mast h1 { font-size: 1.6rem; letter-spacing: .01em; }
+.mast h1 i { color: var(--lantern); font-style: italic; }
+.mast .sub { color: var(--muted); font-size: .9rem; }
+
+/* Title screen */
+.title { display: grid; gap: 26px; max-width: 760px; margin: 3vh auto 0; }
+.title .kicker { font-family: var(--prefix); letter-spacing: .12em; color: var(--lantern); font-size: .95rem; }
+.title h2 { font-size: clamp(2.6rem, 8vw, 4.6rem); line-height: 1.02; }
+.title h2 i { color: var(--lantern); }
+.title p { margin: 0; max-width: 62ch; }
+.epigraph { border-left: 2px solid var(--lantern); padding: 4px 0 4px 16px; font-family: var(--display); font-style: italic; font-size: 1.2rem; }
+.epigraph cite { display: block; font-family: var(--prefix); font-style: normal; font-size: .85rem; letter-spacing: .08em; color: var(--muted); margin-top: 6px; }
+.rules { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.rule-card { border: 1px solid var(--rule); padding: 12px 14px; }
+.rule-card b { font-family: var(--prefix); font-weight: 400; letter-spacing: .06em; display: block; margin-bottom: 4px; }
+.rule-card span { color: var(--muted); font-size: .92rem; }
+.rule-card.key { border-color: #f0b64a66; }
+.rule-card.key b { color: var(--lantern); }
+
+.btn { cursor: pointer; border: 1px solid var(--lantern); background: var(--lantern); color: var(--ink); padding: 11px 22px; font-family: var(--display); font-size: 1.15rem; justify-self: start; transition: transform .15s ease, box-shadow .15s ease; }
+.btn:hover { box-shadow: 0 0 24px #f0b64a55; transform: translateY(-1px); }
+.btn.ghost { background: transparent; color: var(--lantern); }
+
+/* Game */
+.game { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 24px; align-items: start; }
+@media (max-width: 860px) { .game { grid-template-columns: minmax(0, 1fr); } }
+.stage { display: grid; gap: 10px; min-width: 0; }
+.hud { display: grid; gap: 4px; min-height: 4.6em; }
+.hud .where { display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: baseline; }
+.hud .loc { font-family: var(--prefix); letter-spacing: .1em; color: var(--lantern); font-size: .92rem; }
+.hud .num { color: var(--muted); font-size: .88rem; font-variant-numeric: tabular-nums; }
+.hud .obj { margin: 0; font-family: var(--display); font-size: 1.18rem; line-height: 1.3; }
+.board { position: relative; border: 1px solid var(--rule); background: #0a1213; line-height: 0; }
+.board canvas { width: 100%; height: auto; display: block; touch-action: none; cursor: pointer; image-rendering: pixelated; }
+.toast { min-height: 1.5em; font-size: .95rem; color: var(--muted); font-style: italic; }
+.toast b { font-style: normal; font-family: var(--prefix); letter-spacing: .06em; color: var(--lantern); font-weight: 400; }
+.controls { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; }
+.keys { margin: 0; color: var(--muted); font-size: .9rem; max-width: 52ch; }
+.dpad { display: none; grid-template-columns: repeat(3, 54px); grid-template-rows: repeat(2, 48px); gap: 6px; }
+.dpad button { border: 1px solid var(--rule); background: var(--panel); color: var(--lantern); font-size: 1.2rem; cursor: pointer; touch-action: none; user-select: none; -webkit-user-select: none; }
+.dpad button:active { background: #1e3236; }
+.roam { font-size: .95rem; padding: 8px 14px; }
+.roam[aria-pressed="true"] { background: var(--lantern); color: var(--ink); }
+.dpad .up { grid-column: 2; grid-row: 1; }
+.dpad .left { grid-column: 1; grid-row: 2; }
+.dpad .down { grid-column: 2; grid-row: 2; }
+.dpad .right { grid-column: 3; grid-row: 2; }
+@media (hover: none), (max-width: 860px) { .dpad { display: grid; } }
+
+
+/* Prompt book */
+.book { border: 1px solid var(--rule); background: var(--panel); padding: 16px; display: grid; gap: 18px; }
+.book h3 { font-family: var(--prefix); font-size: .92rem; letter-spacing: .12em; color: var(--muted); }
+.meters { display: grid; gap: 12px; }
+.meter { display: grid; gap: 4px; }
+.meter .row { display: flex; justify-content: space-between; gap: 10px; font-size: .92rem; }
+.meter .row b { font-weight: 600; }
+.meter .row span { font-variant-numeric: tabular-nums; color: var(--muted); }
+.meter .hint { font-size: .78rem; color: var(--muted); }
+.bar { height: 7px; background: #0b1214; border: 1px solid var(--rule); overflow: hidden; }
+.bar i { display: block; height: 100%; transition: width .5s ease; }
+.m-script i { background: var(--ok); }
+.m-clown i { background: var(--lantern); }
+.m-fright i { background: var(--fright); }
+.props ul { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 4px; font-size: .9rem; }
+.props li { display: flex; gap: 8px; color: var(--muted); }
+.props li::before { content: "○"; color: var(--rule); }
+.props li.got { color: var(--moon); }
+.props li.got::before { content: "●"; color: var(--lantern); }
+.cap { font-size: .76rem; color: var(--muted); margin-top: 6px; }
+.goal { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; justify-content: space-between; border: 1px solid #f0b64a55; background: linear-gradient(90deg, #f0b64a17, transparent 70%); padding: 10px 14px; }
+.goal p { margin: 0; font-size: .95rem; max-width: 60ch; }
+.goal p b { font-family: var(--prefix); font-weight: 400; letter-spacing: .08em; color: var(--lantern); margin-right: 6px; }
+.acts { display: flex; flex-wrap: wrap; gap: 4px; list-style: none; margin: 0; padding: 0; font-size: .8rem; }
+.acts li { padding: 2px 8px; border: 1px solid var(--rule); color: var(--muted); white-space: nowrap; }
+.acts li.now { border-color: var(--lantern); color: var(--lantern); }
+.acts li.done { color: var(--moon); text-decoration: line-through; text-decoration-color: #8ea29f88; }
+/* Opening night */
+.opening { max-width: 760px; margin: 0 auto; display: grid; gap: 4px; }
+.opening h2 { font-size: clamp(2rem, 6vw, 3.2rem); margin-bottom: 6px; }
+.show-cues { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; margin: 8px 0 16px; }
+.cue { border: 1px solid var(--rule); padding: 6px 8px; font-size: .8rem; color: var(--muted); min-width: 0; }
+.cue b { display: block; font-family: var(--prefix); font-weight: 400; letter-spacing: .04em; color: var(--moon); font-size: .85rem; overflow-wrap: anywhere; }
+.cue.now { border-color: var(--lantern); }
+.cue.great { border-color: #8fc4a288; color: var(--ok); }
+.cue.good { color: var(--lantern); }
+.cue.miss { color: var(--fright); }
+.help { color: var(--muted); margin: 8px 0 0; }
+.meterbar { position: relative; height: 38px; background: #0b1214; border: 1px solid var(--rule); margin: 12px 0 10px; overflow: hidden; }
+.meterbar .zone { position: absolute; top: 0; bottom: 0; background: #f0b64a38; border-left: 1px solid var(--lantern); border-right: 1px solid var(--lantern); }
+.meterbar .sweet { position: absolute; top: 0; bottom: 0; background: #8fc4a25c; }
+.meterbar .fill { position: absolute; left: 0; top: 0; bottom: 0; background: #f0b64a8c; }
+.meterbar .needle { position: absolute; top: 0; bottom: 0; width: 4px; margin-left: -2px; background: var(--moon); box-shadow: 0 0 10px #d3dcd8aa; }
+.meterbar .places { position: absolute; inset: 0; display: grid; place-items: center; font-family: var(--prefix); letter-spacing: .12em; color: var(--muted); line-height: 1; }
+.cuebtn { width: 100%; justify-self: stretch; padding: 16px; font-size: 1.3rem; touch-action: none; user-select: none; -webkit-user-select: none; }
+.react { min-height: 3.4em; margin-top: 12px; font-style: italic; }
+.react b { font-style: normal; font-family: var(--prefix); color: var(--court); font-weight: 400; letter-spacing: .05em; }
+.applause { display: grid; gap: 4px; margin-top: 8px; }
+.applause .row { display: flex; justify-content: space-between; font-size: .95rem; }
+.applause .row span { font-variant-numeric: tabular-nums; color: var(--muted); }
+.m-applause i { background: var(--court); }
+.meterbar [hidden], .goal [hidden] { display: none; }
+.laurels { color: var(--lantern); letter-spacing: .2em; font-size: 1.3rem; }
+@media (max-width: 560px) { .cue { font-size: .68rem; padding: 4px; } .cue span { display: none; } }
+.plot ol { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 3px; font-size: .88rem; }
+.plot li { display: flex; gap: 8px; color: var(--muted); }
+.plot li .n { font-variant-numeric: tabular-nums; width: 3.4em; flex: none; }
+.plot li.done { color: var(--moon); text-decoration: line-through; text-decoration-color: #8ea29f88; }
+.plot li.now { color: var(--lantern); }
+@media (max-width: 860px) { .meters { grid-template-columns: repeat(3, minmax(0, 1fr)); } .meter .hint { display: none; } .book { grid-template-columns: minmax(0, 1fr); } }
+
+/* Scene sheet over the map */
+.overlay { position: fixed; inset: 0; z-index: 20; background: var(--scrim); overflow-y: auto; padding: calc(env(safe-area-inset-top, 0px) + 24px) max(16px, env(safe-area-inset-right, 0px)) calc(env(safe-area-inset-bottom, 0px) + 32px) max(16px, env(safe-area-inset-left, 0px)); }
+.sheet { max-width: 760px; margin: 0 auto; background: var(--night); border: 1px solid var(--rule); padding: clamp(18px, 4vw, 34px); animation: rise .3s ease; }
+.scene-head { display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: baseline; margin-bottom: 6px; }
+.scene-head .loc { font-family: var(--prefix); letter-spacing: .1em; color: var(--lantern); font-size: .92rem; }
+.scene-head .num { color: var(--muted); font-size: .9rem; font-variant-numeric: tabular-nums; }
+.sheet h2 { font-size: clamp(1.8rem, 4.5vw, 2.5rem); margin-bottom: 14px; }
+.setup { color: var(--muted); font-style: italic; margin: 0 0 18px; max-width: 62ch; }
+.script { display: grid; gap: 12px; margin-bottom: 24px; max-width: 64ch; }
+.speech .who { font-family: var(--prefix); letter-spacing: .06em; font-size: .95rem; color: var(--lantern); }
+.speech .who.q { color: var(--ok); }
+.speech .who.court { color: var(--court); }
+.speech p { margin: 2px 0 0; }
+.speech .verse { white-space: pre-line; font-style: italic; }
+.sd { font-style: italic; color: var(--muted); }
+.ask { font-family: var(--display); font-size: 1.3rem; margin: 0 0 12px; }
+.choices { display: grid; gap: 10px; }
+.choice { text-align: left; cursor: pointer; background: var(--part); color: var(--ink); border: none; padding: 13px 16px 13px 18px; clip-path: polygon(0 0, 100% 0, 99.2% 50%, 100% 100%, 0 100%, .8% 50%); transition: transform .15s ease, background .15s ease; }
+.choice:hover:not([disabled]) { transform: translateX(4px); background: #e6dfcd; }
+.choice .tag { font-family: var(--prefix); letter-spacing: .08em; font-size: .82rem; color: #6b5a33; display: block; }
+.choice[disabled] { cursor: default; opacity: .42; }
+.choice.picked { opacity: 1; box-shadow: inset 4px 0 0 var(--lantern); }
+.note { margin-top: 22px; border: 1px solid var(--rule); background: var(--panel); padding: 16px 18px; display: grid; gap: 10px; animation: rise .35s ease; }
+.note h3 { font-family: var(--prefix); font-size: .95rem; letter-spacing: .1em; color: var(--lantern); }
+.note p { margin: 0; max-width: 64ch; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-size: .82rem; border: 1px solid var(--rule); padding: 2px 9px; font-variant-numeric: tabular-nums; }
+.chip.up { border-color: #8fc4a266; color: var(--ok); }
+.chip.down { border-color: #e0725966; color: var(--fright); }
+.chip.role { border-color: #f0b64a88; color: var(--lantern); }
+.parts li.got::before { content: "★"; }
+@keyframes rise { from { transform: translateY(6px); opacity: .4; } to { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* Ending */
+.ending { max-width: 760px; display: grid; gap: 20px; }
+.ending .verdict { font-family: var(--prefix); letter-spacing: .12em; color: var(--lantern); }
+.ending h2 { font-size: clamp(2.2rem, 7vw, 3.8rem); line-height: 1.05; }
+.ending p { margin: 0; max-width: 64ch; }
+.final-meters { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.stats { display: flex; flex-wrap: wrap; gap: 8px 22px; color: var(--muted); font-size: .95rem; }
+.stats b { color: var(--moon); font-variant-numeric: tabular-nums; }
+.log { border-top: 1px solid var(--rule); padding-top: 14px; }
+.log h3 { font-family: var(--prefix); letter-spacing: .1em; font-size: .95rem; color: var(--muted); }
+.log ol { margin: 8px 0 0; padding-left: 1.4em; display: grid; gap: 6px; font-size: .95rem; }
+.log li span { color: var(--muted); }
+.actions { display: flex; flex-wrap: wrap; gap: 12px; }
+
+footer { max-width: 1180px; margin: 40px auto 0; border-top: 1px solid var(--rule); padding-top: 12px; color: var(--muted); font-size: .8rem; }
+/* phone: keep the map and the pad on one screen */
+@media (max-width: 560px) {
+  .acts { display: none; }
+  .goal { padding: 8px 10px; }
+  .goal p { font-size: .84rem; }
+  .hud { min-height: 0; }
+  .hud .obj { font-size: 1.02rem; }
+  .stage { gap: 8px; }
+  .controls { gap: 8px 14px; }
+  .dpad { grid-template-columns: repeat(3, 50px); grid-template-rows: repeat(2, 42px); }
+  .keys { font-size: .82rem; }
+}</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="mast">
+    <h1>Quince’s <i>Rehearsal</i></h1>
+    <span class="sub">A game from <i>A Midsummer Night’s Dream</i>, 1.2 to 5.1</span>
+  </header>
+  <main id="app"></main>
+</div>
+<div class="overlay" id="ov" hidden><div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle"></div></div>
+<footer>ENGL 2313 Creative Exercise. Lines quoted from the public-domain text of <i>A Midsummer Night’s Dream</i> (act and scene cited with each speech). Map, sprites and code drawn from scratch. Built with help from Claude, a generative AI, with the instructor’s permission for this assignment.</footer>
+
+<script>
+(function () {
+  const S = (who, text, cls) => ({ who, text, cls });
+  const SD = (text) => ({ sd: text });
+
+  const SCENES = [
+    {
+      act: "1.2", loc: "Quince’s house, Athens", title: "The Casting",
+      setup: "You have written “The most lamentable comedy and most cruel death of Pyramus and Thisbe” for the Duke’s wedding. You read out the parts. Nick Bottom the weaver is set down for Pyramus.",
+      lines: [
+        S("BOTTOM", "What is Pyramus? A lover, or a tyrant?"),
+        S("QUINCE", "A lover, that kills himself most gallantly for love.", "q"),
+        S("BOTTOM", "That will ask some tears in the true performing of it… yet my chief humour is for a tyrant. I could play Ercles rarely, or a part to tear a cat in, to make all split."),
+        SD("He begins to recite: “The raging rocks / And shivering shocks / Shall break the locks / Of prison gates…”")
+      ],
+      ask: "Bottom is mid-recital. Five actors are still waiting for their parts.",
+      choices: [
+        { tag: "Indulge", text: "Let him finish the whole Ercles speech.", fx: { clown: 15, script: -5 },
+          note: "The company loses ten minutes, and Bottom learns that interrupting works. In the text he stops on his own and says “This was lofty. Now name the rest of the players.” Even when he gives up the floor, he is the one who announces it." },
+        { tag: "Redirect", text: "Move on. Name the rest of the players.", fx: { script: 5 },
+          note: "Closest to the text. Quince never argues with the speech; he just keeps going down the cast list. Bottom then calls his own speech “lofty” and hands the scene back, as if it were his to give." },
+        { tag: "Rewrite", text: "Rewrite Pyramus as a tyrant to keep him happy.", fx: { script: -20, clown: 10 },
+          note: "You have changed the play to fit the actor. Pyramus is a lover from Ovid’s Metamorphoses (Book 4); there is no tyrant in the story. The clown has already reshaped the script before rehearsal begins." }
+      ]
+    },
+    {
+      act: "1.2", loc: "Quince’s house, Athens", title: "Thisbe",
+      setup: "You give Thisbe to Francis Flute, the bellows-mender.",
+      lines: [
+        S("FLUTE", "Nay, faith, let not me play a woman. I have a beard coming."),
+        S("QUINCE", "That’s all one. You shall play it in a mask, and you may speak as small as you will.", "q"),
+        S("BOTTOM", "And I may hide my face, let me play Thisbe too. I’ll speak in a monstrous little voice; ‘Thisne, Thisne!’ ‘Ah, Pyramus, my lover dear! thy Thisbe dear! and lady dear!’")
+      ],
+      ask: "Bottom wants both lovers.",
+      choices: [
+        { tag: "Refuse", text: "“No, no, you must play Pyramus; and, Flute, you Thisbe.”", fx: { script: 10, clown: -5 },
+          note: "This is Quince’s actual line. Note what the scene takes for granted: a man plays Thisbe in a mask, as boys and young men played every woman on Shakespeare’s stage. Women do not act on the English stage until the Restoration, the world of Behn’s The Rover." },
+        { tag: "Indulge", text: "Let Bottom play both Pyramus and Thisbe.", fx: { script: -15, clown: 20 },
+          note: "Pyramus and Thisbe spend their big scene talking to each other through a wall. With one actor, Bottom would be whispering to himself through a chink. The play has become a one-man show." },
+        { tag: "Bargain", text: "Let him do the voice once, then give it to Flute.", fx: { script: 5, clown: 5 },
+          note: "A director’s compromise: the clown gets his laugh in rehearsal, and the casting holds. Quince does exactly this, in effect: Bottom performs “Thisne, Thisne!” for the room before being told no." }
+      ]
+    },
+    {
+      act: "1.2", loc: "Quince’s house, Athens", title: "The Lion",
+      setup: "Snug the joiner is cast as the Lion.",
+      lines: [
+        S("SNUG", "Have you the lion’s part written? Pray you, if it be, give it me, for I am slow of study."),
+        S("QUINCE", "You may do it extempore, for it is nothing but roaring.", "q"),
+        S("BOTTOM", "Let me play the lion too. I will roar that I will do any man’s heart good to hear me. I will roar that I will make the Duke say ‘Let him roar again, let him roar again.’"),
+        S("QUINCE", "If you should do it too terribly, you would fright the Duchess and the ladies, that they would shriek; and that were enough to hang us all.", "q"),
+        S("BOTTOM", "I will aggravate my voice so, that I will roar you as gently as any sucking dove; I will roar you an ’twere any nightingale.")
+      ],
+      ask: "Bottom now wants a third part.",
+      choices: [
+        { tag: "Flatter", text: "“Pyramus is a sweet-faced man… a most lovely gentleman-like man. Therefore you must needs play Pyramus.”", fx: { script: 10, clown: 5 },
+          note: "Quince’s real move. He never wins an argument with Bottom; he wins with flattery. Shakespeare shows the dramatist managing the clown rather than commanding him, and Bottom gives in: “Well, I will undertake it. What beard were I best to play it in?”" },
+        { tag: "Indulge", text: "Give Bottom the Lion as well.", fx: { clown: 15, fright: 20, script: -10 },
+          note: "A gentle roar from a man who has never done anything gently. Quince already named the danger: frighten the Duchess and “that were enough to hang us all.”" },
+        { tag: "Refuse", text: "Tell him no, flatly.", fx: { script: 5, clown: -10 },
+          note: "The parts stay where you put them, and Bottom sulks. A clown who is not enjoying himself is not funny. That is the problem every company with a star clown had to solve." }
+      ]
+    },
+    {
+      act: "3.1", loc: "A wood near Athens", title: "The Sword",
+      setup: "First rehearsal, in the wood, by moonlight. The green plot is your stage; the hawthorn brake is your tiring-house. (You do not know that the Fairy Queen is asleep a few yards away.)",
+      lines: [
+        S("QUINCE", "What sayest thou, bully Bottom?", "q"),
+        S("BOTTOM", "There are things in this comedy of Pyramus and Thisbe that will never please. First, Pyramus must draw a sword to kill himself; which the ladies cannot abide. How answer you that?"),
+        S("STARVELING", "I believe we must leave the killing out, when all is done."),
+        S("BOTTOM", "Not a whit; I have a device to make all well. Write me a prologue, and let the prologue seem to say we will do no harm with our swords, and that Pyramus is not killed indeed; and for the more better assurance, tell them that I Pyramus am not Pyramus but Bottom the weaver.")
+      ],
+      ask: "Your tragedy has a death in it. What do you do with it?",
+      choices: [
+        { tag: "Bottom’s way", text: "Write the prologue: Pyramus is not Pyramus but Bottom the weaver.", fx: { clown: 10, fright: -15, script: -5 },
+          note: "Quince agrees in the text. Look at what Bottom has done: the prologue is now about him. The joke is that the mechanicals think a noble audience cannot tell a play from real life, so they keep breaking the illusion to reassure it." },
+        { tag: "Cut it", text: "Leave the killing out, as Starveling says.", fx: { script: -25, fright: -10 },
+          note: "A tragedy with no death. Aristotle’s Poetics says tragedy works through pity and fear; you have just removed the fear, and most of the pity with it." },
+        { tag: "Hold firm", text: "Keep the death exactly as written.", fx: { script: 10, fright: 15 },
+          note: "Your play survives intact, and so does the sword. Whether the ladies survive it is another question." }
+      ]
+    },
+    {
+      act: "3.1", loc: "A wood near Athens", title: "Eight and Six",
+      setup: "Now someone has to write that prologue. That someone is you.",
+      lines: [
+        S("QUINCE", "Well, we will have such a prologue; and it shall be written in eight and six.", "q"),
+        S("BOTTOM", "No, make it two more; let it be written in eight and eight.")
+      ],
+      ask: "Eight and six is ballad meter: lines of eight and six syllables, alternating. Bottom wants two more syllables in every other line, which means more for the actor to say.",
+      choices: [
+        { tag: "Hold firm", text: "Eight and six. It’s my prologue.", fx: { script: 10, clown: -5 },
+          note: "In the text, Quince never answers. Snout changes the subject to the lion and Bottom’s two syllables go unopposed. As we read it in class, the clown is proposing to take over the play one line at a time." },
+        { tag: "Indulge", text: "Fine. Eight and eight.", fx: { clown: 10, script: -5 },
+          note: "A small concession, and the kind that adds up. Every extra syllable belongs to the actor, not the author." },
+        { tag: "Overrule both", text: "Agree out loud. Write it however you like at home.", fx: { script: 10 },
+          note: "The dramatist’s revenge. In Act 5 the Prologue is in neither meter: it is written in ten-syllable pentameter lines. Shakespeare overrules Quince and Bottom both." }
+      ]
+    },
+    {
+      act: "3.1", loc: "A wood near Athens", title: "Not a Lion",
+      setup: "Snout has a worry.",
+      lines: [
+        S("SNOUT", "Will not the ladies be afeard of the lion?"),
+        S("BOTTOM", "Masters, you ought to consider with yourselves, to bring in (God shield us!) a lion among ladies is a most dreadful thing… Nay, you must name his name, and half his face must be seen through the lion’s neck; and he himself must speak through, saying thus… ‘If you think I come hither as a lion, it were pity of my life. No, I am no such thing; I am a man as other men are’: and there, indeed, let him name his name, and tell them plainly he is Snug the joiner.")
+      ],
+      ask: "How real should your lion be?",
+      choices: [
+        { tag: "Bottom’s way", text: "Snug shows half his face and tells the ladies he is Snug the joiner.", fx: { fright: -15, clown: 5, script: -5 },
+          note: "This is what happens in Act 5: “You, ladies, you, whose gentle hearts do fear…” The lion explains that he is not a lion. Bottom has now directed someone else’s part." },
+        { tag: "Snout’s way", text: "Write another prologue saying he is not a lion.", fx: { fright: -10, script: -10 },
+          note: "Snout’s suggestion. That makes two prologues for a short play, each one there to apologize for the play." },
+        { tag: "Realism", text: "Get a proper lion costume and let Snug roar.", fx: { fright: 20, script: 5 },
+          note: "A convincing lion is the one thing everyone in the company agrees is a hanging offense." }
+      ]
+    },
+    {
+      act: "3.1", loc: "A wood near Athens", title: "Moonshine",
+      setup: "Pyramus and Thisbe meet by moonlight. How do you get the moon into a palace?",
+      lines: [
+        S("QUINCE", "But there is two hard things: that is, to bring the moonlight into a chamber.", "q"),
+        S("BOTTOM", "A calendar, a calendar! Look in the almanack; find out moonshine, find out moonshine… Why, then may you leave a casement of the great chamber window, where we play, open; and the moon may shine in at the casement."),
+        S("QUINCE", "Ay; or else one must come in with a bush of thorns and a lantern, and say he comes to disfigure, or to present, the person of Moonshine.", "q")
+      ],
+      ask: "Bottom wants the real moon. You want an actor who stands for it.",
+      choices: [
+        { tag: "Bottom’s way", text: "Open the window and use the real moon.", fx: { clown: 5, script: -5 },
+          note: "Bottom wants reality itself on stage. But theater is imitation, Aristotle’s mimesis: not the thing, but a representation of it. The real moon would not even know its cue." },
+        { tag: "Quince’s way", text: "An actor with a lantern, a dog, and a bush of thorns presents Moonshine.", fx: { script: 10 },
+          note: "This is what the court sees in Act 5 (“This man, with lantern, dog, and bush of thorn, / Presenteth Moonshine”). Pure representation, so obvious that the audience heckles it, which is the comedy." },
+        { tag: "Cut it", text: "Skip the moonlight. Nobody will notice.", fx: { script: -15 },
+          note: "The lovers’ meeting by moonlight is the plot. Without it, Thisbe has no reason to be at Ninny’s tomb at night." }
+      ]
+    },
+    {
+      act: "3.1 / 4.2", loc: "A wood near Athens, then Quince’s house", title: "Translated",
+      setup: "Mid-rehearsal, Bottom steps into the brake for his cue and comes back wearing an ass’s head. Puck has been watching.",
+      lines: [
+        SD("Enter Puck and Bottom with an ass’s head. The company runs."),
+        S("SNOUT", "O Bottom, thou art changed! What do I see on thee?"),
+        S("QUINCE", "Bless thee, Bottom! bless thee! Thou art translated.", "q"),
+        SD("Days later. Bottom has not come home, and the wedding is today."),
+        S("FLUTE", "If he come not, then the play is marred. It goes not forward, doth it?")
+      ],
+      ask: "Your Pyramus is missing.",
+      choices: [
+        { tag: "Wait", text: "Wait for Bottom. The play cannot go on without him.", fx: { clown: 10 },
+          note: "Quince’s answer in the text: “You have not a man in all Athens able to discharge Pyramus but he.” For all the trouble, the clown is the one actor the company cannot replace." },
+        { tag: "Recast", text: "Give Pyramus to someone else and rehearse without him.", fx: { script: 15, clown: -20 },
+          note: "Your script survives. Your best comic actor does not. Flute, in the text: “he hath simply the best wit of any handicraft man in Athens.”" },
+        { tag: "Search", text: "Go back into the wood to find him.", fx: { fright: 10, clown: 5 },
+          note: "The wood is where Athenians lose their minds: lovers swap partners and a Fairy Queen falls for an ass. Nobody comes out of it unchanged." }
+      ]
+    },
+    {
+      act: "5.1", loc: "Theseus’s palace", title: "The Duke Heckles",
+      setup: "The wedding night. Bottom is back. The play is on, and the Duke is talking during it.",
+      lines: [
+        S("PYRAMUS (BOTTOM)", "O wicked wall, through whom I see no bliss, / Curs’d be thy stones for thus deceiving me!"),
+        S("THESEUS", "The wall, methinks, being sensible, should curse again.", "court"),
+        SD("Bottom turns away from Thisbe’s wall and toward the Duke.")
+      ],
+      ask: "Bottom is about to step out of the play to answer the Duke.",
+      choices: [
+        { tag: "Let him", text: "Let him answer the Duke.", fx: { clown: 15, fright: -5, script: -5 },
+          note: "He does, in the text: “No, in truth, sir, he should not. ‘Deceiving me’ is Thisbe’s cue: she is to enter now, and I am to spy her through the wall.” An actor stops the play to explain how the play works. That is meta-theater: a play about how plays are made." },
+        { tag: "Hold the line", text: "Signal from the wings: stay in character!", fx: { script: 10, clown: -10 },
+          note: "The fiction holds and the moment passes. But this is the funniest exchange in the scene, and the court came for a laugh." },
+        { tag: "Improvise", text: "Have Wall curse back, as the Duke suggests.", fx: { clown: 5, script: -10 },
+          note: "Now Snout is improvising too. Once the clown breaks the script, everyone else wants to." }
+      ]
+    },
+    {
+      act: "5.1", loc: "Theseus’s palace", title: "The Death of Pyramus",
+      setup: "Pyramus finds Thisbe’s bloody mantle and believes the Lion has eaten her. This is the moment the whole company was afraid of.",
+      lines: [
+        S("PYRAMUS (BOTTOM)", "Thus die I, thus, thus, thus.\nNow am I dead,\nNow am I fled;\nMy soul is in the sky.\nTongue, lose thy light!\nMoon, take thy flight!\nNow die, die, die, die, die.", "verse")
+      ],
+      ask: "Five “die”s. Bottom intends to act every one of them.",
+      choices: [
+        { tag: "Indulge", text: "Let him die all five times.", fx: { clown: 15 },
+          note: "The court is in pieces. Hippolyta, who earlier called this “the silliest stuff that ever I heard,” is laughing at a death scene. The ladies are not frightened. They are delighted." },
+        { tag: "Trim", text: "Cut it to a single “die.”", fx: { script: 10, clown: -10 },
+          note: "Tidier, and less funny. The repetition is the joke Shakespeare wrote for the clown." },
+        { tag: "Encore", text: "Let him die, then get back up to offer the court a dance.", fx: { clown: 10, script: 5 },
+          note: "This is the text. Bottom rises from the dead to correct Demetrius (“No, I assure you; the wall is down that parted their fathers”) and offers “the epilogue, or… a Bergomask dance.” The clown cannot even stay dead. And every word of it is written down." }
+      ]
+    }
+  ];
+
+  const ENDINGS = {
+    hanged: {
+      verdict: "The play ends in disaster",
+      title: "Every Mother’s Son",
+      quote: "That would hang us every mother’s son.", cite: "THE COMPANY, 1.2",
+      body: [
+        "Your lion was too real, or your death too convincing. The Duchess shrieked, and the mechanicals’ worst fear came true.",
+        "The joke in Shakespeare’s version is that this fear is absurd: no noble audience would mistake Snug the joiner for a lion. In your version, you made it true. You took imitation too far toward reality, which is the one thing Bottom and Quince both spent Act 3 trying to prevent."
+      ]
+    },
+    clown: {
+      verdict: "Bottom took over",
+      title: "The Clown’s Play",
+      quote: "And let those that play your clowns speak no more than is set down for them.", cite: "HAMLET, 3.2",
+      body: [
+        "Bottom ran the show. The court laughed, but they did not see Pyramus and Thisbe. They saw Nick Bottom.",
+        "Will Kemp, the actor who first played Bottom, was a sharer in Shakespeare’s company and famous for improvising. He left the company around 1599, and in 1600 he danced a morris from London to Norwich as a solo act. A few years later Shakespeare had Hamlet tell a company of actors to keep their clowns to the script. Your playthrough is the reason for that line."
+      ]
+    },
+    script: {
+      verdict: "Every line survived",
+      title: "Lamentable Indeed",
+      quote: "This is the silliest stuff that ever I heard.", cite: "HIPPOLYTA, 5.1",
+      body: [
+        "You kept the clown so tightly controlled that the comedy went out of him. The play was performed exactly as written, and nobody enjoyed it.",
+        "Theseus defends you anyway: “The best in this kind are but shadows; and the worst are no worse, if imagination amend them.” But a comedy that depends on the audience’s generosity has already failed. Pyramus and Thisbe only works because Bottom is in it."
+      ]
+    },
+    balance: {
+      verdict: "The best ending",
+      title: "Very Notably Discharged",
+      quote: "Marry, if he that writ it had played Pyramus, and hanged himself in Thisbe’s garter, it would have been a fine tragedy; and so it is, truly; and very notably discharged.", cite: "THESEUS, 5.1",
+      body: [
+        "You let Bottom have his moments and kept the play standing around them. The court laughed, nobody was frightened, and Quince’s play was still recognizably his.",
+        "This is the solution Shakespeare found for his own clown. Bottom breaking character, Bottom correcting the Duke, Bottom getting up from the dead to offer a dance: all of it is in the script. Shakespeare controls the improviser by writing the improvisation down. Quince is the playwright inside the play, and Shakespeare is the one who actually wins."
+      ]
+    }
+  };
+
+  /* ---------- extra beat: the bower (no choice) ---------- */
+  const BOWER = {
+    act: "3.1 / 4.1", loc: "Titania’s bower, the wood", title: "A Most Rare Vision",
+    setup: "Bottom, still wearing the ass’s head, wanders into the bower where the Fairy Queen is sleeping. Oberon’s love-juice is on her eyes.",
+    lines: [
+      S("TITANIA", "What angel wakes me from my flowery bed?", "court"),
+      SD("She falls in love with the ass-headed weaver. Days pass. Oberon lifts the spell, and Puck takes the ass’s head off."),
+      S("BOTTOM", "I have had a most rare vision. I have had a dream, past the wit of man to say what dream it was.")
+    ],
+    note: "No choice here, on purpose. Shakespeare gives the clown the strangest experience in the play and then lets him riff on it. Bottom decides Peter Quince should write it up as a ballad called “Bottom’s Dream,” “because it hath no bottom.” Even his dream needs the playwright."
+  };
+
+  const OBJ = [
+    "Find Peter Quince outside his house. He is handing out the parts.",
+    "Francis Flute is waiting by his bellows shop.",
+    "Snug the joiner wants to know if the lion’s part is written yet.",
+    "Quince is on the green plot. Start the rehearsal.",
+    "Quince has gone to the far side of the plot to write the prologue.",
+    "Snout has a worry.",
+    "Starveling is trying to work out the moonlight.",
+    "Bottom’s cue. Walk him into the hawthorn brake, the tiring-house. Puck is watching.",
+    "The wedding night. Get Bottom back to Theseus’s palace. Wall is waiting on the stage.",
+    "Thisbe’s mantle lies at Ninny’s tomb, on the stage. Time for Pyramus to die."
+  ];
+  const OBJ_TROUPE = "Lead the company out of Athens, over the bridge, and into the palace wood. Find the green plot.";
+  const PLACE_LINES = {
+    "Theseus’s palace": ["Now, fair Hippolyta, our nuptial hour / Draws on apace.", "THESEUS, 1.1"],
+    "The Duke’s oak": ["At the Duke’s oak we meet.", "QUINCE, 1.2"],
+    "The palace wood, by moonlight": ["Over hill, over dale, / Thorough bush, thorough brier…", "A FAIRY, 2.1"],
+    "The green plot, in the palace wood": ["This green plot shall be our stage, this hawthorn brake our tiring-house.", "QUINCE, 3.1"],
+    "Titania’s bower": ["I know a bank where the wild thyme blows, / Where oxlips and the nodding violet grows…", "OBERON, 2.1"],
+    "Where the lovers are lost": ["Things base and vile, holding no quantity, / Love can transpose to form and dignity.", "HELENA, 1.1"]
+  };
+  const OBJ_ROAM = "Free roam. The story is paused, so explore Athens and the wood and meet everyone. Turn free roam off to pick the story back up.";
+  const OBJ_BOWER = "Bottom is alone, and translated. Someone is asleep in the flowery bower to the northeast.";
+
+  const TARGETS = [
+    { x: 3, y: 12 }, { x: 8, y: 12 }, { x: 10, y: 11 },
+    { x: 20, y: 8 }, { x: 23, y: 10 }, { x: 17, y: 10 }, { x: 22, y: 8 },
+    { x: 20, y: 6, label: "The hawthorn brake" },
+    { x: 5, y: 2 }, { x: 3, y: 3, label: "Ninny’s tomb" }
+  ];
+
+  const PROPS = [
+    { id: "lantern", name: "A lantern", x: 0, y: 10, text: "Moonshine’s lantern. In 5.1 this one lantern is the whole moon. It also lights Bottom’s way in the wood." },
+    { id: "loam", name: "Plaster and loam", x: 11, y: 10, text: "For Wall: “let him have some plaster, or some loam, or some rough-cast about him, to signify wall” (3.1)." },
+    { id: "lion", name: "The lion’s skin", x: 23, y: 11, text: "Snug’s costume. Bottom insists half his face must show through the lion’s neck (3.1)." },
+    { id: "thorns", name: "A bush of thorns", x: 17, y: 16, text: "Moonshine’s other prop, from Quince’s plan in 3.1." },
+    { id: "dog", name: "Moonshine’s dog", x: 28, y: 16, text: "The dog has no lines and will steal the scene anyway. It follows Bottom now." }
+  ];
+
+  const SAY = {
+    quince: { athens: ["Here is the scroll of every man’s name.", "QUINCE, 1.2"], glade: ["Here’s a marvellous convenient place for our rehearsal.", "QUINCE, 3.1"], palace: ["If we offend, it is with our good will.", "PROLOGUE, 5.1"] },
+    flute: { athens: ["Nay, faith, let not me play a woman. I have a beard coming.", "FLUTE, 1.2"], glade: ["Must I speak now?", "FLUTE, 3.1"], palace: ["O wall, full often hast thou heard my moans.", "THISBE, 5.1"] },
+    snug: { athens: ["Pray you, if it be, give it me, for I am slow of study.", "SNUG, 1.2"], glade: ["Pray you, if it be, give it me, for I am slow of study.", "SNUG, 1.2"], palace: ["You, ladies, you, whose gentle hearts do fear…", "LION, 5.1"] },
+    snout: { athens: ["Here, Peter Quince.", "SNOUT, 1.2"], glade: ["By’r lakin, a parlous fear.", "SNOUT, 3.1"], palace: ["Thus have I, Wall, my part discharged so.", "WALL, 5.1"] },
+    starveling: { athens: ["Here, Peter Quince.", "STARVELING, 1.2"], glade: ["I believe we must leave the killing out, when all is done.", "STARVELING, 3.1"], palace: ["(He holds up his lantern. He is the moon.)", "STARVELING, 5.1"] },
+    puck: [["Lord, what fools these mortals be!", "PUCK, 3.2"], ["I’ll put a girdle round about the earth / In forty minutes.", "PUCK, 2.1"]],
+    puckBrake: ["What hempen home-spuns have we swaggering here, / So near the cradle of the fairy queen?", "PUCK, 3.1"],
+    oberon: [["Ill met by moonlight, proud Titania.", "OBERON, 2.1"]],
+    lysander: [["The course of true love never did run smooth.", "LYSANDER, 1.1"]],
+    hermia: [["I am amazed, and know not what to say.", "HERMIA, 3.2"]],
+    helena: [["Apollo flies and Daphne holds the chase.", "HELENA, 2.1"]],
+    demetrius: [["I love thee not, therefore pursue me not.", "DEMETRIUS, 2.1"]],
+    theseus: [["The lunatic, the lover, and the poet / Are of imagination all compact.", "THESEUS, 5.1"]],
+    hippolyta: [["This is the silliest stuff that ever I heard.", "HIPPOLYTA, 5.1"]],
+    titania: [["(The Fairy Queen is asleep. Not yet.)", "TITANIA, 2.2"]],
+    peaseblossom: [["Hail, mortal!", "PEASEBLOSSOM, 3.1"]],
+    cobweb: [["Hail!", "COBWEB, 3.1"]],
+    moth: [["Hail!", "MOTH, 3.1"]],
+    mustardseed: [["Hail!", "MUSTARDSEED, 3.1"]]
+  };
+
+  const ADLIB = {
+    base: [["Let me play the lion too!", "BOTTOM, 1.2"], ["I could play Ercles rarely!", "BOTTOM, 1.2"], ["Thisne, Thisne!", "BOTTOM, 1.2"], ["I will roar you as gently as any sucking dove.", "BOTTOM, 1.2"], ["The raging rocks / And shivering shocks…", "BOTTOM, 1.2"]],
+    ass: [["Methinks I am marvellous hairy about the face.", "BOTTOM, 4.1"], ["I have a reasonable good ear in music.", "BOTTOM, 4.1"], ["I see their knavery: this is to make an ass of me.", "BOTTOM, 3.1"]],
+    after: [["Masters, I am to discourse wonders.", "BOTTOM, 4.2"], ["I have had a most rare vision.", "BOTTOM, 4.1"], ["Let me play the lion too!", "BOTTOM, 1.2"]]
+  };
+
+  const LOOK = {
+    bottom: { skin: "#e3b48a", hair: "#5a3a22", shirt: "#c0562f", legs: "#3f3226" },
+    quince: { skin: "#dcae86", hair: "#cfc8b8", shirt: "#3f6f8f", legs: "#2c2a28", hat: "#2a2724" },
+    flute: { skin: "#ecc29c", hair: "#b0812f", shirt: "#a88f3a", legs: "#3a3a2c" },
+    snug: { skin: "#c99a72", hair: "#2a1d14", shirt: "#6d4c2f", legs: "#2e261d" },
+    snout: { skin: "#d9a985", hair: "#6b6b6b", shirt: "#5b6b70", legs: "#2c3033" },
+    starveling: { skin: "#e6bf9e", hair: "#8a6a4a", shirt: "#7a5d8f", legs: "#2f2836" },
+    puck: { skin: "#b9c79a", hair: "#c86b2a", shirt: "#3e8c4f", legs: "#2f5a37", small: true },
+    oberon: { skin: "#c7d0d8", hair: "#1c2130", shirt: "#2f3e7a", legs: "#1c2240", crown: "#d9c26a" },
+    titania: { skin: "#eadfe8", hair: "#e8d9a8", shirt: "#c9a2d8", legs: "#c9a2d8", crown: "#d9c26a", dress: true },
+    theseus: { skin: "#dcae86", hair: "#4a3020", shirt: "#7a2f3a", legs: "#3a1c20", crown: "#e0c050" },
+    hippolyta: { skin: "#c48f68", hair: "#1e1410", shirt: "#3a6f7a", legs: "#3a6f7a", crown: "#e0c050", dress: true },
+    lysander: { skin: "#e3b48a", hair: "#3a2416", shirt: "#4f7a3a", legs: "#2a3320" },
+    demetrius: { skin: "#dcae86", hair: "#1e1a16", shirt: "#8a3a5a", legs: "#33202a" },
+    hermia: { skin: "#c99a72", hair: "#1e1410", shirt: "#b8583a", legs: "#b8583a", dress: true },
+    helena: { skin: "#f0cdb0", hair: "#d9b060", shirt: "#5a8aa8", legs: "#5a8aa8", dress: true },
+    peaseblossom: { fairy: true, skin: "#f3e6d8", shirt: "#cfe6a8" },
+    cobweb: { fairy: true, skin: "#f3e6d8", shirt: "#d9dde8" },
+    moth: { fairy: true, skin: "#f3e6d8", shirt: "#c9b48a" },
+    mustardseed: { fairy: true, skin: "#f3e6d8", shirt: "#e6c95a" }
+  };
+  const NAME = { quince: "Peter Quince", flute: "Francis Flute", snug: "Snug", snout: "Tom Snout", starveling: "Robin Starveling", puck: "Puck", oberon: "Oberon", titania: "Titania", theseus: "Theseus", hippolyta: "Hippolyta", lysander: "Lysander", demetrius: "Demetrius", hermia: "Hermia", helena: "Helena", peaseblossom: "Peaseblossom", cobweb: "Cobweb", moth: "Moth", mustardseed: "Mustardseed" };
+  const MECH = ["quince", "flute", "snug", "snout", "starveling"];
+
+  const GOAL = "Get your company to the Duke’s wedding with the play still yours, then win the court’s applause on opening night.";
+  const ACTS = ["Act I · Athens, four days to the wedding", "Act II · The wood, rehearsal by moonlight", "Act III · The palace, the wedding night"];
+
+  const CUES = [
+    { id: "prologue", name: "Prologue", who: "QUINCE, as Prologue", type: "stop", speed: 0.75, line: ["If we offend, it is with our good will.", "PROLOGUE, 5.1"],
+      help: "Press when the needle is in the gold to land the opening line. Green is perfect.",
+      great: ["This fellow doth not stand upon points.", "THESEUS, 5.1"], good: ["This fellow doth not stand upon points.", "THESEUS, 5.1"], miss: ["He hath rid his prologue like a rough colt; he knows not the stop.", "LYSANDER, 5.1"] },
+    { id: "wall", name: "Wall", who: "SNOUT, as Wall", type: "stop", speed: 0.95, props: ["loam"], line: ["Thus have I, Wall, my part discharged so.", "WALL, 5.1"],
+      help: "Wall holds up his fingers for the chink. Press in the gold. (Plaster and loam make the gold wider.)",
+      great: ["It is the wittiest partition that ever I heard discourse, my lord.", "DEMETRIUS, 5.1"], good: ["It is the wittiest partition that ever I heard discourse, my lord.", "DEMETRIUS, 5.1"], miss: ["(Wall forgets which hand is the chink.)", ""] },
+    { id: "lion", name: "Lion", who: "SNUG, as Lion", type: "hold", props: ["lion"], line: ["You, ladies, you, whose gentle hearts do fear…", "LION, 5.1"],
+      help: "Hold to roar, and let go in the gold: “as gently as any sucking dove.” Hold too long and the ladies shriek.",
+      great: ["Well roared, Lion.", "DEMETRIUS, 5.1"], good: ["A very gentle beast, and of a good conscience.", "THESEUS, 5.1"], miss: ["(A squeak. Nobody notices the lion.)", ""], over: ["(Too real. The ladies shriek. Fright +15.)", ""] },
+    { id: "moon", name: "Moonshine", who: "STARVELING, as Moonshine", type: "stop", speed: 1.15, props: ["lantern", "thorns", "dog"], line: ["(He holds up the lantern, the thorns, and the dog.)", "MOONSHINE, 5.1"],
+      help: "Press in the gold. Each Moonshine prop you found (lantern, thorns, dog) makes the gold wider.",
+      great: ["Well shone, Moon.", "HIPPOLYTA, 5.1"], good: ["Well shone, Moon.", "HIPPOLYTA, 5.1"], miss: ["I am aweary of this moon: would he would change!", "HIPPOLYTA, 5.1"] },
+    { id: "die", name: "Pyramus dies", who: "BOTTOM, as Pyramus", type: "mash", line: ["Now die, die, die, die, die.", "PYRAMUS, 5.1"],
+      help: "Tap five times before the candle burns down. One tap, one “die.”",
+      great: ["With the help of a surgeon he might yet recover, and prove an ass.", "THESEUS, 5.1"], good: ["No die, but an ace, for him; for he is but one.", "DEMETRIUS, 5.1"], miss: ["(Bottom dies once and forgets the other four.)", ""] }
+  ];
+  const POINTS = { great: 20, good: 13, miss: 4 };
+
+  // Parts Bottom grabs when you give in to him, by scene and choice
+  const ROLE_BY = {
+    0: { 0: "Ercles, the tyrant (one speech)", 2: "Pyramus, rewritten as a tyrant" },
+    1: { 1: "Thisbe", 2: "Thisbe’s voice, once" },
+    2: { 1: "The Lion" },
+    3: { 0: "The prologue’s real subject" },
+    4: { 1: "Two extra syllables a line" },
+    5: { 0: "Director of the Lion" },
+    6: { 0: "Stage manager of the moon" },
+    7: { 0: "The one actor nobody can replace" },
+    8: { 0: "Critic of the Duke" },
+    9: { 0: "Five deaths", 2: "Back from the dead, with a dance" }
+  };
+  const RANKS = [[0, "Extra"], [25, "Player"], [50, "Lead"], [75, "Star"], [90, "The Whole Show"]];
+  const rank = (n) => RANKS.filter((r) => n >= r[0]).pop()[1];
+  const AUDIENCE = Object.keys(NAME).length;
+
+  const LABEL = { script: "Script", clown: "Bottom", fright: "Fright" };
+  const START = { script: 60, clown: 40, fright: 20 };
+  const T = 32, W = 30, H = 18, STEP = 150;
+  const DIRS = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  let st;
+  const app = document.getElementById("app");
+  const ov = document.getElementById("ov");
+  const sheet = document.getElementById("sheet");
+  const clamp = (n) => Math.max(0, Math.min(100, n));
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const pickOne = (a) => a[Math.floor(Math.random() * a.length)];
+
+  function fresh() {
+    return { view: "title", scene: 0, script: START.script, clown: START.clown, fright: START.fright, log: [],
+      x: 6, y: 9, face: "down", props: [], met: [], seen: [], roam: false, roles: ["Pyramus"], troupe: false, head: false, bower: false, open: null, wanders: 0, steps: 0 };
+  }
+
+  /* ---------- the map ---------- */
+  function buildMap() {
+    const m = [];
+    for (let y = 0; y < H; y++) { const r = []; for (let x = 0; x < W; x++) r.push(x < 12 ? "G" : x === 12 ? "S" : "t"); m.push(r); }
+    const rect = (x0, y0, x1, y1, c) => { for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) m[y][x] = c; };
+    const hs = (x, y) => { let h = (x * 374761393 + y * 668265263) >>> 0; h = Math.imul(h ^ (h >>> 13), 1274126177) >>> 0; return (h ^ (h >>> 16)) % 100; };
+    for (let y = 0; y < H; y++) for (let x = 13; x < W; x++) if (hs(x, y) < 42 || x === 29 || y === 0 || y === 17) m[y][x] = "T";
+    // Athens
+    rect(1, 1, 10, 6, "W"); rect(2, 2, 9, 5, "M"); rect(2, 2, 9, 3, "m"); m[6][5] = "M"; m[6][6] = "M";
+    rect(0, 8, 11, 8, "R"); rect(5, 7, 6, 12, "R"); rect(0, 12, 11, 12, "R");
+    rect(1, 13, 4, 16, "B"); rect(7, 13, 10, 16, "B"); rect(5, 13, 6, 17, "R");
+    [[1, 10], [10, 9], [2, 17], [9, 17]].forEach(([x, y]) => (m[y][x] = "O")); m[10][8] = "F";
+    m[8][12] = "D";
+    // the wood
+    rect(13, 8, 17, 8, "P");
+    rect(17, 6, 23, 6, "t"); rect(17, 7, 23, 11, "g"); rect(19, 6, 22, 6, "h");
+    rect(24, 1, 28, 4, "f"); rect(24, 5, 24, 7, "P");
+    rect(14, 12, 18, 16, "t"); rect(24, 13, 28, 16, "t");
+    rect(20, 12, 20, 14, "P"); rect(14, 14, 24, 14, "P");
+    rect(15, 15, 16, 16, "S");
+    rect(13, 4, 16, 7, "t"); rect(14, 5, 15, 6, "K");
+    [[0, 2], [0, 4], [11, 2], [11, 4]].forEach(([x, y]) => (m[y][x] = "C"));
+    return m;
+  }
+  const MAP = buildMap();
+  const WALK = new Set(["G", "R", "M", "m", "D", "t", "P", "g", "f"]);
+  const inMap = (x, y) => x >= 0 && y >= 0 && x < W && y < H;
+  const walkable = (x, y) => inMap(x, y) && WALK.has(MAP[y][x]);
+  const inRect = (x, y, x0, y0, x1, y1) => x >= x0 && x <= x1 && y >= y0 && y <= y1;
+  const inGlade = (x, y) => inRect(x, y, 17, 7, 23, 11);
+
+  function region(x, y) {
+    if (inRect(x, y, 1, 1, 10, 6)) return "Theseus’s palace";
+    if (x < 12) return "Athens";
+    if (x === 12) return "The bridge";
+    if (inGlade(x, y) || inRect(x, y, 17, 6, 23, 6)) return "The green plot, in the palace wood";
+    if (inRect(x, y, 24, 1, 28, 4)) return "Titania’s bower";
+    if (inRect(x, y, 13, 4, 16, 7)) return "The Duke’s oak";
+    if (inRect(x, y, 24, 13, 28, 16)) return "Where the lovers are lost";
+    return "The palace wood, by moonlight";
+  }
+
+  /* ---------- who is where ---------- */
+  const wand = {};
+  const WANDER = {
+    puck: { home: [15, 10], ok: (x, y) => x >= 13 && x <= 28 && !inRect(x, y, 24, 1, 28, 4) && !inRect(x, y, 17, 6, 23, 11) },
+    lysander: { home: [25, 13], ok: (x, y) => inRect(x, y, 24, 13, 28, 16) },
+    hermia: { home: [27, 13], ok: (x, y) => inRect(x, y, 24, 13, 28, 16) },
+    helena: { home: [25, 16], ok: (x, y) => inRect(x, y, 24, 13, 28, 16) },
+    demetrius: { home: [27, 15], ok: (x, y) => inRect(x, y, 24, 13, 28, 16) },
+    peaseblossom: { home: [24, 1], ok: (x, y) => inRect(x, y, 24, 1, 28, 4) && !(x === 27 && y === 2) },
+    cobweb: { home: [26, 4], ok: (x, y) => inRect(x, y, 24, 1, 28, 4) && !(x === 27 && y === 2) },
+    moth: { home: [28, 1], ok: (x, y) => inRect(x, y, 24, 1, 28, 4) && !(x === 27 && y === 2) },
+    mustardseed: { home: [25, 3], ok: (x, y) => inRect(x, y, 24, 1, 28, 4) && !(x === 27 && y === 2) }
+  };
+  // start every wanderer on an open tile inside its own area (the nearest one to its home)
+  function resetWanderers() { for (const k in WANDER) {
+    let [x, y] = WANDER[k].home, best = null;
+    for (let yy = 0; yy < H; yy++) for (let xx = 0; xx < W; xx++) {
+      if (!walkable(xx, yy) || !WANDER[k].ok(xx, yy) || MAP[yy][xx] === "P" || MAP[yy][xx] === "D") continue;
+      const d = Math.abs(xx - x) + Math.abs(yy - y);
+      if (!best || d < best[2]) best = [xx, yy, d];
+    }
+    if (best) { x = best[0]; y = best[1]; }
+    wand[k] = { x, y, fx: x, fy: y, t0: 0, face: "down" };
+  } }
+  resetWanderers();
+
+  function npcs() {
+    const L = [], s = st.scene;
+    const add = (id, x, y, line, extra) => L.push(Object.assign({ id, x, y, fx: x, fy: y, t0: 0, line }, extra || {}));
+    add("theseus", 3, s >= 8 ? 5 : 4, pickOne(SAY.theseus), { face: "up" });
+    add("hippolyta", 8, s >= 8 ? 5 : 4, pickOne(SAY.hippolyta), { face: "up" });
+    if (s <= 2) {
+      const P = { quince: [3, 12], flute: [8, 12], snug: [10, 11], snout: [6, 10], starveling: [2, 11] };
+      MECH.forEach((id) => add(id, P[id][0], P[id][1], SAY[id].athens));
+    } else if (s <= 7 && !st.troupe) {
+      const P = { quince: s === 3 ? [20, 8] : [23, 10], flute: [18, 11], snug: [21, 11], snout: [17, 10], starveling: [22, 8] };
+      MECH.forEach((id) => add(id, P[id][0], P[id][1], SAY[id].glade));
+    } else if (s >= 8) {
+      const P = { quince: [2, 2], snout: [5, 2], flute: [7, 2], starveling: [9, 2], snug: [8, 3] };
+      MECH.forEach((id) => add(id, P[id][0], P[id][1], SAY[id].palace, { face: "down" }));
+    }
+    if (s === 7) add("puck", 23, 6, SAY.puckBrake);
+    else { const w = wand.puck; L.push({ id: "puck", x: w.x, y: w.y, fx: w.fx, fy: w.fy, t0: w.t0, face: w.face, line: pickOne(SAY.puck) }); }
+    add("oberon", 14, 13, SAY.oberon[0]);
+    ["lysander", "hermia", "helena", "demetrius", "peaseblossom", "cobweb", "moth", "mustardseed"].forEach((id) => { const w = wand[id]; L.push({ id, x: w.x, y: w.y, fx: w.fx, fy: w.fy, t0: w.t0, face: w.face, line: SAY[id][0] }); });
+    if (!st.bower) add("titania", 27, 2, SAY.titania[0], { asleep: true });
+    return L;
+  }
+  function npcAt(x, y) { return npcs().find((n) => n.x === x && n.y === y); }
+  function propAt(x, y) { return PROPS.find((p) => p.x === x && p.y === y && !st.props.includes(p.id)); }
+
+  function target() {
+    if (st.view !== "map" || st.scene > 9 || st.roam) return null;
+    if (st.scene === 8 && !st.bower) return { x: 27, y: 2, label: "Titania" };
+    if (st.troupe) return null;
+    return TARGETS[st.scene];
+  }
+
+  const wanderP = () => Math.min(0.25, st.clown / 400);
+
+  /* ---------- runtime (not saved) ---------- */
+  let cv, ctx, dark, dctx, staticLayer, VW = W, VH = H, dpr = 1;
+  let mover = null, path = [], goal = null, held = [], trail = [], sinceWander = 0;
+  let bubbles = { bottom: null, npc: null };
+  let flies = [], lastWand = 0, raf = 0, guidePts = [], lastGuide = 0, poof = null;
+  function sparkle() { poof = { x: st.x, y: st.y, t0: performance.now() }; }
+  const ptr = { down: false, x: 0, y: 0, sx: 0, sy: 0, drag: false };
+  function guideGoal() { if (st.roam || st.open) return null; if (st.troupe) return { x: 19, y: 9 }; return target(); }
+  function updateGuide(now) {
+    if (now - lastGuide < 350) return;
+    lastGuide = now;
+    const g = guideGoal(); guidePts = [];
+    if (!g) return;
+    let x = st.x, y = st.y;
+    for (const d of plan(g.x, g.y).slice(0, 14)) { x += DIRS[d][0]; y += DIRS[d][1]; guidePts.push({ x, y }); }
+  }
+  // the direction from Bottom toward a tile, for steering with a held mouse or finger
+  function toward(gx, gy) {
+    const dx = gx - st.x, dy = gy - st.y;
+    if (!dx && !dy) return null;
+    const h = dx > 0 ? "right" : "left", v = dy > 0 ? "down" : "up";
+    const first = Math.abs(dx) >= Math.abs(dy) ? h : v, second = first === h ? (dy ? v : null) : (dx ? h : null);
+    const tg = target();
+    const ok = (d) => { const nx = st.x + DIRS[d][0], ny = st.y + DIRS[d][1]; return (tg && nx === tg.x && ny === tg.y) || (walkable(nx, ny) && !npcAt(nx, ny)); };
+    if (ok(first)) return first;
+    if (second && ok(second)) return second;
+    return first;
+  }
+
+  function resetTrail() { trail = []; for (let i = 0; i < 12; i++) trail.push({ x: st.x, y: st.y }); }
+
+  /* ---------- drawing: tiles ---------- */
+  function rnd(x, y, k) { let h = (x * 928371 + y * 123457 + k * 98765 + 17) >>> 0; h ^= h << 13; h >>>= 0; h ^= h >>> 17; h ^= h << 5; return ((h >>> 0) % 1000) / 1000; }
+
+  function drawTile(c, x, y, ch) {
+    const px = x * T, py = y * T;
+    const f = (col, a, b, w, h) => { c.fillStyle = col; c.fillRect(px + a, py + b, w, h); };
+    const speck = (cols, n, sz) => { for (let k = 0; k < n; k++) f(cols[k % cols.length], Math.floor(rnd(x, y, k) * (T - sz)), Math.floor(rnd(x, y, k + 40) * (T - sz)), sz, sz); };
+    const at = (xx, yy) => (inMap(xx, yy) ? MAP[yy][xx] : "");
+    const base = { G: "#6a7442", O: "#6a7442", C: "#6a7442", F: "#cbbf9f", R: "#cbbf9f", M: "#ddd6c6", m: "#7a5533", W: "#d8d0bf", B: "#b4553a", S: "#24505e", D: "#24505e", t: "#1d3529", T: "#1d3529", K: "#1d3529", P: "#4a4030", g: "#3d6a44", h: "#3d6a44", f: "#2f4433" }[ch];
+    f(base, 0, 0, T, T);
+    if (ch === "G" || ch === "O" || ch === "C") { speck(["#77814b", "#5c6638", "#8a8a52", "#7a7a46"], 8, 2); if (rnd(x, y, 70) > .8) f("#b8ad8c", Math.floor(rnd(x, y, 71) * 26) + 2, Math.floor(rnd(x, y, 72) * 26) + 2, 3, 2); }
+    if (ch === "R" || ch === "F") {
+      const off = (y % 2) * 8;
+      for (let i = 0; i < 2; i++) f("#b3a684", 0, i * 16 + 15, T, 1);
+      for (let i = -1; i < 3; i++) { f("#b3a684", i * 16 + off, 0, 1, 15); f("#b3a684", i * 16 + 8 - off + 8, 16, 1, 15); }
+      speck(["#d8cdb0", "#bdb092"], 4, 2);
+    }
+    if (ch === "M") {
+      if ((x + y) % 2) f("#cfc6b2", 0, 0, T, T);
+      f("#bdb39c", T - 1, 0, 1, T); f("#bdb39c", 0, T - 1, T, 1);
+      c.strokeStyle = "rgba(150,140,120,.35)"; c.lineWidth = 1; c.beginPath(); c.moveTo(px + rnd(x, y, 1) * T, py); c.quadraticCurveTo(px + 16, py + 16, px + rnd(x, y, 2) * T, py + T); c.stroke();
+    }
+    if (ch === "m") { for (let i = 0; i < 4; i++) f("#694829", 0, i * 8 + 7, T, 1); f("#8a6440", ((x * 7) % 3) * 8 + 4, 2, 1, 4); }
+    if (ch === "W") {
+      if (y === 6) {
+        f("#5f584c", 0, 0, T, T); f("#e9e2d2", 0, 0, T, 4); f("#e9e2d2", 0, T - 4, T, 4);
+        for (const cx0 of [4, 20]) { f("#f1ebdd", cx0, 4, 8, T - 8); f("#d2c9b5", cx0 + 2, 6, 1, T - 12); f("#d2c9b5", cx0 + 5, 6, 1, T - 12); f("#fbf7ee", cx0 - 1, 4, 10, 2); f("#fbf7ee", cx0 - 1, T - 6, 10, 2); }
+      } else if (y === 1) {
+        f("#e4ddcd", 0, 0, T, T); f("#b9b09c", 0, 20, T, 2);
+        for (let i = 0; i < T; i += 6) f("#c9c0ab", i, 23, 3, 4);
+        f("#cfc6b2", 0, T - 3, T, 3);
+      } else {
+        for (let r2 = 0; r2 < 4; r2++) { f("#bfb6a1", 0, r2 * 8 + 7, T, 1); const o = r2 % 2 ? 0 : 12; for (let b2 = o; b2 < T; b2 += 24) f("#bfb6a1", b2, r2 * 8, 1, 7); }
+      }
+    }
+    if (ch === "B") {
+      if (at(x, y + 1) !== "B") {
+        f("#ebe3d0", 0, 0, T, T); f("#c9bfa8", 0, 0, T, 3); speck(["#ddd3bd"], 4, 2);
+        if (x === 3 || x === 8) { f("#5a3a24", 10, 10, 12, 22); c.fillStyle = "#5a3a24"; c.beginPath(); c.arc(px + 16, py + 11, 6, Math.PI, 0); c.fill(); f("#c9a24a", 19, 21, 2, 2); }
+        else { f("#2e3c48", 9, 9, 14, 12); f("#3f6f9a", 4, 9, 5, 12); f("#3f6f9a", 23, 9, 5, 12); f("#ebe3d0", 15, 9, 2, 12); }
+      } else {
+        for (let r2 = 0; r2 < 4; r2++) for (let i = (r2 % 2) * 4; i < T + 4; i += 8) { c.fillStyle = "#9a4630"; c.beginPath(); c.arc(px + i, py + r2 * 8 + 8, 4, 0, Math.PI); c.fill(); }
+        if (at(x, y - 1) !== "B") f("#c96a4a", 0, 0, T, 2);
+      }
+    }
+    if (ch === "S" || ch === "D") speck(["#2f6272", "#1e4552"], 4, 2);
+    if (ch === "D") { f("#8a6a43", 0, 3, T, 26); for (let i = 0; i < T; i += 6) f("#6e5233", i, 3, 1, 26); f("#5e4529", 0, 2, T, 3); f("#5e4529", 0, 27, T, 3); }
+    if (ch === "t" || ch === "T" || ch === "K") speck(["#244232", "#182d22", "#2a4a36"], 7, 2);
+    if (ch === "t") {
+      if (rnd(x, y, 77) > .88) { // love-in-idleness, Oberon's little western flower
+        const fx = 8 + Math.floor(rnd(x, y, 78) * 16), fy = 8 + Math.floor(rnd(x, y, 79) * 16);
+        f("#7b4fa8", fx - 3, fy - 3, 3, 3); f("#7b4fa8", fx + 1, fy - 3, 3, 3); f("#e9e0f0", fx - 3, fy + 1, 3, 3); f("#e9e0f0", fx + 1, fy + 1, 3, 3); f("#e8c64a", fx - 1, fy - 1, 2, 2);
+      }
+      if (rnd(x, y, 88) > .955) { // a fairy ring
+        for (let k = 0; k < 8; k++) { const a = k / 8 * Math.PI * 2, mx = px + 16 + Math.cos(a) * 11, my = py + 16 + Math.sin(a) * 9; c.fillStyle = "#e8dcc4"; c.fillRect(mx - 1, my, 2, 3); c.fillStyle = k % 3 ? "#d8cbb0" : "#b8473a"; c.fillRect(mx - 2, my - 2, 5, 2); }
+      }
+    }
+    if (ch === "P") speck(["#574a37", "#3e3527", "#3d5a3a"], 7, 2);
+    if (ch === "g" || ch === "h") { speck(["#4a7a50", "#335c3a"], 7, 2); if (rnd(x, y, 9) > .5) f(rnd(x, y, 3) > .5 ? "#efe9dc" : "#c9a2d8", Math.floor(rnd(x, y, 5) * 26) + 2, Math.floor(rnd(x, y, 6) * 26) + 2, 2, 2); }
+    if (ch === "f") {
+      // "a bank where the wild thyme blows, where oxlips and the nodding violet grows... with sweet musk-roses and with eglantine"
+      speck(["#3b5640", "#27392b"], 6, 2);
+      for (let k = 0; k < 10; k++) f("#b39ad0", Math.floor(rnd(x, y, k) * 29), Math.floor(rnd(x, y, k + 20) * 29), 2, 2);
+      for (let k = 0; k < 3; k++) f("#efe2a0", Math.floor(rnd(x, y, k + 50) * 27), Math.floor(rnd(x, y, k + 60) * 27), 3, 3);
+      for (let k = 0; k < 3; k++) f("#6f4fb0", Math.floor(rnd(x, y, k + 70) * 27), Math.floor(rnd(x, y, k + 80) * 27), 3, 3);
+      if (rnd(x, y, 90) > .5) { const rx = Math.floor(rnd(x, y, 91) * 22) + 4, ry = Math.floor(rnd(x, y, 92) * 22) + 4; f("#e8a0b4", rx, ry, 5, 5); f("#f6d0dc", rx + 1, ry + 1, 2, 2); }
+      if (rnd(x, y, 93) > .6) { const rx = Math.floor(rnd(x, y, 94) * 22) + 4, ry = Math.floor(rnd(x, y, 95) * 22) + 4; f("#f2c2cc", rx, ry, 4, 4); }
+    }
+  }
+
+  function circle(c, x, y, r, col) { c.fillStyle = col; c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); c.fill(); }
+
+  function drawTall(c, x, y, ch) {
+    const cx = x * T + 16, cy = y * T + 16;
+    if (ch === "T") {
+      c.fillStyle = "#3b2a1c"; c.fillRect(cx - 3, cy + 4, 6, 11);
+      circle(c, cx, cy - 2, 16, "#13291b"); circle(c, cx - 4, cy - 5, 11, "#1b3825"); circle(c, cx + 5, cy - 8, 6, "#25482f");
+    } else if (ch === "O") {
+      c.fillStyle = "#5a4630"; c.fillRect(cx - 2, cy + 2, 4, 12);
+      circle(c, cx, cy - 2, 13, "#66765a"); circle(c, cx - 3, cy - 5, 8, "#7c8c6a"); circle(c, cx + 4, cy - 7, 4, "#93a27e");
+    } else if (ch === "F") {
+      circle(c, cx, cy, 14, "#a59c8a"); circle(c, cx, cy, 10, "#3f7b8c"); circle(c, cx, cy, 3, "#a59c8a");
+    } else if (ch === "C") {
+      c.fillStyle = "#4a3624"; c.fillRect(cx - 2, cy + 8, 4, 7);
+      c.fillStyle = "#22402a"; c.beginPath(); c.ellipse(cx, cy - 4, 7, 18, 0, 0, Math.PI * 2); c.fill();
+      c.fillStyle = "#2f5638"; c.beginPath(); c.ellipse(cx - 2, cy - 7, 3, 12, 0, 0, Math.PI * 2); c.fill();
+    } else if (ch === "K" && MAP[y][x - 1] !== "K" && MAP[y - 1][x] !== "K") {
+      const ox = x * T + 32, oy = y * T + 30;
+      c.fillStyle = "#4a3422"; c.fillRect(ox - 7, oy, 14, 30); c.fillRect(ox - 14, oy + 24, 28, 6);
+      circle(c, ox, oy - 6, 34, "#17321c"); circle(c, ox - 14, oy - 12, 22, "#21452a"); circle(c, ox + 14, oy - 16, 18, "#2a5432"); circle(c, ox + 2, oy - 26, 14, "#336340");
+      for (let k = 0; k < 10; k++) { c.fillStyle = "#8a6a3a"; c.fillRect(ox - 26 + Math.floor(rnd(x, y, k) * 52), oy - 34 + Math.floor(rnd(x, y, k + 9) * 44), 2, 3); }
+    } else if (ch === "h") {
+      circle(c, cx, cy + 2, 15, "#2a4626"); circle(c, cx - 5, cy - 2, 9, "#33552e");
+      for (let k = 0; k < 9; k++) { c.fillStyle = "#efe9dc"; c.fillRect(cx - 12 + Math.floor(rnd(x, y, k) * 24), cy - 10 + Math.floor(rnd(x, y, k + 9) * 22), 2, 2); }
+    }
+  }
+
+  function buildStatic() {
+    staticLayer = document.createElement("canvas");
+    staticLayer.width = W * T; staticLayer.height = H * T;
+    const c = staticLayer.getContext("2d");
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) drawTile(c, x, y, MAP[y][x]);
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) drawTall(c, x, y, MAP[y][x]);
+    // shop signs and the stage curtain
+    c.font = "11px 'IM Fell English SC', Georgia, serif"; c.textAlign = "center"; c.textBaseline = "middle";
+    const sign = (txt, x, y) => { c.fillStyle = "#3b2416"; c.fillRect(x - 34, y - 8, 68, 16); c.fillStyle = "#e9dcc0"; c.fillText(txt, x, y + 1); };
+    sign("QUINCE", 2.5 * T + 16, 13 * T + 14); sign("BELLOWS", 8.5 * T + 16, 13 * T + 14);
+    c.fillStyle = "#6b1f2a"; c.fillRect(2 * T, 2 * T, 8 * T, 5);
+    // the palace pediment
+    c.fillStyle = "#e9e2d2"; c.strokeStyle = "#b9b09c"; c.lineWidth = 2;
+    c.beginPath(); c.moveTo(2.2 * T, 1 * T + 6); c.lineTo(6 * T, 0.05 * T); c.lineTo(9.8 * T, 1 * T + 6); c.closePath(); c.fill(); c.stroke();
+    circle(c, 6 * T, 0.68 * T, 5, "#c9a24a");
+    // woodbine over the bower: "quite over-canopied with luscious woodbine"
+    for (let x = 24; x <= 28; x++) {
+      for (let k = 0; k < 7; k++) { circle(c, x * T + 2 + k * 5, T + 2 + Math.sin(k + x) * 3, 4, k % 2 ? "#2f5a34" : "#3a6a3e"); }
+      c.fillStyle = "#f3dfb0"; c.fillRect(x * T + 8, T + 2, 3, 3); c.fillStyle = "#e8a0b4"; c.fillRect(x * T + 22, T + 4, 3, 3);
+    }
+    for (let y = 1; y <= 4; y++) for (const x of [24, 28]) { const ex = x === 24 ? x * T + 1 : x * T + T - 3; for (let k = 0; k < 5; k++) circle(c, ex, y * T + 3 + k * 6, 3, k % 2 ? "#2f5a34" : "#3a6a3e"); }
+    c.font = "11px 'IM Fell English SC', Georgia, serif";
+  }
+
+  /* ---------- drawing: sprites ---------- */
+  function drawPerson(c, px, py, lk, o) {
+    o = o || {};
+    const u = 2, sm = lk.small ? 2 : 0, bob = o.bob || 0;
+    c.fillStyle = "rgba(0,0,0,.35)"; c.beginPath(); c.ellipse(px + 16, py + 29, 8, 3, 0, 0, Math.PI * 2); c.fill();
+    const r = (gx, gy, w, h, col) => { c.fillStyle = col; c.fillRect(px + gx * u, py + (gy + sm) * u + bob, w * u, h * u); };
+    if (lk.fairy) {
+      const t = performance.now() / 160, fl = reduce ? 0 : Math.sin(t + px) * 2, hov = reduce ? 0 : Math.sin(t / 3 + py) * 2;
+      const g = c.createRadialGradient(px + 16, py + 14 + hov, 0, px + 16, py + 14 + hov, 14); g.addColorStop(0, "rgba(240,236,170,.45)"); g.addColorStop(1, "rgba(240,236,170,0)");
+      c.fillStyle = g; c.fillRect(px, py, 32, 32);
+      c.fillStyle = "rgba(232,240,255,.75)"; c.beginPath(); c.ellipse(px + 11, py + 12 + hov, 5, 3 + fl, -.5, 0, Math.PI * 2); c.fill(); c.beginPath(); c.ellipse(px + 21, py + 12 + hov, 5, 3 + fl, .5, 0, Math.PI * 2); c.fill();
+      c.fillStyle = lk.shirt; c.fillRect(px + 14, py + 13 + hov, 4, 7);
+      c.fillStyle = lk.skin; c.fillRect(px + 14, py + 9 + hov, 4, 4);
+      return;
+    }
+    if (o.asleep) {
+      c.fillStyle = "#7a9a6a"; c.fillRect(px - 4, py + 12, 40, 14);
+      c.fillStyle = lk.shirt; c.fillRect(px + 8, py + 13, 24, 10);
+      c.fillStyle = lk.skin; c.fillRect(px - 2, py + 12, 11, 10);
+      c.fillStyle = lk.hair; c.fillRect(px - 3, py + 11, 4, 12);
+      c.fillStyle = lk.crown; c.fillRect(px - 4, py + 12, 2, 10);
+      return;
+    }
+    const leg = o.step ? 1 : 0;
+    if (lk.dress) { r(4, 8, 8, 5, lk.shirt); r(3, 12, 10, 3, lk.shirt); r(5, 15, 2, 1, "#2a2420"); r(9, 15, 2, 1, "#2a2420"); }
+    else { r(5, 12, 2, 3 + leg, lk.legs); r(9, 12, 2, 4 - leg, lk.legs); r(4, 7, 8, 6, lk.shirt); r(4, 12, 8, 1, "#00000033"); }
+    r(3, 8, 1, 4, lk.shirt); r(12, 8, 1, 4, lk.shirt); r(3, 12, 1, 1, lk.skin); r(12, 12, 1, 1, lk.skin);
+    if (o.ass) {
+      r(4, -2, 2, 5, "#8a8580"); r(10, -2, 2, 5, "#8a8580"); r(5, -1, 1, 3, "#c79a9a"); r(10, -1, 1, 3, "#c79a9a");
+      r(4, 2, 8, 6, "#8a8580"); r(5, 5, 6, 3, "#b8b0a6"); r(6, 7, 1, 1, "#4a4440"); r(9, 7, 1, 1, "#4a4440");
+      if (o.face !== "up") { r(5, 3, 1, 1, "#111"); r(10, 3, 1, 1, "#111"); }
+      return;
+    }
+    r(5, 2, 6, 6, lk.skin);
+    if (o.face === "up") r(5, 1, 6, 6, lk.hair);
+    else {
+      r(5, 1, 6, 2, lk.hair); r(4, 2, 1, 3, lk.hair); r(11, 2, 1, 3, lk.hair);
+      const ex = o.face === "left" ? -1 : o.face === "right" ? 1 : 0;
+      r(6 + ex, 4, 1, 1, "#1a1a1a"); r(9 + ex, 4, 1, 1, "#1a1a1a");
+    }
+    if (lk.hat) { r(4, 0, 8, 2, lk.hat); r(5, -1, 6, 1, lk.hat); }
+    if (lk.crown) { r(5, 0, 6, 1, lk.crown); r(5, -1, 1, 1, lk.crown); r(7, -1, 2, 1, lk.crown); r(10, -1, 1, 1, lk.crown); }
+  }
+
+  function drawDog(c, px, py, bob) {
+    c.fillStyle = "rgba(0,0,0,.3)"; c.beginPath(); c.ellipse(px + 16, py + 28, 9, 3, 0, 0, Math.PI * 2); c.fill();
+    const r = (x, y, w, h, col) => { c.fillStyle = col; c.fillRect(px + x, py + y + (bob || 0), w, h); };
+    r(7, 16, 16, 8, "#8a5a32"); r(20, 11, 8, 8, "#8a5a32"); r(26, 14, 4, 3, "#6a4224"); r(20, 9, 3, 5, "#5a3a1e");
+    r(24, 13, 2, 2, "#111"); r(8, 23, 3, 5, "#6a4224"); r(18, 23, 3, 5, "#6a4224"); r(4, 14, 4, 2, "#8a5a32");
+  }
+
+  function drawProp(c, p, t) {
+    const px = p.x * T, py = p.y * T, g = Math.sin(t / 300 + p.x) * 1.5;
+    if (p.id === "dog") return drawDog(c, px, py, 0);
+    c.save(); c.translate(0, g);
+    if (p.id === "lantern") { c.fillStyle = "#3a2a18"; c.fillRect(px + 11, py + 8, 10, 3); c.fillStyle = "#f0b64a"; c.fillRect(px + 11, py + 11, 10, 12); c.fillStyle = "#fff1c4"; c.fillRect(px + 14, py + 14, 4, 6); c.fillStyle = "#3a2a18"; c.fillRect(px + 11, py + 23, 10, 3); c.fillRect(px + 15, py + 4, 2, 4); }
+    if (p.id === "loam") { c.fillStyle = "#6a5a48"; c.fillRect(px + 9, py + 12, 14, 14); c.fillStyle = "#b6aa94"; c.fillRect(px + 8, py + 9, 16, 5); c.fillStyle = "#4a3e30"; c.fillRect(px + 9, py + 18, 14, 2); }
+    if (p.id === "lion") { circle(c, px + 16, py + 16, 11, "#a8642a"); circle(c, px + 16, py + 17, 7, "#d9a45a"); c.fillStyle = "#111"; c.fillRect(px + 13, py + 15, 2, 2); c.fillRect(px + 18, py + 15, 2, 2); }
+    if (p.id === "thorns") { circle(c, px + 16, py + 18, 9, "#4a3a22"); c.strokeStyle = "#7a6040"; c.lineWidth = 1.5; for (let k = 0; k < 7; k++) { const a = k * 0.9; c.beginPath(); c.moveTo(px + 16, py + 18); c.lineTo(px + 16 + Math.cos(a) * 13, py + 18 + Math.sin(a) * 11); c.stroke(); } }
+    c.restore();
+  }
+
+  /* ---------- drawing: frame ---------- */
+  function lerp(a, b, k) { return a + (b - a) * k; }
+  function moverK(now) { return mover ? Math.min(1, (now - mover.t0) / STEP) : 1; }
+  function bottomPx(now) { const k = moverK(now); return mover ? [lerp(mover.fx, st.x, k) * T, lerp(mover.fy, st.y, k) * T] : [st.x * T, st.y * T]; }
+  function npcPx(n, now) { const k = Math.min(1, (now - (n.t0 || 0)) / 260); return [lerp(n.fx, n.x, k) * T, lerp(n.fy, n.y, k) * T]; }
+
+  function wrapText(c, text, maxW) {
+    const words = text.split(" "), lines = []; let cur = "";
+    for (const w of words) { const t = cur ? cur + " " + w : w; if (c.measureText(t).width > maxW && cur) { lines.push(cur); cur = w; } else cur = t; }
+    if (cur) lines.push(cur); return lines;
+  }
+
+  function drawBubble(c, b, ax, ay, now) {
+    if (!b || now > b.until) return;
+    const vw = VW * T;
+    c.font = "15px Alegreya, Georgia, serif";
+    const lines = b.text.split(" / ").flatMap((seg) => wrapText(c, seg, Math.min(230, vw - 40)));
+    const cw = Math.max(...lines.map((l) => c.measureText(l).width));
+    c.font = "11px 'IM Fell English SC', Georgia, serif";
+    const citeW = b.cite ? c.measureText(b.cite).width : 0;
+    const w = Math.max(cw, citeW) + 18, h = lines.length * 18 + (b.cite ? 16 : 0) + 12;
+    let x = Math.round(ax - w / 2), y = Math.round(ay - h - 10);
+    x = Math.max(4, Math.min(vw - w - 4, x));
+    let below = false; if (y < 4) { y = ay + 44; below = true; }
+    c.fillStyle = b.sd ? "#152326" : "#efe7d3"; c.strokeStyle = b.sd ? "#2a3c3f" : "#221d15"; c.lineWidth = 1;
+    c.beginPath(); c.rect(x + .5, y + .5, w, h); c.fill(); c.stroke();
+    c.beginPath();
+    if (!below) { c.moveTo(ax - 5, y + h); c.lineTo(ax, y + h + 7); c.lineTo(ax + 5, y + h); }
+    else { c.moveTo(ax - 5, y); c.lineTo(ax, y - 7); c.lineTo(ax + 5, y); }
+    c.fill();
+    c.fillStyle = b.sd ? "#d3dcd8" : "#221d15"; c.font = (b.sd ? "italic " : "") + "15px Alegreya, Georgia, serif"; c.textAlign = "left"; c.textBaseline = "top";
+    lines.forEach((l, i) => c.fillText(l, x + 9, y + 7 + i * 18));
+    if (b.cite) { c.font = "11px 'IM Fell English SC', Georgia, serif"; c.fillStyle = b.sd ? "#8ea29f" : "#6b5a33"; c.fillText(b.cite, x + 9, y + 9 + lines.length * 18); }
+  }
+
+  function label(c, text, cx, y, col) {
+    c.font = "12px 'IM Fell English SC', Georgia, serif"; c.textAlign = "center"; c.textBaseline = "middle";
+    const w = c.measureText(text).width + 10;
+    c.fillStyle = "rgba(10,18,19,.82)"; c.fillRect(cx - w / 2, y - 8, w, 16);
+    c.fillStyle = col || "#d3dcd8"; c.fillText(text, cx, y + 1);
+  }
+
+  function draw(now) {
+    const [bx, by] = bottomPx(now);
+    const camX = Math.max(0, Math.min(W * T - VW * T, bx + 16 - VW * T / 2));
+    const camY = Math.max(0, Math.min(H * T - VH * T, by + 16 - VH * T / 2));
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.imageSmoothingEnabled = false;
+    ctx.clearRect(0, 0, VW * T, VH * T);
+    ctx.save(); ctx.translate(-camX, -camY);
+    ctx.drawImage(staticLayer, 0, 0);
+    // water shimmer
+    if (!reduce) { ctx.fillStyle = "rgba(170,210,220,.25)"; for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (MAP[y][x] === "S") { const o = (now / 60 + y * 9 + x * 5) % 32; ctx.fillRect(x * T + o % 28, y * T + ((y * 13 + x * 7) % 26) + 3, 4, 1); } }
+    const tg = target();
+    PROPS.forEach((p) => { if (!st.props.includes(p.id)) drawProp(ctx, p, now); });
+    // everyone, sorted by depth
+    const list = npcs().map((n) => { const [px, py] = npcPx(n, now); return { kind: "npc", n, px, py }; });
+    const k = moverK(now);
+    const followers = (st.troupe ? MECH.slice() : []).concat(st.props.includes("dog") ? ["dog"] : []);
+    followers.forEach((id, i) => {
+      const a = trail[i + 1] || trail[trail.length - 1], b = trail[i] || a;
+      list.push({ kind: id === "dog" ? "dog" : "follow", id, px: lerp(a.x, b.x, k) * T, py: lerp(a.y, b.y, k) * T });
+    });
+    list.push({ kind: "bottom", px: bx, py: by });
+    list.sort((a, b) => a.py - b.py);
+    const walkBob = mover ? -Math.abs(Math.sin(k * Math.PI)) * 2 : 0;
+    const step = mover ? (st.steps % 2 === 0) : false;
+    list.forEach((e) => {
+      if (e.kind === "bottom") drawPerson(ctx, e.px, e.py, LOOK.bottom, { face: st.face, ass: st.head, bob: walkBob, step });
+      else if (e.kind === "dog") drawDog(ctx, e.px, e.py, walkBob);
+      else if (e.kind === "follow") drawPerson(ctx, e.px, e.py, LOOK[e.id], { face: st.face, bob: walkBob, step: !step });
+      else drawPerson(ctx, e.px, e.py, LOOK[e.n.id], { face: e.n.face || "down", asleep: e.n.asleep });
+    });
+    if (tg && MAP[tg.y][tg.x] === "h") { ctx.strokeStyle = "rgba(240,182,74,.7)"; ctx.lineWidth = 2; ctx.strokeRect(tg.x * T + 2, tg.y * T + 2, T - 4, T - 4); }
+    ctx.restore();
+
+    // night
+    const night = st.scene >= 3 || st.troupe;
+    dctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    dctx.globalCompositeOperation = "source-over";
+    dctx.clearRect(0, 0, VW * T, VH * T);
+    dctx.fillStyle = "rgba(4,10,26,.58)"; dctx.fillRect(12.5 * T - camX, -camY, W * T, H * T);
+    if (night) { dctx.fillStyle = "rgba(4,10,26,.36)"; dctx.fillRect(-camX, -camY, 12.5 * T, H * T); }
+    dctx.globalCompositeOperation = "destination-out";
+    const light = (x, y, r, a) => { const g = dctx.createRadialGradient(x - camX, y - camY, 0, x - camX, y - camY, r); g.addColorStop(0, `rgba(0,0,0,${a})`); g.addColorStop(1, "rgba(0,0,0,0)"); dctx.fillStyle = g; dctx.fillRect(x - camX - r, y - camY - r, r * 2, r * 2); };
+    light(bx + 16, by + 16, st.props.includes("lantern") ? 150 : 96, 1);
+    light(20.5 * T, 9 * T, 130, .55);
+    light(26.5 * T, 2.6 * T, 95, .6);
+    if (night) light(5.5 * T, 3.8 * T, 170, .8);
+    if (tg) light(tg.x * T + 16, tg.y * T + 16, 60, .8);
+    dctx.globalCompositeOperation = "source-over";
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.drawImage(dark, 0, 0);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    // fireflies
+    flies.forEach((f) => {
+      const x = f.x + (reduce ? 0 : Math.sin(now / 1300 + f.p) * 14) - camX, y = f.y + (reduce ? 0 : Math.cos(now / 1700 + f.p * 2) * 10) - camY;
+      const a = reduce ? .6 : (Math.sin(now / 500 + f.p * 3) + 1) / 2;
+      ctx.fillStyle = `rgba(232,245,154,${.15 * a})`; ctx.beginPath(); ctx.arc(x, y, 5, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = `rgba(250,255,200,${.9 * a})`; ctx.fillRect(x - 1, y - 1, 2, 2);
+    });
+
+    // mist in the wood
+    if (!reduce) for (let i = 0; i < 7; i++) {
+      const fx = ((now / 90 + i * 170) % (18 * T)) + 12 * T - camX, fy = (1.5 + i * 2.3) * T - camY;
+      const g = ctx.createRadialGradient(fx, fy, 0, fx, fy, 90); g.addColorStop(0, "rgba(200,215,230,.08)"); g.addColorStop(1, "rgba(200,215,230,0)");
+      ctx.fillStyle = g; ctx.fillRect(fx - 90, fy - 90, 180, 180);
+    }
+    // the moon
+    if (night || st.x >= 12) {
+      const mx = VW * T - 30, my = 28, g = ctx.createRadialGradient(mx, my, 0, mx, my, 48);
+      g.addColorStop(0, "rgba(243,239,217,.35)"); g.addColorStop(1, "rgba(243,239,217,0)");
+      ctx.fillStyle = g; ctx.fillRect(mx - 48, my - 48, 96, 96);
+      circle(ctx, mx, my, 15, "#f1ecd4"); circle(ctx, mx - 5, my - 3, 3, "#dcd5b8"); circle(ctx, mx + 5, my + 5, 2, "#dcd5b8"); circle(ctx, mx + 3, my - 6, 2, "#dcd5b8");
+    }
+    // the guide: lantern dots along the way to the next scene, and an arrow at Bottom's feet
+    if (guidePts.length && !st.open) {
+      guidePts.forEach((p, i) => {
+        const a = Math.max(.15, .9 - i * .07), gx = p.x * T + 16 - camX, gy = p.y * T + 18 - camY;
+        ctx.fillStyle = `rgba(240,182,74,${a * .3})`; ctx.beginPath(); ctx.arc(gx, gy, 6, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = `rgba(250,214,140,${a})`; ctx.beginPath(); ctx.arc(gx, gy, 2.5, 0, Math.PI * 2); ctx.fill();
+      });
+      const p0 = guidePts[Math.min(1, guidePts.length - 1)];
+      const ang = Math.atan2(p0.y * T - by, p0.x * T - bx), ax = bx + 16 - camX + Math.cos(ang) * 22, ay = by + 22 - camY + Math.sin(ang) * 16;
+      ctx.save(); ctx.translate(ax, ay); ctx.rotate(ang);
+      ctx.fillStyle = "#f0b64a"; ctx.strokeStyle = "#221d15"; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(9, 0); ctx.lineTo(-5, -7); ctx.lineTo(-2, 0); ctx.lineTo(-5, 7); ctx.closePath(); ctx.stroke(); ctx.fill();
+      ctx.restore();
+    }
+
+    // place names
+    ctx.globalAlpha = .75;
+    label(ctx, "THE DUKE’S OAK", 15 * T - camX, 4.3 * T - camY, "#9fc49a");
+    label(ctx, "ATHENS", 9 * T - camX, 7.5 * T - camY, "#e9dcc0");
+    label(ctx, "THESEUS’S PALACE", 5.5 * T + 16 - camX, 1 * T + 8 - camY, "#e9dcc0");
+    label(ctx, "THE PALACE WOOD", 15.5 * T - camX, 7.2 * T - camY, "#9fc49a");
+    label(ctx, "TITANIA’S BOWER", 26.5 * T - camX, 0.7 * T - camY, "#c9a2d8");
+    ctx.globalAlpha = 1;
+
+    // target marker and names nearby
+    if (tg) {
+      const n = npcAt(tg.x, tg.y);
+      let mx = tg.x * T + 16, my = tg.y * T - 8;
+      if (n) { const [px, py] = npcPx(n, now); mx = px + 16; my = py - 8; }
+      const bobm = reduce ? 0 : Math.sin(now / 220) * 3;
+      ctx.save(); ctx.translate(mx - camX, my - camY + bobm);
+      ctx.fillStyle = "rgba(240,182,74,.25)"; ctx.beginPath(); ctx.arc(0, 0, 10, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = "#f0b64a"; ctx.beginPath(); ctx.moveTo(0, -7); ctx.lineTo(5, 0); ctx.lineTo(0, 7); ctx.lineTo(-5, 0); ctx.closePath(); ctx.fill();
+      ctx.restore();
+      label(ctx, tg.label || (n ? NAME[n.id] : ""), mx - camX, my - 20 - camY + bobm, "#f0b64a");
+    }
+    npcs().forEach((n) => {
+      if (tg && n.x === tg.x && n.y === tg.y) return;
+      if (Math.abs(n.x - st.x) + Math.abs(n.y - st.y) <= 2) { const [px, py] = npcPx(n, now); label(ctx, NAME[n.id], px + 16 - camX, py - 6 - camY); }
+    });
+
+    // speech
+    if (bubbles.npc && now <= bubbles.npc.until) {
+      const n = npcs().find((q) => q.id === bubbles.npc.id);
+      if (n) { const [px, py] = npcPx(n, now); drawBubble(ctx, bubbles.npc, px + 16 - camX, py - camY, now); }
+    }
+    if (poof && now - poof.t0 < 1400) {
+      const k = (now - poof.t0) / 1400, cx = poof.x * T + 16 - camX, cy = poof.y * T + 14 - camY;
+      for (let i = 0; i < 18; i++) {
+        const a = i / 18 * Math.PI * 2 + k * 2, r = 6 + k * 34, sx = cx + Math.cos(a) * r, sy = cy + Math.sin(a) * r * .8;
+        ctx.fillStyle = `rgba(${i % 2 ? "240,182,74" : "232,220,255"},${1 - k})`;
+        ctx.fillRect(sx - 2, sy - 2, 4, 4); ctx.fillRect(sx - 5, sy - .5, 10, 1); ctx.fillRect(sx - .5, sy - 5, 1, 10);
+      }
+      const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, 40); g.addColorStop(0, `rgba(240,236,190,${.55 * (1 - k)})`); g.addColorStop(1, "rgba(240,236,190,0)");
+      ctx.fillStyle = g; ctx.fillRect(cx - 40, cy - 40, 80, 80);
+    }
+    drawBubble(ctx, bubbles.bottom, bx + 16 - camX, by - camY, now);
+  }
+
+  /* ---------- movement ---------- */
+  function say(who, line, ms, extra) { bubbles[who] = Object.assign({ text: line[0], cite: line[1], until: performance.now() + (ms || 2600) }, extra || {}); if (line[0].startsWith("(")) bubbles[who].sd = true; }
+  let toastAt = 0;
+  function toast(html) { const el = document.getElementById("toast"); if (el) el.innerHTML = html; toastAt = performance.now(); }
+
+  // raise Bottom's spotlight and report a new rank
+  function spot(n) {
+    const before = rank(st.clown); st.clown = clamp(st.clown + n); const after = rank(st.clown);
+    return before !== after ? ` <b>Spotlight rank: ${esc(after)}!</b>` : "";
+  }
+  function free(x, y) { return walkable(x, y) && !npcAt(x, y) && !(x === st.x && y === st.y); }
+
+  function adlibs() { return st.head ? ADLIB.ass : st.bower ? ADLIB.after : ADLIB.base; }
+
+  const OPP = { up: "down", down: "up", left: "right", right: "left" };
+  let prankUntil = 0;
+  function tryStep(d, now, byHand) {
+    if (byHand && now < prankUntil) d = OPP[d];
+    let [dx, dy] = DIRS[d];
+    let face = d, wandered = false;
+    sinceWander++;
+    if (sinceWander > 5 && Math.random() < wanderP()) {
+      const alts = Object.keys(DIRS).filter((k) => k !== d && free(st.x + DIRS[k][0], st.y + DIRS[k][1]));
+      sinceWander = 0; st.wanders++; wandered = true;
+      say("bottom", pickOne(adlibs()), 2200);
+      toast(`<b>Off his mark.</b> Bottom ignored your blocking. (At ${st.clown} spotlight he wanders about ${Math.round(wanderP() * 100)}% of the time.)`);
+      if (!alts.length) { path = []; return; }
+      face = pickOne(alts); [dx, dy] = DIRS[face];
+    }
+    st.face = face;
+    const nx = st.x + dx, ny = st.y + dy, tg = target();
+    if (tg && nx === tg.x && ny === tg.y) {
+      path = []; goal = null; held = [];
+      if (walkable(nx, ny) && !npcAt(nx, ny)) moveTo(nx, ny, now);
+      openTarget();
+      return;
+    }
+    const n = npcAt(nx, ny);
+    if (n) {
+      path = []; goal = null; say("npc", n.line, 3200, { id: n.id });
+      if (!st.met.includes(n.id)) {
+        st.met.push(n.id);
+        const up = spot(1);
+        toast(`<b>New audience.</b> Bottom performed for ${esc(NAME[n.id])}. Spotlight +1 (${st.met.length} of ${AUDIENCE} met).${up}`);
+        refreshBook();
+      }
+      if (n.id === "puck" && st.scene !== 7) { prankUntil = now + 7000; held = []; toast("<b>Puck’s prank.</b> He squeezed a flower on Bottom’s eyes. Your directions are reversed for a few seconds."); }
+      return;
+    }
+    if (!walkable(nx, ny)) { path = []; goal = null; return; }
+    moveTo(nx, ny, now);
+    if (wandered && goal) path = plan(goal.x, goal.y);
+  }
+
+  function moveTo(nx, ny, now) {
+    trail.unshift({ x: st.x, y: st.y }); trail.length = 12;
+    mover = { fx: st.x, fy: st.y, t0: now };
+    st.x = nx; st.y = ny; st.steps++;
+  }
+
+  function arrived() {
+    const p = propAt(st.x, st.y);
+    if (p) {
+      st.props.push(p.id); st.script = clamp(st.script + 3);
+      toast(`<b>${esc(p.name)}</b> for Quince’s prop list (Script +3). ${esc(p.text)}`);
+      refreshBook();
+    }
+    if (st.troupe && inGlade(st.x, st.y)) {
+      st.troupe = false;
+      say("npc", ["Here’s a marvellous convenient place for our rehearsal.", "QUINCE, 3.1"], 3400, { id: "quince" });
+      toast("<b>The company takes its places.</b> This green plot is the stage; the hawthorn brake is the tiring-house.");
+      refreshHud();
+    }
+    const r = region(st.x, st.y), el = document.getElementById("hudLoc");
+    if (PLACE_LINES[r] && !st.seen.includes(r) && !p && performance.now() - toastAt > 2500) {
+      st.seen.push(r);
+      const [q, cite] = PLACE_LINES[r];
+      if (!p) toast(`<b>${esc(r)}.</b> “${esc(q.replace(" / ", " "))}” (${esc(cite)})`);
+    }
+    if (el && el.textContent !== r) el.textContent = r;
+  }
+
+  function plan(gx, gy) {
+    const tg = target();
+    const passable = (x, y) => walkable(x, y) && !npcAt(x, y);
+    const key = (x, y) => y * W + x;
+    const prev = new Map([[key(st.x, st.y), null]]);
+    const q = [[st.x, st.y]];
+    while (q.length) {
+      const [x, y] = q.shift();
+      for (const d in DIRS) { const nx = x + DIRS[d][0], ny = y + DIRS[d][1], k2 = key(nx, ny); if (!prev.has(k2) && passable(nx, ny)) { prev.set(k2, [x, y, d]); q.push([nx, ny]); } }
+    }
+    const build = (x, y) => { const out = []; let k2 = key(x, y); while (prev.get(k2)) { const [px, py, d] = prev.get(k2); out.unshift(d); k2 = key(px, py); } return out; };
+    if (prev.has(key(gx, gy))) return build(gx, gy);
+    // the goal is blocked (a person, a tree, the brake): walk next to it, then step into it
+    let best = null;
+    for (const d in DIRS) {
+      const ax = gx - DIRS[d][0], ay = gy - DIRS[d][1];
+      if (prev.has(key(ax, ay))) { const p = build(ax, ay); if (!best || p.length < best.length) best = p.concat([d]); }
+    }
+    return best || [];
+  }
+
+  function updateWanderers(now) {
+    if (now - lastWand < 850) return;
+    lastWand = now;
+    for (const id in wand) {
+      if (id === "puck" && st.scene === 7) continue;
+      if (Math.random() < .45) continue;
+      const w = wand[id], d = pickOne(Object.keys(DIRS)), nx = w.x + DIRS[d][0], ny = w.y + DIRS[d][1];
+      const tg = target();
+      if (!WANDER[id].ok(nx, ny) || !walkable(nx, ny) || (nx === st.x && ny === st.y)) continue;
+      if (MAP[ny][nx] === "P" || MAP[ny][nx] === "D") continue;
+      if (tg && nx === tg.x && ny === tg.y) continue;
+      if (npcs().some((n) => n.x === nx && n.y === ny)) continue;
+      if (PROPS.some((p) => p.x === nx && p.y === ny && !st.props.includes(p.id))) continue;
+      w.fx = w.x; w.fy = w.y; w.x = nx; w.y = ny; w.t0 = now; w.face = d;
+    }
+  }
+
+  function loop(now) {
+    raf = requestAnimationFrame(loop);
+    if (st.view !== "map" || !cv) return;
+    if (mover && now - mover.t0 >= STEP) { mover = null; arrived(); }
+    if (!mover && !st.open) {
+      const follow = ptr.down && ptr.drag ? toward(ptr.x, ptr.y) : null;
+      const byHand = held.length > 0 || !!follow;
+      const d = held.length ? held[held.length - 1] : follow ? follow : path.length ? path.shift() : null;
+      if (d) tryStep(d, now, byHand);
+    }
+    updateWanderers(now);
+    updateGuide(now);
+    draw(now);
+  }
+
+  /* ---------- views ---------- */
+  function meterHTML(key, name, hint) {
+    return `<div class="meter m-${key}">
+      <div class="row"><b>${name}</b><span>${st[key]}</span></div>
+      <div class="bar"><i style="width:${st[key]}%"></i></div>
+      ${hint ? `<div class="hint">${hint}</div>` : ""}
+    </div>`;
+  }
+
+  function bookHTML() {
+    const plot = SCENES.map((s, i) => `<li class="${i < st.scene ? "done" : i === st.scene ? "now" : ""}"><span class="n">${s.act.split(" ")[0]}</span><span>${esc(s.title)}</span></li>`).join("");
+    const props = PROPS.map((p) => `<li class="${st.props.includes(p.id) ? "got" : ""}">${esc(p.name)}</li>`).join("");
+    return `<h3>Quince’s prompt book</h3>
+      <div class="meters">
+        ${meterHTML("script", "Your script", "How much of the play is still yours")}
+        ${meterHTML("clown", `Bottom’s spotlight · ${rank(st.clown)}`, `Rises when he gets his way or finds a new audience. He ignores your directions about ${Math.round(wanderP() * 100)}% of the time`)}
+        ${meterHTML("fright", "Fright the ladies", "At the top: “enough to hang us all”")}
+      </div>
+      <div class="props parts"><h3>Bottom’s parts, ${st.roles.length}</h3><ul>${st.roles.map((r) => `<li class="got">${esc(r)}</li>`).join("")}</ul>
+        <div class="cap">Audience met: ${st.met.length} of ${AUDIENCE}. Walk into people to perform for them.</div></div>
+      <div class="props"><h3>Prop list, ${st.props.length} of ${PROPS.length}</h3><ul>${props}</ul>
+        <div class="cap">Companies kept written prop lists. Henslowe’s include “One caldron for the Jew.” Each prop found: Script +3.</div></div>
+      <div class="plot"><h3>The plot</h3><ol>${plot}</ol>
+        <div class="cap">Elizabethan companies hung a “plot” backstage: a sheet listing each scene’s entrances.</div></div>`;
+  }
+  function refreshBook() { const b = document.getElementById("book"); if (b) b.innerHTML = bookHTML(); }
+  function actIdx() { if (st.scene <= 2 && !st.troupe) return 0; if (st.scene >= 9 || (st.scene === 8 && st.bower)) return 2; return 1; }
+  function refreshHud() {
+    const g = document.getElementById("goalTxt"), a = document.getElementById("acts");
+    if (g) { g.textContent = GOAL; const k = actIdx(); a.innerHTML = ACTS.map((t, i) => `<li class="${i < k ? "done" : i === k ? "now" : ""}">${esc(t)}</li>`).join(""); }
+    const o = document.getElementById("hudObj"), n = document.getElementById("hudNum"), l = document.getElementById("hudLoc");
+    if (!o) return;
+    const s = st.scene;
+    const rb = document.getElementById("roamBtn");
+    if (rb) { rb.textContent = st.roam ? "Free roam: on" : "Free roam: off"; rb.setAttribute("aria-pressed", String(!!st.roam)); }
+    o.textContent = st.roam ? OBJ_ROAM : st.troupe ? OBJ_TROUPE : (s === 8 && !st.bower) ? OBJ_BOWER : OBJ[Math.min(s, 9)];
+    n.textContent = `Next: scene ${Math.min(s + 1, 10)} of 10 · ${SCENES[Math.min(s, 9)].act}`;
+    l.textContent = region(st.x, st.y);
+  }
+
+  function titleView() {
+    stopGame();
+    app.innerHTML = `<section class="title">
+      <span class="kicker">A rehearsal game in ten scenes</span>
+      <h2>You wrote the play.<br><i>Bottom is in it.</i></h2>
+      <p>You are Peter Quince, carpenter and playwright, staging “Pyramus and Thisbe” for Duke Theseus’s wedding. Your lead actor, Nick Bottom the weaver, wants every part, every line, and every laugh. Walk him from Athens into the palace wood and back. At each lantern a scene opens, and you decide how Quince handles him.</p>
+      <p><b style="color:var(--lantern);font-family:var(--prefix);font-weight:400;letter-spacing:.06em">Your goal:</b> get the company to the Duke’s wedding with the play still yours, then win the court’s applause on opening night by hitting every actor’s cue.</p>
+      <div class="epigraph">“And let those that play your clowns speak no more than is set down for them.”<cite>HAMLET, 3.2</cite></div>
+      <div class="rules">
+        <div class="rule-card key"><b>Direct Bottom</b><span>Arrow keys or WASD, or click where you want him to go, or hold the mouse and he follows it. Lantern dots guide you, and free roam lets you just explore.</span></div>
+        <div class="rule-card"><b>He is the clown</b><span>Bottom grabs parts and spotlight every time he gets his way or finds a new audience. The bigger his spotlight, the more often he ignores your directions.</span></div>
+        <div class="rule-card"><b>Opening night</b><span>The finale is live. Hit five cues in front of the court. Props you found make the cues easier.</span></div>
+        <div class="rule-card"><b>Fright the ladies</b><span>Too real a lion and “that were enough to hang us all.”</span></div>
+      </div>
+      <button class="btn" id="begin">Call the company</button>
+    </section>`;
+    document.getElementById("begin").onclick = () => { st.view = "map"; render(); };
+  }
+
+  function gameView() {
+    if (!document.getElementById("cv")) {
+      app.innerHTML = `<div class="game">
+        <section class="stage" aria-label="Map of Athens and the wood">
+          <div class="goal"><p><b>Goal</b><span id="goalTxt"></span></p><ol class="acts" id="acts"></ol></div>
+          <div class="hud"><div class="where"><span class="loc" id="hudLoc"></span><span class="num" id="hudNum"></span></div><p class="obj" id="hudObj"></p></div>
+          <div class="board"><canvas id="cv" aria-label="Game map. Use arrow keys to move Bottom."></canvas></div>
+          <div class="toast" id="toast" role="status">Follow the lantern. Walk into anyone to hear what they say.</div>
+          <div class="controls">
+            <div class="dpad" aria-label="Direction pad">
+              <button class="up" data-d="up" aria-label="Up">▲</button><button class="left" data-d="left" aria-label="Left">◀</button>
+              <button class="down" data-d="down" aria-label="Down">▼</button><button class="right" data-d="right" aria-label="Right">▶</button>
+            </div>
+            <p class="keys">Arrow keys or WASD. Or click a spot to walk there, or hold the mouse down and Bottom follows it. The lantern dots point the way to the next scene.</p>
+            <button class="btn ghost roam" id="roamBtn" aria-pressed="false">Free roam: off</button>
+          </div>
+        </section>
+        <aside class="book" id="book" aria-label="Quince's prompt book"></aside>
+      </div>`;
+      setupCanvas();
+    }
+    refreshHud(); refreshBook();
+    if (st.open) openSheet(); else closeSheet();
+  }
+
+  function setupCanvas() {
+    cv = document.getElementById("cv"); ctx = cv.getContext("2d");
+    dark = document.createElement("canvas"); dctx = dark.getContext("2d");
+    buildStatic();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (cv) buildStatic(); });
+    flies = []; for (let i = 0; i < 18; i++) flies.push({ x: (13.5 + rnd(i, 1, 2) * 15) * T, y: (1 + rnd(i, 3, 4) * 15.5) * T, p: i * 1.7 });
+    resetTrail();
+    sizeCanvas();
+    const tileAt = (e) => {
+      const r = cv.getBoundingClientRect();
+      const [bx, by] = bottomPx(performance.now());
+      const camX = Math.max(0, Math.min(W * T - VW * T, bx + 16 - VW * T / 2));
+      const camY = Math.max(0, Math.min(H * T - VH * T, by + 16 - VH * T / 2));
+      return [Math.floor(((e.clientX - r.left) / r.width * VW * T + camX) / T), Math.floor(((e.clientY - r.top) / r.height * VH * T + camY) / T)];
+    };
+    cv.addEventListener("pointerdown", (e) => {
+      if (st.open) return;
+      const [gx, gy] = tileAt(e);
+      if (!inMap(gx, gy)) return;
+      Object.assign(ptr, { down: true, drag: false, x: gx, y: gy, sx: e.clientX, sy: e.clientY });
+      try { cv.setPointerCapture(e.pointerId); } catch (err) { /* optional */ }
+      goal = { x: gx, y: gy }; path = plan(gx, gy);
+    });
+    cv.addEventListener("pointermove", (e) => {
+      if (!ptr.down) return;
+      const [gx, gy] = tileAt(e); ptr.x = gx; ptr.y = gy;
+      if (!ptr.drag && Math.hypot(e.clientX - ptr.sx, e.clientY - ptr.sy) > 14) ptr.drag = true;
+      if (ptr.drag) { path = []; goal = null; }
+    });
+    const ptrUp = () => { ptr.down = false; ptr.drag = false; };
+    cv.addEventListener("pointerup", ptrUp); cv.addEventListener("pointercancel", ptrUp);
+    const rb = document.getElementById("roamBtn");
+    rb.onclick = () => {
+      st.roam = !st.roam; path = []; goal = null;
+      toast(st.roam ? "<b>Free roam on.</b> The story is paused. Wander anywhere and meet everyone." : "<b>Free roam off.</b> Back to the story. Follow the lantern dots.");
+      refreshHud();
+    };
+    document.querySelectorAll(".dpad button").forEach((b) => {
+      const d = b.dataset.d;
+      const on = (e) => { e.preventDefault(); path = []; goal = null; held = held.filter((x) => x !== d).concat(d); };
+      const off = () => { held = held.filter((x) => x !== d); };
+      b.addEventListener("pointerdown", on); b.addEventListener("pointerup", off); b.addEventListener("pointerleave", off); b.addEventListener("pointercancel", off);
+    });
+    if (!raf) raf = requestAnimationFrame(loop);
+  }
+
+  function sizeCanvas() {
+    if (!cv) return;
+    const wpx = cv.parentElement.clientWidth || 700;
+    if (wpx >= 600) { VW = W; VH = H; } else { VW = 12; VH = 11; }
+    dpr = Math.min(2, window.devicePixelRatio || 1);
+    cv.width = VW * T * dpr; cv.height = VH * T * dpr;
+    dark.width = cv.width; dark.height = cv.height;
+  }
+
+  function stopGame() { cv = null; held = []; path = []; goal = null; mover = null; }
+
+  /* ---------- scene sheet ---------- */
+  function openTarget() {
+    const tg = target(), who = tg && npcAt(tg.x, tg.y);
+    if (who && !st.met.includes(who.id)) st.met.push(who.id);
+    st.open = { kind: st.scene === 8 && !st.bower ? "bower" : "scene", picked: null };
+    openSheet();
+  }
+
+  function linesHTML(lines) {
+    return lines.map((l) => l.sd
+      ? `<div class="sd">[${esc(l.sd)}]</div>`
+      : `<div class="speech"><div class="who ${l.cls === "q" ? "q" : l.cls === "court" ? "court" : ""}">${esc(l.who)}.</div><p class="${l.cls === "verse" ? "verse" : ""}">${esc(l.text)}</p></div>`).join("");
+  }
+
+  function openSheet() {
+    held = []; path = [];
+    document.body.classList.add("locked");
+    ov.hidden = false;
+    if (st.open.kind === "bower") {
+      const b = BOWER;
+      sheet.innerHTML = `<div class="scene-head"><span class="loc">${esc(b.loc)}</span><span class="num">Between scenes 8 and 9 · ${esc(b.act)}</span></div>
+        <h2 id="sheetTitle">${esc(b.title)}</h2>
+        <p class="setup">${esc(b.setup)}</p>
+        <div class="script">${linesHTML(b.lines)}</div>
+        <div class="note"><h3>In the text</h3><p>${esc(b.note)}</p><button class="btn" id="next">Back to Athens</button></div>`;
+      const nx = document.getElementById("next"); nx.onclick = () => finishBower(); nx.focus({ preventScroll: true });
+      ov.scrollTop = 0;
+      return;
+    }
+    const s = SCENES[st.scene], picked = st.open.picked;
+    const choices = s.choices.map((c, i) => `<button class="choice${picked === i ? " picked" : ""}" data-i="${i}" ${picked !== null ? "disabled" : ""}><span class="tag">${esc(c.tag)}</span>${esc(c.text)}</button>`).join("");
+    let note = "";
+    if (picked !== null) {
+      const c = s.choices[picked];
+      const chips = Object.entries(c.fx).map(([k, v]) => {
+        const good = k === "script" ? v > 0 : k === "fright" ? v < 0 : null;
+        return `<span class="chip ${good === null ? "" : good ? "up" : "down"}">${LABEL[k]} ${v > 0 ? "+" : ""}${v}</span>`;
+      }).join("");
+      const last = st.scene === SCENES.length - 1;
+      const extra = (st.open.role ? `<span class="chip role">Bottom claims a new part: ${esc(st.open.role)}</span>` : "") + (st.open.rank ? `<span class="chip role">Spotlight rank: ${esc(st.open.rank)}</span>` : "");
+      note = `<div class="note" role="status"><h3>In the text</h3><p>${esc(c.note)}</p><div class="chips">${chips}${extra}</div>
+        <button class="btn" id="next">${last ? "Raise the curtain" : "Back to the map"}</button></div>`;
+    }
+    sheet.innerHTML = `<div class="scene-head"><span class="loc">${esc(s.loc)}</span><span class="num">Scene ${st.scene + 1} of ${SCENES.length} · ${esc(s.act)}</span></div>
+      <h2 id="sheetTitle">${esc(s.title)}</h2>
+      <p class="setup">${esc(s.setup)}</p>
+      <div class="script">${linesHTML(s.lines)}</div>
+      <p class="ask">${esc(s.ask)}</p>
+      <div class="choices">${choices}</div>
+      ${note}`;
+    sheet.querySelectorAll(".choice").forEach((b) => (b.onclick = () => pick(+b.dataset.i)));
+    const nx = document.getElementById("next");
+    if (nx) { nx.onclick = () => finishScene(); nx.focus({ preventScroll: true }); nx.scrollIntoView({ block: "nearest", behavior: reduce ? "auto" : "smooth" }); }
+    else { ov.scrollTop = 0; const f = sheet.querySelector(".choice"); if (f) f.focus({ preventScroll: true }); }
+  }
+
+  function closeSheet() { ov.hidden = true; sheet.innerHTML = ""; document.body.classList.remove("locked"); }
+
+  function pick(i) {
+    if (!st.open || st.open.picked !== null) return;
+    const s = SCENES[st.scene], c = s.choices[i];
+    const before = rank(st.clown);
+    for (const [k, v] of Object.entries(c.fx)) st[k] = clamp(st[k] + v);
+    st.open.picked = i;
+    const role = (ROLE_BY[st.scene] || {})[i];
+    st.open.role = role && !st.roles.includes(role) ? role : null;
+    if (st.open.role) st.roles.push(role);
+    st.open.rank = rank(st.clown) !== before ? rank(st.clown) : null;
+    st.log.push({ title: s.title, act: s.act, tag: c.tag, text: c.text });
+    openSheet(); refreshBook();
+  }
+
+  function finishScene() {
+    const i = st.scene;
+    st.open = null; st.scene = i + 1;
+    if (i === SCENES.length - 1) { closeSheet(); st.view = "show"; st.show = { i: 0, res: [] }; render(); window.scrollTo({ top: 0 }); return; }
+    closeSheet();
+    if (i === 2) { st.troupe = true; resetTrail(); toast("<b>Quince:</b> “Meet me in the palace wood, a mile without the town, by moonlight.” (1.2) The company falls in behind Bottom."); }
+    else if (i === 7) { st.head = true; sparkle(); say("bottom", ["I see their knavery: this is to make an ass of me.", "BOTTOM, 3.1"], 4200); toast("<b>Quince:</b> “O monstrous! O strange! We are haunted. Pray, masters! fly, masters! Help!” (3.1) The company runs back to Athens."); }
+    else if (i === 8) toast("<b>Wall</b> holds up his fingers for the chink. Thisbe’s mantle is waiting at Ninny’s tomb.");
+    else toast("Follow the lantern to the next scene.");
+    refreshHud(); refreshBook();
+    cv && cv.focus && document.activeElement && document.activeElement.blur();
+  }
+
+  function finishBower() {
+    st.open = null; st.bower = true; st.head = false;
+    if (!st.roles.includes("Titania’s beloved")) st.roles.push("Titania’s beloved");
+    closeSheet();
+    sparkle(); say("bottom", ["Methought I was… there is no man can tell what.", "BOTTOM, 4.1"], 4200);
+    toast("<b>Oberon:</b> “Gentle Puck, take this transformed scalp / From off the head of this Athenian swain.” (4.1) Bottom wakes with his own head back on. New part claimed: Titania’s beloved. The wedding is tonight.");
+    refreshHud(); refreshBook();
+  }
+
+  function whichEnding() {
+    if (st.fright >= 70) return "hanged";
+    if (st.clown >= 75 && st.script < 45) return "clown";
+    if (st.script >= 75 && st.clown < 35) return "script";
+    return "balance";
+  }
+
+  function endingView() {
+    stopGame();
+    const e = ENDINGS[whichEnding()];
+    const log = st.log.map((l) => `<li><b>${esc(l.title)}</b> <span>(${esc(l.act)})</span>: ${esc(l.tag)}. ${esc(l.text)}</li>`).join("");
+    app.innerHTML = `<section class="ending">
+      <span class="verdict">${esc(e.verdict)}</span>
+      <h2>${esc(e.title)}</h2>
+      <div class="epigraph">“${esc(e.quote)}”<cite>${esc(e.cite)}</cite></div>
+      ${e.body.map((p) => `<p>${esc(p)}</p>`).join("")}
+      <div class="final-meters">${meterHTML("script", "Your script")}${meterHTML("clown", "Bottom’s spotlight")}${meterHTML("fright", "Fright the ladies")}</div>
+      ${applauseHTML()}
+      <div class="stats"><span>Props found <b>${st.props.length} of ${PROPS.length}</b></span><span>Parts Bottom claimed <b>${st.roles.length}</b></span><span>Spotlight rank <b>${esc(rank(st.clown))}</b></span><span>Audience met <b>${st.met.length} of ${AUDIENCE}</b></span><span>Times Bottom wandered off his mark <b>${st.wanders}</b></span><span>Steps walked <b>${st.steps}</b></span></div>
+      <div class="log"><h3>Your prompt book</h3><ol>${log}</ol></div>
+      <p style="color:var(--muted)">There are four endings. Only one of them is the play Shakespeare wrote.</p>
+      <div class="actions"><button class="btn" id="again">Rehearse again</button></div>
+    </section>`;
+    document.getElementById("again").onclick = () => { resetWanderers(); st = fresh(); render(); window.scrollTo({ top: 0 }); };
+  }
+
+  /* ---------- opening night ---------- */
+  let run = null, audio = null;
+  function beep(freq, dur, type) {
+    try {
+      audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+      const o = audio.createOscillator(), g = audio.createGain();
+      o.type = type || "triangle"; o.frequency.value = freq; g.gain.value = 0.08;
+      g.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + dur);
+      o.connect(g); g.connect(audio.destination); o.start(); o.stop(audio.currentTime + dur);
+    } catch (e) { /* sound is optional */ }
+  }
+  function applauseNow() { return (st.show ? st.show.res : []).reduce((a, r) => a + POINTS[r], 0); }
+  function laurels(n) { const k = n >= 85 ? 4 : n >= 65 ? 3 : n >= 40 ? 2 : 1; return "✦".repeat(k) + "✧".repeat(4 - k); }
+  function applauseWord(n) { return n >= 85 ? "The court is on its feet." : n >= 65 ? "Warm applause, and a call for the Bergomask." : n >= 40 ? "Polite applause from the nobles." : "The court talks through the dance."; }
+  function applauseHTML() {
+    if (!st.show) return "";
+    const n = applauseNow();
+    return `<div class="applause"><div class="row"><b>Opening night applause</b><span>${n}%</span></div><div class="bar m-applause"><i style="width:${n}%"></i></div><div><span class="laurels">${laurels(n)}</span> ${esc(applauseWord(n))}</div></div>`;
+  }
+  function cueBonus(c) {
+    let b = st.script >= 70 ? 0.04 : 0;
+    (c.props || []).forEach((p) => { if (st.props.includes(p)) b += c.id === "moon" ? 0.05 : 0.08; });
+    return b;
+  }
+
+  function showView() {
+    stopGame();
+    const sh = st.show, c = CUES[Math.min(sh.i, CUES.length - 1)];
+    const chips = CUES.map((q, i) => { const r = sh.res[i]; return `<div class="cue ${r || (i === sh.i ? "now" : "")}"><b>${esc(q.name)}</b><span>${r ? r === "great" ? "Perfect" : r === "good" ? "Good" : "Missed" : i === sh.i ? "Now" : "Waiting"}</span></div>`; }).join("");
+    app.innerHTML = `<section class="opening">
+      <div class="scene-head"><span class="loc">Theseus’s palace, the wedding night</span><span class="num">Opening night · cue ${Math.min(sh.i + 1, 5)} of 5 · 5.1</span></div>
+      <h2>Opening Night</h2>
+      <p class="setup">This is what the whole game was walking toward. The court is seated, the candles are lit. Hit each cue to win their applause.</p>
+      <div class="show-cues">${chips}</div>
+      <div class="speech"><div class="who">${esc(c.who)}.</div><p>${esc(c.line[0].startsWith("(") ? c.line[0] : "“" + c.line[0] + "”")}</p></div>
+      <p class="help">${esc(c.help)}</p>
+      <div class="meterbar" id="mb"><div class="zone" id="mbZone" hidden></div><div class="sweet" id="mbSweet" hidden></div><div class="fill" id="mbFill" hidden></div><div class="needle" id="mbNeedle" hidden></div><div class="places" id="mbPlaces">Places…</div></div>
+      <button class="btn cuebtn" id="cueBtn">${c.type === "hold" ? "Hold to roar (Space)" : c.type === "mash" ? "Die! (Space)" : "Cue! (Space)"}</button>
+      <div class="react" id="react" role="status"></div>
+      <div id="applause">${applauseHTML()}</div>
+    </section>`;
+    setupCue();
+    const btn = document.getElementById("cueBtn");
+    btn.addEventListener("pointerdown", (e) => { e.preventDefault(); if (run && run.phase === "done") nextCue(); else press(); });
+    btn.addEventListener("pointerup", release); btn.addEventListener("pointerleave", release); btn.addEventListener("pointercancel", release);
+    btn.addEventListener("keydown", (e) => { if (e.key === "Enter") e.preventDefault(); });
+  }
+
+  function setupCue() {
+    const c = CUES[st.show.i], b = cueBonus(c);
+    run = { id: Math.random(), c, phase: "wait", t0: performance.now() + 700 + Math.random() * 700, pos: 0, fill: 0, taps: 0, holding: false, hs: 0, off: Math.random() * 2 };
+    const z = document.getElementById("mbZone"), sw = document.getElementById("mbSweet");
+    if (c.type === "stop" || c.type === "hold") {
+      const w = Math.min(0.42, 0.17 + b);
+      const lo = c.type === "hold" ? 0.45 : 0.12 + Math.random() * (0.76 - w);
+      run.zone = [lo, lo + w]; run.sweet = [lo + w * 0.3, lo + w * 0.7];
+      z.style.left = lo * 100 + "%"; z.style.width = w * 100 + "%";
+      sw.style.left = run.sweet[0] * 100 + "%"; sw.style.width = w * 40 + "%";
+    }
+    const myId = run.id;
+    requestAnimationFrame((t) => showTick(t, myId));
+  }
+
+  function showTick(now, myId) {
+    if (st.view !== "show" || !run || run.id !== myId || !document.getElementById("mb")) return;
+    const c = run.c, needle = document.getElementById("mbNeedle"), fill = document.getElementById("mbFill");
+    if (run.phase === "wait" && now >= run.t0) {
+      run.phase = "run"; run.t0 = now; beep(520, 0.12);
+      document.getElementById("mbPlaces").hidden = true;
+      if (c.type !== "mash") { document.getElementById("mbZone").hidden = false; document.getElementById("mbSweet").hidden = false; }
+      if (c.type === "stop") needle.hidden = false; else fill.hidden = false;
+    }
+    if (run.phase === "run") {
+      if (c.type === "stop") {
+        const t = ((now - run.t0) / 1000 * c.speed + run.off) % 2;
+        run.pos = t < 1 ? t : 2 - t; needle.style.left = run.pos * 100 + "%";
+      } else if (c.type === "hold") {
+        if (run.holding) { run.fill = Math.min(1, (now - run.hs) / 2000); if (run.fill >= 1) release(); }
+        fill.style.width = run.fill * 100 + "%";
+      } else if (c.type === "mash") {
+        const left = 1 - (now - run.t0) / 3200; fill.style.width = Math.max(0, left) * 100 + "%";
+        if (left <= 0) grade(run.taps >= 5 ? "great" : run.taps >= 3 ? "good" : "miss");
+      }
+    }
+    if (run.phase !== "done") requestAnimationFrame((t) => showTick(t, myId));
+  }
+
+  function press() {
+    if (!run || run.phase !== "run") return;
+    const c = run.c;
+    if (c.type === "stop") {
+      const p = run.pos;
+      grade(p >= run.sweet[0] && p <= run.sweet[1] ? "great" : p >= run.zone[0] && p <= run.zone[1] ? "good" : "miss");
+    } else if (c.type === "hold") {
+      if (!run.holding) { run.holding = true; run.hs = performance.now(); beep(110, 0.5, "sawtooth"); }
+    } else if (c.type === "mash") {
+      run.taps++; beep(300 - run.taps * 30, 0.1);
+      document.getElementById("react").innerHTML = `<b>Pyramus.</b> ${"Die, ".repeat(run.taps).replace(/, $/, "!")}`;
+      if (run.taps >= 5) grade("great");
+    }
+  }
+
+  function release() {
+    if (!run || run.phase !== "run" || run.c.type !== "hold" || !run.holding) return;
+    run.holding = false;
+    const f = run.fill;
+    if (f > run.zone[1]) { st.fright = clamp(st.fright + 15); grade("miss", run.c.over); }
+    else grade(f >= run.sweet[0] && f <= run.sweet[1] ? "great" : f >= run.zone[0] ? "good" : "miss");
+  }
+
+  function grade(g, lineOverride) {
+    run.phase = "done";
+    st.show.res[st.show.i] = g;
+    const c = run.c, line = lineOverride || c[g];
+    beep(g === "great" ? 880 : g === "good" ? 660 : 200, g === "miss" ? 0.35 : 0.2);
+    const who = line[1] ? line[1].split(",")[0] : "";
+    document.getElementById("react").innerHTML = line[0].startsWith("(") ? esc(line[0]) : `<b>${esc(who)}.</b> “${esc(line[0])}”`;
+    document.getElementById("applause").innerHTML = applauseHTML();
+    const last = st.show.i >= CUES.length - 1;
+    const btn = document.getElementById("cueBtn");
+    btn.textContent = last ? "Hear the Duke’s verdict" : "Next cue";
+    document.querySelectorAll(".cue")[st.show.i].className = "cue " + g;
+  }
+
+  function nextCue() {
+    st.show.i++;
+    if (st.show.i >= CUES.length) { st.view = "end"; run = null; render(); window.scrollTo({ top: 0 }); return; }
+    showView();
+  }
+
+  window.addEventListener("keydown", (e) => {
+    if (st.view !== "show" || (e.key !== " " && e.key !== "Enter")) return;
+    e.preventDefault(); if (e.repeat) return;
+    if (run && run.phase === "done") nextCue(); else press();
+  });
+  window.addEventListener("keyup", (e) => { if (st.view === "show" && (e.key === " " || e.key === "Enter")) release(); });
+
+  function render() {
+    if (st.view === "title") { closeSheet(); titleView(); }
+    else if (st.view === "end") { closeSheet(); endingView(); }
+    else if (st.view === "show") { closeSheet(); showView(); }
+    else gameView();
+  }
+
+  /* ---------- keyboard ---------- */
+  const KEYMAP = { ArrowUp: "up", ArrowDown: "down", ArrowLeft: "left", ArrowRight: "right", w: "up", s: "down", a: "left", d: "right", W: "up", S: "down", A: "left", D: "right" };
+  window.addEventListener("keydown", (e) => {
+    if (st.view !== "map" || st.open || e.metaKey || e.ctrlKey || e.altKey) return;
+    const d = KEYMAP[e.key]; if (!d) return;
+    e.preventDefault(); path = []; goal = null;
+    if (!held.includes(d)) held.push(d);
+  });
+  window.addEventListener("keyup", (e) => { const d = KEYMAP[e.key]; if (d) held = held.filter((x) => x !== d); });
+  window.addEventListener("blur", () => { held = []; });
+  window.addEventListener("resize", () => sizeCanvas());
+
+  // read-only hook for testing in a browser console
+  window.__qr = { get st() { return st; }, MAP, PROPS, TARGETS, plan, walkable, npcs, target, render, start: (d) => start(d), wand };
+
+  function start(saved) {
+    st = (saved && saved.st && saved.st.view) ? Object.assign(fresh(), saved.st) : fresh();
+    render();
+  }
+  window.claude?.hot?.snapshot?.(() => ({ st }));
+  window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+})();
+</script>
+</body>
+</html>
